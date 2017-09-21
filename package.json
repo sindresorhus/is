@@ -1,0 +1,49 @@
+{
+	"name": "@sindresorhus/is",
+	"version": "0.0.0",
+	"description": "Type check values: `is.string('🦄') //=> true`",
+	"license": "MIT",
+	"repository": "sindresorhus/is",
+	"author": {
+		"name": "Sindre Sorhus",
+		"email": "sindresorhus@gmail.com",
+		"url": "sindresorhus.com"
+	},
+	"publishConfig": {
+		"access": "public"
+	},
+	"engines": {
+		"node": ">=4"
+	},
+	"scripts": {
+		"test": "xo && ava"
+	},
+	"files": [
+		"index.js"
+	],
+	"keywords": [
+		"type",
+		"types",
+		"is",
+		"check",
+		"checking",
+		"validate",
+		"validation",
+		"utility",
+		"util",
+		"typeof",
+		"instanceof",
+		"object",
+		"assert",
+		"assertion",
+		"test",
+		"kind",
+		"primitive",
+		"verify",
+		"compare"
+	],
+	"devDependencies": {
+		"ava": "*",
+		"xo": "*"
+	}
+}
