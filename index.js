@@ -148,4 +148,6 @@ const typedArrayTypes = new Set([
 ]);
 is.typedArray = x => typedArrayTypes.has(getObjectType(x));
 
+is.withinRange = (x, arr) => (x > Math.min.apply(Math, arr)) && (x < Math.max.apply(Math, arr));
+
 module.exports = is;
