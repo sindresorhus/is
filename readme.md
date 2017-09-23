@@ -117,6 +117,11 @@ An object is plain if it's created by either `{}`, `new Object()`, or `Object.cr
 ##### .iterable(value)
 ##### .typedArray(value)
 
+##### .inRange(value, range)
+
+Check to see if the value is within a given range, for example `is.inRange(3, [0, 5])`.
+The range supplied can be an array of any size, though this will only check for
+the minimum and maximum values in it.
 
 ## FAQ
 
