@@ -294,9 +294,9 @@ test('is.typedArray', t => {
 	t.false(m.typedArray({}));
 });
 
-test('is.withinRange', t => {
+test('is.inRange', t => {
 	const x = 3;
 	const arr = [0, 5];
 
-	t.true(m.withinRange(x, arr));
+	t.true(m.inRange(x, arr));
 });
