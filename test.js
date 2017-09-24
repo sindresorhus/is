@@ -287,6 +287,18 @@ test('is.iterable', t => {
 	t.false(m.iterable({}));
 });
 
+test('is.class', t => {
+	class Foo {}
+	const classDeclarations = [
+		Foo,
+		class Bar extends Foo {}
+	];
+
+	for (const x of classDeclarations) {
+		t.true(m.class(x));
+	}
+});
+
 test('is.typedArray', t => {
 	const typedArrays = [
 		new Int8Array(),
