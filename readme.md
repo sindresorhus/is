@@ -115,6 +115,10 @@ JavaScript primitives are as follows: `null`, `undefined`, `string`, `number`, `
 An object is plain if it's created by either `{}`, `new Object()`, or `Object.create(null)`.
 
 ##### .iterable(value)
+##### .class(value)
+
+Returns `true` for instances created by a ES2015 class.
+
 ##### .typedArray(value)
 
 
