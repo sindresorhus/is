@@ -6,6 +6,8 @@ const isNode8orHigher = Number(process.versions.node.split('.')[0]) >= 8;
 
 const PromiseSubclassFixture = class extends Promise {};
 const ErrorSubclassFixture = class extends Error {};
+const FooClassFixture = class Foo {};
+const BarClassFixture = class Bar extends FooClassFixture {};
 
 const types = new Map([
 	['undefined', undefined],
@@ -27,6 +29,9 @@ const types = new Map([
 	['array', [
 		[1, 2],
 		new Array(2)
+	]],
+	['class', [
+		new BarClassFixture()
 	]],
 	['function', [
 		function foo() {}, // eslint-disable-line func-names
@@ -128,6 +133,10 @@ test('is.symbol', t => {
 
 test('is.array', t => {
 	testType(t, 'array');
+});
+
+test('is.class', t => {
+	t.true(types.get('class')[0] instanceof FooClassFixture);
 });
 
 test('is.function', t => {

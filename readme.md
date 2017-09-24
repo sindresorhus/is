@@ -64,6 +64,10 @@ All the below methods accept a value and returns a boolean for whether the value
 #### Built-in types
 
 ##### .array(value)
+##### .class(value)
+
+Returns `true` for any function that initialized as an ES6 class.
+
 ##### .function(value)
 ##### .buffer(value)
 ##### .object(value)

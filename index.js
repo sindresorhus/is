@@ -62,6 +62,7 @@ is.symbol = x => typeof x === 'symbol';
 
 is.array = Array.isArray;
 is.function = x => typeof x === 'function';
+is.class = x => typeof x === 'function' && x.toString().startsWith('class ');
 is.buffer = Buffer.isBuffer;
 
 is.object = x => {
@@ -130,7 +131,7 @@ is.plainObject = x => {
 	// eslint-disable-next-line no-return-assign
 	return getObjectType(x) === 'Object' &&
 		(prototype = Object.getPrototypeOf(x), prototype === null ||
-		prototype === Object.getPrototypeOf({}));
+			prototype === Object.getPrototypeOf({}));
 };
 
 is.iterable = x => !is.null(x) && !is.undefined(x) && typeof x[Symbol.iterator] === 'function';
