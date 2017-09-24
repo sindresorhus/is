@@ -78,6 +78,9 @@ Keep in mind that [functions are objects too](https://developer.mozilla.org/en-U
 
 Returns `true` for any object with a `.then()` and `.catch()` method. Prefer this one over `.nativePromise()` as you usually want to allow userland promise implementations too.
 
+##### .generator(value)
+##### .generatorFunction(value)
+
 ##### .map(value)
 ##### .set(value)
 ##### .weakMap(value)

@@ -81,6 +81,10 @@ is.promise = x => {
 		);
 };
 
+is.generator = x => x && typeof x.next === 'function' && typeof x.throw === 'function';
+
+is.generatorFunction = x => x.constructor.name === 'GeneratorFunction';
+
 is.regExp = x => getObjectType(x) === 'RegExp';
 is.date = x => getObjectType(x) === 'Date';
 is.error = x => getObjectType(x) === 'Error';

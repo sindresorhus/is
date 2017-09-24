@@ -82,7 +82,7 @@ const types = new Map([
 	['integer', 6]
 ]);
 
-// This ensure a certain method matches only the types
+// This ensures a certain method matches only the types
 // it's supposed to and none of the other methods' types
 const testType = (t, type, exclude) => {
 	for (const [key, value] of types) {
@@ -165,6 +165,20 @@ if (isNode8orHigher) {
 		testType(t, 'promise', ['nativePromise']);
 	});
 }
+
+test('is.generator', t => {
+	const genObj = (function * () {
+		yield 42;
+	})();
+	t.true(m.generator(genObj));
+});
+
+test('is.generatorFunction', t => {
+	const gen = function * () {
+		yield 42;
+	};
+	t.true(m.generatorFunction(gen));
+});
 
 test('is.map', t => {
 	testType(t, 'map');
