@@ -66,7 +66,7 @@ All the below methods accept a value and returns a boolean for whether the value
 ##### .array(value)
 ##### .class(value)
 
-Returns `true` for any function that initialized as an ES6 class.
+Returns `true` for instances created by a ES2015 class.
 
 ##### .function(value)
 ##### .buffer(value)
