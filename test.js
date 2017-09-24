@@ -131,14 +131,14 @@ test('is.array', t => {
 });
 
 test('is.class', t => {
-	const BaseClass = class Foo { };
+	const BaseClass = class Foo {};
 	const classDeclarations = [
 		BaseClass,
-		class Bar extends BaseClass { }
+		class Bar extends BaseClass {}
 	];
 
-	for (const ins of classDeclarations) {
-		t.true(m.class(ins));
+	for (const x of classDeclarations) {
+		t.true(m.class(x));
 	}
 });
 
