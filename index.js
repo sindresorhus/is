@@ -1,6 +1,7 @@
 'use strict';
 const toString = Object.prototype.toString;
 const getObjectType = x => toString.call(x).slice(8, -1);
+const isOfType = type => x => getObjectType(x) === type;
 
 const is = value => {
 	if (value == null) { // eslint-disable-line no-eq-null, eqeqeq
@@ -59,69 +60,55 @@ is.string = x => typeof x === 'string';
 is.number = x => typeof x === 'number';
 is.boolean = x => typeof x === 'boolean';
 is.symbol = x => typeof x === 'symbol';
+is.nullOrUndefined = x => is.null(x) || is.undefined(x);
+
+const primitiveTypes = new Set([
+	'undefined',
+	'string',
+	'number',
+	'boolean',
+	'symbol'
+]);
+is.primitive = x => is.null(x) || primitiveTypes.has(typeof x);
 
 is.array = Array.isArray;
 is.function = x => typeof x === 'function';
 is.buffer = Buffer.isBuffer;
 
-is.object = x => {
-	const type = typeof x;
-	return x !== null && (type === 'object' || type === 'function');
-};
+is.object = x => !is.nullOrUndefined(x) && (is.function(x) || typeof x === 'object');
 
-is.nativePromise = x => getObjectType(x) === 'Promise';
+is.nativePromise = isOfType('Promise');
 
-is.promise = x => {
-	return is.nativePromise(x) ||
-		(
-			x !== null &&
-			typeof x === 'object' &&
-			typeof x.then === 'function' &&
-			typeof x.catch === 'function'
-		);
-};
+const hasPromiseAPI = x =>
+	!is.null(x) &&
+	typeof x === 'object' &&
+	is.function(x.then) &&
+	is.function(x.catch);
 
-is.regExp = x => getObjectType(x) === 'RegExp';
-is.date = x => getObjectType(x) === 'Date';
-is.error = x => getObjectType(x) === 'Error';
-is.map = x => getObjectType(x) === 'Map';
-is.set = x => getObjectType(x) === 'Set';
-is.weakMap = x => getObjectType(x) === 'WeakMap';
-is.weakSet = x => getObjectType(x) === 'WeakSet';
+is.promise = x => is.nativePromise(x) || hasPromiseAPI(x);
 
-is.int8Array = x => getObjectType(x) === 'Int8Array';
-is.uint8Array = x => getObjectType(x) === 'Uint8Array';
-is.uint8ClampedArray = x => getObjectType(x) === 'Uint8ClampedArray';
-is.int16Array = x => getObjectType(x) === 'Int16Array';
-is.uint16Array = x => getObjectType(x) === 'Uint16Array';
-is.int32Array = x => getObjectType(x) === 'Int32Array';
-is.uint32Array = x => getObjectType(x) === 'Uint32Array';
-is.float32Array = x => getObjectType(x) === 'Float32Array';
-is.float64Array = x => getObjectType(x) === 'Float64Array';
+is.regExp = isOfType('RegExp');
+is.date = isOfType('Date');
+is.error = isOfType('Error');
+is.map = isOfType('Map');
+is.set = isOfType('Set');
+is.weakMap = isOfType('WeakMap');
+is.weakSet = isOfType('WeakSet');
 
-is.arrayBuffer = x => getObjectType(x) === 'ArrayBuffer';
+is.int8Array = isOfType('Int8Array');
+is.uint8Array = isOfType('Uint8Array');
+is.uint8ClampedArray = isOfType('Uint8ClampedArray');
+is.int16Array = isOfType('Int16Array');
+is.uint16Array = isOfType('Uint16Array');
+is.int32Array = isOfType('Int32Array');
+is.uint32Array = isOfType('Uint32Array');
+is.float32Array = isOfType('Float32Array');
+is.float64Array = isOfType('Float64Array');
 
-is.sharedArrayBuffer = x => {
-	try {
-		return getObjectType(x) === 'SharedArrayBuffer';
-	} catch (err) {
-		return false;
-	}
-};
+is.arrayBuffer = isOfType('ArrayBuffer');
+is.sharedArrayBuffer = isOfType('SharedArrayBuffer');
 
 is.nan = Number.isNaN;
-is.nullOrUndefined = x => x === null || typeof x === 'undefined';
-
-is.primitive = x => {
-	const type = typeof x;
-	return x === null ||
-		type === 'undefined' ||
-		type === 'string' ||
-		type === 'number' ||
-		type === 'boolean' ||
-		type === 'symbol';
-};
-
 is.integer = Number.isInteger;
 
 is.plainObject = x => {
@@ -133,9 +120,9 @@ is.plainObject = x => {
 			prototype === Object.getPrototypeOf({}));
 };
 
-is.iterable = x => !is.null(x) && !is.undefined(x) && typeof x[Symbol.iterator] === 'function';
+is.iterable = x => !is.nullOrUndefined(x) && is.function(x[Symbol.iterator]);
 
-is.class = x => typeof x === 'function' && x.toString().startsWith('class ');
+is.class = x => is.function(x) && x.toString().startsWith('class ');
 
 const typedArrayTypes = new Set([
 	'Int8Array',
