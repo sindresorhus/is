@@ -121,6 +121,13 @@ Returns `true` for instances created by a ES2015 class.
 
 ##### .typedArray(value)
 
+##### .inRange(value, range)
+
+Check to see if the value is within a given range, for example `is.inRange(3, [0, 5])`.
+The range supplied can be an array of any size, though this will only check for
+the minimum and maximum values in it.
+
+If `range` is a number (e.g., `is.inRange(3, 10)`), it will be treated as a range of 0 to `range`.
 
 ## FAQ
 

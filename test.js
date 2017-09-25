@@ -305,3 +305,16 @@ test('is.typedArray', t => {
 	t.false(m.typedArray([]));
 	t.false(m.typedArray({}));
 });
+
+test('is.inRange', t => {
+	const x = 3;
+
+	t.true(m.inRange(x, [0, 5]));
+	t.true(m.inRange(x, [5, 0]));
+	t.true(m.inRange(x, [-5, 5]));
+	t.true(m.inRange(x, [5, -5]));
+	t.false(m.inRange(x, [4, 8]));
+
+	t.true(m.inRange(x, 10));
+	t.false(m.inRange(x, 2));
+});
