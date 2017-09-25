@@ -152,10 +152,15 @@ is.typedArray = x => typedArrayTypes.has(getObjectType(x));
 
 is.inRange = (x, range) => {
 	if (is.number(range)) {
-		return (x >= Math.min(0, range)) && (x <= Math.max(range, 0));
+		return x >= Math.min(0, range) && x <= Math.max(range, 0);
 	}
 
-	return (is.array(range)) && (x >= Math.min.apply(Math, range)) && (x <= Math.max.apply(Math, range));
+	if (is.array(range) && range.length === 2) {
+		// TODO: Use spread operator here when targeting Node.js 6 or higher
+		return x >= Math.min.apply(null, range) && x <= Math.max.apply(null, range);
+	}
+
+	throw new TypeError('Invalid range');
 };
 
 module.exports = is;

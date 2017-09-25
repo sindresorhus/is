@@ -314,7 +314,19 @@ test('is.inRange', t => {
 	t.true(m.inRange(x, [-5, 5]));
 	t.true(m.inRange(x, [5, -5]));
 	t.false(m.inRange(x, [4, 8]));
+	t.true(m.inRange(-7, [-5, -10]));
+	t.true(m.inRange(-5, [-5, -10]));
+	t.true(m.inRange(-10, [-5, -10]));
 
 	t.true(m.inRange(x, 10));
+	t.true(m.inRange(0, 0));
 	t.false(m.inRange(x, 2));
+
+	t.throws(() => {
+		t.true(m.inRange(0));
+	});
+
+	t.throws(() => {
+		t.true(m.inRange(0, [5]));
+	});
 });

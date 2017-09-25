@@ -123,11 +123,22 @@ Returns `true` for instances created by a ES2015 class.
 
 ##### .inRange(value, range)
 
-Check to see if the value is within a given range, for example `is.inRange(3, [0, 5])`.
-The range supplied can be an array of any size, though this will only check for
-the minimum and maximum values in it.
+Check if `value` (number) is in the given `range`. The range is an array of two values, lower bound and upper bound, in no specific order.
 
-If `range` is a number (e.g., `is.inRange(3, 10)`), it will be treated as a range of 0 to `range`.
+```js
+is.inRange(3, [0, 5]);
+is.inRange(3, [5, 0]);
+is.inRange(0, [-2, 2]);
+```
+
+##### .inRange(value, upperBound)
+
+Check if `value` (number) is in the range of `0` to `upperBound`.
+
+```js
+is.inRange(3, 10);
+```
+
 
 ## FAQ
 
