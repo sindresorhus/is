@@ -54,6 +54,9 @@ const types = new Map([
 		PromiseSubclassFixture.resolve()
 	]],
 	['promise', {then() {}, catch() {}}],
+	['generator', (function * () {
+		yield 42;
+	})()],
 	['map', new Map()],
 	['set', new Set()],
 	['weakMap', new WeakMap()],
@@ -167,10 +170,7 @@ if (isNode8orHigher) {
 }
 
 test('is.generator', t => {
-	const genObj = (function * () {
-		yield 42;
-	})();
-	t.true(m.generator(genObj));
+	testType(t, 'generator', ['function']);
 });
 
 test('is.generatorFunction', t => {
