@@ -1,4 +1,7 @@
 'use strict';
+
+const util = require('util');
+
 const toString = Object.prototype.toString;
 const getObjectType = x => toString.call(x).slice(8, -1);
 const isOfType = type => x => typeof x === type; // eslint-disable-line valid-typeof
@@ -151,7 +154,7 @@ is.inRange = (x, range) => {
 		return x >= Math.min.apply(null, range) && x <= Math.max.apply(null, range);
 	}
 
-	throw new TypeError('Invalid range');
+	throw new TypeError(`Invalid range: ${util.inspect}`);
 };
 
 module.exports = is;

@@ -333,6 +333,14 @@ test('is.inRange', t => {
 	});
 
 	t.throws(() => {
+		m.inRange(0, []);
+	});
+
+	t.throws(() => {
 		m.inRange(0, [5]);
+	});
+
+	t.throws(() => {
+		m.inRange(0, [1, 2, 3]);
 	});
 });
