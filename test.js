@@ -251,7 +251,9 @@ test('is.primitive', t => {
 		Symbol('🦄')
 	];
 
-	primitives.forEach(el => t.true(m.primitive(el)));
+	for (const el of primitives) {
+		t.true(m.primitive(el));
+	}
 });
 
 test('is.integer', t => {
@@ -326,11 +328,11 @@ test('is.inRange', t => {
 	t.false(m.inRange(x, 2));
 	t.false(m.inRange(-3, -2));
 
-	t.throws(() =>
-		t.true(m.inRange(0))
-	);
+	t.throws(() => {
+		m.inRange(0)
+	});
 
-	t.throws(() =>
-		t.true(m.inRange(0, [5]))
-	);
+	t.throws(() => {
+		m.inRange(0, [5])
+	});
 });
