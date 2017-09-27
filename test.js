@@ -329,10 +329,10 @@ test('is.inRange', t => {
 	t.false(m.inRange(-3, -2));
 
 	t.throws(() => {
-		m.inRange(0)
+		m.inRange(0);
 	});
 
 	t.throws(() => {
-		m.inRange(0, [5])
+		m.inRange(0, [5]);
 	});
 });
