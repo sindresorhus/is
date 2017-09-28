@@ -169,6 +169,12 @@ The most common mistakes I noticed in these modules was using `instanceof` for t
 - [is-empty-iterable](https://github.com/sindresorhus/is-empty-iterable) - Check if an Iterable is empty
 
 
+## Created by
+
+- [Sindre Sorhus](https://github.com/sindresorhus)
+- [Giora Guttsait](https://github.com/gioragutt)
+
+
 ## License
 
-MIT © [Sindre Sorhus](https://sindresorhus.com)
+MIT
