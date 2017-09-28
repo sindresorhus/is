@@ -78,12 +78,6 @@ Keep in mind that [functions are objects too](https://developer.mozilla.org/en-U
 
 Returns `true` for any object with a `.then()` and `.catch()` method. Prefer this one over `.nativePromise()` as you usually want to allow userland promise implementations too.
 
-##### .generator(value)
-
-Returns `true` for any object that implements its own `.next()` and `.throw()` methods and has a function definition for `Symbol.iterator`.
-
-##### .generatorFunction(value)
-
 ##### .map(value)
 ##### .set(value)
 ##### .weakMap(value)
@@ -127,6 +121,24 @@ Returns `true` for instances created by a ES2015 class.
 
 ##### .typedArray(value)
 
+##### .inRange(value, range)
+
+Check if `value` (number) is in the given `range`. The range is an array of two values, lower bound and upper bound, in no specific order.
+
+```js
+is.inRange(3, [0, 5]);
+is.inRange(3, [5, 0]);
+is.inRange(0, [-2, 2]);
+```
+
+##### .inRange(value, upperBound)
+
+Check if `value` (number) is in the range of `0` to `upperBound`.
+
+```js
+is.inRange(3, 10);
+```
+
 
 ## FAQ
 
@@ -157,6 +169,12 @@ The most common mistakes I noticed in these modules was using `instanceof` for t
 - [is-empty-iterable](https://github.com/sindresorhus/is-empty-iterable) - Check if an Iterable is empty
 
 
+## Created by
+
+- [Sindre Sorhus](https://github.com/sindresorhus)
+- [Giora Guttsait](https://github.com/gioragutt)
+
+
 ## License
 
-MIT © [Sindre Sorhus](https://sindresorhus.com)
+MIT
