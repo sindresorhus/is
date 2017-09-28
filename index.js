@@ -1,6 +1,10 @@
 'use strict';
+const util = require('util');
+
 const toString = Object.prototype.toString;
 const getObjectType = x => toString.call(x).slice(8, -1);
+const isOfType = type => x => typeof x === type; // eslint-disable-line valid-typeof
+const isObjectOfType = type => x => getObjectType(x) === type;
 
 const is = value => {
 	if (value == null) { // eslint-disable-line no-eq-null, eqeqeq
@@ -29,7 +33,7 @@ const is = value => {
 		return 'symbol';
 	}
 
-	if (type === 'function') {
+	if (is.function(value)) {
 		return 'Function';
 	}
 
@@ -53,78 +57,68 @@ const is = value => {
 	return 'Object';
 };
 
-is.undefined = x => typeof x === 'undefined';
+is.undefined = isOfType('undefined');
 is.null = x => x === null;
-is.string = x => typeof x === 'string';
-is.number = x => typeof x === 'number';
-is.boolean = x => typeof x === 'boolean';
-is.symbol = x => typeof x === 'symbol';
+is.string = isOfType('string');
+is.number = isOfType('number');
+is.boolean = isOfType('boolean');
+is.symbol = isOfType('symbol');
 
 is.array = Array.isArray;
-is.function = x => typeof x === 'function';
+is.function = isOfType('function');
 is.buffer = Buffer.isBuffer;
 
-is.object = x => {
-	const type = typeof x;
-	return x !== null && (type === 'object' || type === 'function');
-};
+const isObject = x => typeof x === 'object';
 
-is.nativePromise = x => getObjectType(x) === 'Promise';
+is.object = x => !is.nullOrUndefined(x) && (is.function(x) || isObject(x));
 
-is.promise = x => {
-	return is.nativePromise(x) ||
-		(
-			x !== null &&
-			typeof x === 'object' &&
-			typeof x.then === 'function' &&
-			typeof x.catch === 'function'
-		);
-};
+is.nativePromise = isObjectOfType('Promise');
+
+const hasPromiseAPI = x =>
+	!is.null(x) &&
+	isObject(x) &&
+	is.function(x.then) &&
+	is.function(x.catch);
+
+is.promise = x => is.nativePromise(x) || hasPromiseAPI(x);
 
 is.generator = x => is.iterable(x) && is.function(x.next) && is.function(x.throw);
 
-is.generatorFunction = x => getObjectType(x) === 'GeneratorFunction';
+// Change to use `isObjectOfType` once Node 4.x.x LTS is dropped
+is.generatorFunction = x => x.constructor.name === 'GeneratorFunction';
 
-is.regExp = x => getObjectType(x) === 'RegExp';
-is.date = x => getObjectType(x) === 'Date';
-is.error = x => getObjectType(x) === 'Error';
-is.map = x => getObjectType(x) === 'Map';
-is.set = x => getObjectType(x) === 'Set';
-is.weakMap = x => getObjectType(x) === 'WeakMap';
-is.weakSet = x => getObjectType(x) === 'WeakSet';
+is.regExp = isObjectOfType('RegExp');
+is.date = isObjectOfType('Date');
+is.error = isObjectOfType('Error');
+is.map = isObjectOfType('Map');
+is.set = isObjectOfType('Set');
+is.weakMap = isObjectOfType('WeakMap');
+is.weakSet = isObjectOfType('WeakSet');
 
-is.int8Array = x => getObjectType(x) === 'Int8Array';
-is.uint8Array = x => getObjectType(x) === 'Uint8Array';
-is.uint8ClampedArray = x => getObjectType(x) === 'Uint8ClampedArray';
-is.int16Array = x => getObjectType(x) === 'Int16Array';
-is.uint16Array = x => getObjectType(x) === 'Uint16Array';
-is.int32Array = x => getObjectType(x) === 'Int32Array';
-is.uint32Array = x => getObjectType(x) === 'Uint32Array';
-is.float32Array = x => getObjectType(x) === 'Float32Array';
-is.float64Array = x => getObjectType(x) === 'Float64Array';
+is.int8Array = isObjectOfType('Int8Array');
+is.uint8Array = isObjectOfType('Uint8Array');
+is.uint8ClampedArray = isObjectOfType('Uint8ClampedArray');
+is.int16Array = isObjectOfType('Int16Array');
+is.uint16Array = isObjectOfType('Uint16Array');
+is.int32Array = isObjectOfType('Int32Array');
+is.uint32Array = isObjectOfType('Uint32Array');
+is.float32Array = isObjectOfType('Float32Array');
+is.float64Array = isObjectOfType('Float64Array');
 
-is.arrayBuffer = x => getObjectType(x) === 'ArrayBuffer';
-
-is.sharedArrayBuffer = x => {
-	try {
-		return getObjectType(x) === 'SharedArrayBuffer';
-	} catch (err) {
-		return false;
-	}
-};
+is.arrayBuffer = isObjectOfType('ArrayBuffer');
+is.sharedArrayBuffer = isObjectOfType('SharedArrayBuffer');
 
 is.nan = Number.isNaN;
-is.nullOrUndefined = x => x === null || typeof x === 'undefined';
+is.nullOrUndefined = x => is.null(x) || is.undefined(x);
 
-is.primitive = x => {
-	const type = typeof x;
-	return x === null ||
-		type === 'undefined' ||
-		type === 'string' ||
-		type === 'number' ||
-		type === 'boolean' ||
-		type === 'symbol';
-};
+const primitiveTypes = new Set([
+	'undefined',
+	'string',
+	'number',
+	'boolean',
+	'symbol'
+]);
+is.primitive = x => is.null(x) || primitiveTypes.has(typeof x);
 
 is.integer = Number.isInteger;
 
@@ -137,9 +131,9 @@ is.plainObject = x => {
 			prototype === Object.getPrototypeOf({}));
 };
 
-is.iterable = x => !is.null(x) && !is.undefined(x) && typeof x[Symbol.iterator] === 'function';
+is.iterable = x => !is.nullOrUndefined(x) && is.function(x[Symbol.iterator]);
 
-is.class = x => typeof x === 'function' && x.toString().startsWith('class ');
+is.class = x => is.function(x) && x.toString().startsWith('class ');
 
 const typedArrayTypes = new Set([
 	'Int8Array',
@@ -153,5 +147,18 @@ const typedArrayTypes = new Set([
 	'Float64Array'
 ]);
 is.typedArray = x => typedArrayTypes.has(getObjectType(x));
+
+is.inRange = (x, range) => {
+	if (is.number(range)) {
+		return x >= Math.min(0, range) && x <= Math.max(range, 0);
+	}
+
+	if (is.array(range) && range.length === 2) {
+		// TODO: Use spread operator here when targeting Node.js 6 or higher
+		return x >= Math.min.apply(null, range) && x <= Math.max.apply(null, range);
+	}
+
+	throw new TypeError(`Invalid range: ${util.inspect(range)}`);
+};
 
 module.exports = is;
