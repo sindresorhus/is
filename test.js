@@ -10,7 +10,11 @@ const ErrorSubclassFixture = class extends Error {};
 const types = new Map([
 	['undefined', undefined],
 	['null', null],
-	['string', '🦄'],
+	['string', [
+		'🦄',
+		'hello world',
+		''
+	]],
 	['number', [
 		6,
 		1.4,
@@ -320,13 +324,23 @@ test('is.inRange', t => {
 
 	t.true(m.inRange(x, 10));
 	t.true(m.inRange(0, 0));
+	t.true(m.inRange(-2, -3));
 	t.false(m.inRange(x, 2));
+	t.false(m.inRange(-3, -2));
 
 	t.throws(() => {
-		t.true(m.inRange(0));
+		m.inRange(0);
 	});
 
 	t.throws(() => {
-		t.true(m.inRange(0, [5]));
+		m.inRange(0, []);
+	});
+
+	t.throws(() => {
+		m.inRange(0, [5]);
+	});
+
+	t.throws(() => {
+		m.inRange(0, [1, 2, 3]);
 	});
 });
