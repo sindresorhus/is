@@ -153,7 +153,7 @@ is.inRange = (x, range) => {
 		return x >= Math.min.apply(null, range) && x <= Math.max.apply(null, range);
 	}
 
-	throw new TypeError(`Invalid range: ${util.inspect}`);
+	throw new TypeError(`Invalid range: ${util.inspect(range)}`);
 };
 
 module.exports = is;
