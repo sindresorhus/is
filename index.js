@@ -1,5 +1,4 @@
 'use strict';
-
 const util = require('util');
 
 const toString = Object.prototype.toString;
