@@ -59,8 +59,11 @@ const types = new Map([
 	]],
 	['promise', {then() {}, catch() {}}],
 	['generator', (function * () {
-		yield 42;
+		yield 4;
 	})()],
+	['generatorFunction', function * () {
+		yield 4;
+	}],
 	['map', new Map()],
 	['set', new Set()],
 	['weakMap', new WeakMap()],
@@ -138,7 +141,7 @@ test('is.array', t => {
 });
 
 test('is.function', t => {
-	testType(t, 'function');
+	testType(t, 'function', ['generatorFunction']);
 });
 
 test('is.buffer', t => {
@@ -174,14 +177,11 @@ if (isNode8orHigher) {
 }
 
 test('is.generator', t => {
-	testType(t, 'generator', ['function']);
+	testType(t, 'generator');
 });
 
 test('is.generatorFunction', t => {
-	const gen = function * () {
-		yield 42;
-	};
-	t.true(m.generatorFunction(gen));
+	testType(t, 'generatorFunction', ['function']);
 });
 
 test('is.map', t => {

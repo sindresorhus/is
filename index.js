@@ -84,8 +84,8 @@ is.promise = x => is.nativePromise(x) || hasPromiseAPI(x);
 
 is.generator = x => is.iterable(x) && is.function(x.next) && is.function(x.throw);
 
-// Change to use `isObjectOfType` once Node 4.x.x LTS is dropped
-is.generatorFunction = x => x.constructor.name === 'GeneratorFunction';
+// TODO: Change to use `isObjectOfType` once Node.js 6 or higher is targeted
+is.generatorFunction = x => is.function(x) && is.function(x.constructor) && x.constructor.name === 'GeneratorFunction';
 
 is.regExp = isObjectOfType('RegExp');
 is.date = isObjectOfType('Date');
