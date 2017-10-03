@@ -1,5 +1,6 @@
 import util from 'util';
 import test from 'ava';
+import {JSDOM} from 'jsdom';
 import m from '.';
 
 const isNode8orHigher = Number(process.versions.node.split('.')[0]) >= 8;
@@ -357,4 +358,18 @@ test('is.inRange', t => {
 	t.throws(() => {
 		m.inRange(0, [1, 2, 3]);
 	});
+});
+
+test('is.domElement', t => {
+	const {document} = (new JSDOM(`...`)).window;
+	t.true(m.domElement(document.createElement('div')));
+	t.false(m.domElement('hello world'));
+	t.false(m.domElement([]));
+	t.false(m.domElement(new Map()));
+	t.false(m.domElement(null));
+	t.false(m.domElement(undefined));
+	t.false(m.domElement(0));
+	t.false(m.domElement(NaN));
+	t.false(m.domElement(Infinity));
+	t.false(m.domElement({}));
 });

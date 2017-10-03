@@ -44,6 +44,7 @@
   ],
   "devDependencies": {
     "ava": "*",
+    "jsdom": "^11.3.0",
     "xo": "*"
   }
 }

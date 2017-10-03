@@ -145,6 +145,10 @@ Check if `value` (number) is in the range of `0` to `upperBound`.
 is.inRange(3, 10);
 ```
 
+##### .domElement(value)
+
+Returns `true` if `value` is a domElement.
+
 
 ## FAQ
 
