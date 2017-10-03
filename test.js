@@ -1,6 +1,6 @@
 import util from 'util';
 import test from 'ava';
-import {JSDOM} from 'jsdom';
+import {jsdom} from 'jsdom';
 import m from '.';
 
 const isNode8orHigher = Number(process.versions.node.split('.')[0]) >= 8;
@@ -361,7 +361,7 @@ test('is.inRange', t => {
 });
 
 test('is.domElement', t => {
-	const {document} = (new JSDOM(`...`)).window;
+	const document = jsdom();
 	t.true(m.domElement(document.createElement('div')));
 	t.false(m.domElement('hello world'));
 	t.false(m.domElement([]));
