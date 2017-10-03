@@ -147,7 +147,7 @@ is.inRange(3, 10);
 
 ##### .domElement(value)
 
-Returns `true` if `value` is a domElement.
+Returns `true` if `value` is a DOM Element.
 
 
 ## FAQ
