@@ -11,14 +11,14 @@ const is = value => {
 		return 'null';
 	}
 
-	if (value === true || value === false) {
-		return 'boolean';
-	}
-
 	const type = typeof value;
 
 	if (type === 'undefined') {
 		return 'undefined';
+	}
+	
+	if (type === 'boolean') {
+		return 'boolean';
 	}
 
 	if (type === 'string') {
