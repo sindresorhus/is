@@ -17,7 +17,7 @@ const is = value => {
 		return 'undefined';
 	}
 	
-	if (value === 'boolean') {
+	if (type === 'boolean') {
 		return 'boolean';
 	}
 
