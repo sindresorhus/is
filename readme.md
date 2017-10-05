@@ -147,7 +147,8 @@ is.inRange(3, 10);
 
 ##### .infinite(value)
 
-Check if `value` is Infinity or -Infinity.
+Check if `value` is `Infinity` or `-Infinity`.
+
 
 ## FAQ
 
