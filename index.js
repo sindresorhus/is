@@ -7,7 +7,7 @@ const isOfType = type => x => typeof x === type; // eslint-disable-line valid-ty
 const isObjectOfType = type => x => getObjectType(x) === type;
 
 const is = value => {
-	if (value == null) { // eslint-disable-line no-eq-null, eqeqeq
+	if (value === null) {
 		return 'null';
 	}
 

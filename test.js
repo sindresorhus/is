@@ -112,6 +112,13 @@ const testType = (t, type, exclude) => {
 	}
 };
 
+test('is', t => {
+	t.is(m(null), 'null');
+	t.is(m(undefined), 'undefined');
+
+	// TODO: Expand this to all the supported types. Maybe reuse `testType()` somehow.
+});
+
 test('is.undefined', t => {
 	testType(t, 'undefined', ['nullOrUndefined']);
 });
