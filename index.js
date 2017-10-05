@@ -7,7 +7,7 @@ const isOfType = type => x => typeof x === type; // eslint-disable-line valid-ty
 const isObjectOfType = type => x => getObjectType(x) === type;
 
 const is = value => {
-	if (value == null) { // eslint-disable-line no-eq-null, eqeqeq
+	if (value === null) {
 		return 'null';
 	}
 
@@ -61,7 +61,7 @@ is.undefined = isOfType('undefined');
 is.null = x => x === null;
 is.string = isOfType('string');
 is.number = isOfType('number');
-is.boolean = isOfType('boolean');
+is.boolean = x => x === true || x === false;
 is.symbol = isOfType('symbol');
 
 is.array = Array.isArray;
@@ -167,5 +167,7 @@ is.domElement = x => {
 	return is.object(x) && x.nodeType === ELEMENT_NODE && is.string(x.nodeName) &&
 				!is.plainObject(x) && propsToCheck.every(prop => prop in x);
 };
+
+is.infinite = x => x === Infinity || x === -Infinity;
 
 module.exports = is;

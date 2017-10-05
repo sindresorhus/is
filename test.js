@@ -106,6 +106,10 @@ const types = new Map([
 		document,
 		document.implementation.createDocumentType('svg:svg', '-//W3C//DTD SVG 1.1//EN', 'http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd'),
 		document.createDocumentFragment()
+	]],
+	['infinite', [
+		Infinity,
+		-Infinity
 	]]
 ]);
 
@@ -129,6 +133,13 @@ const testType = (t, type, exclude) => {
 	}
 };
 
+test('is', t => {
+	t.is(m(null), 'null');
+	t.is(m(undefined), 'undefined');
+
+	// TODO: Expand this to all the supported types. Maybe reuse `testType()` somehow.
+});
+
 test('is.undefined', t => {
 	testType(t, 'undefined', ['nullOrUndefined']);
 });
@@ -142,7 +153,7 @@ test('is.string', t => {
 });
 
 test('is.number', t => {
-	testType(t, 'number', ['nan', 'integer']);
+	testType(t, 'number', ['nan', 'integer', 'infinite']);
 });
 
 test('is.boolean', t => {
@@ -379,4 +390,8 @@ test('is.inRange', t => {
 test('is.domElement', t => {
 	testType(t, 'domElement');
 	t.false(m.domElement({nodeType: 1, nodeName: 'div'}));
+});
+
+test('is.infinite', t => {
+	testType(t, 'infinite', ['number']);
 });

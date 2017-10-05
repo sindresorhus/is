@@ -149,6 +149,9 @@ is.inRange(3, 10);
 
 Returns `true` if `value` is a DOM Element.
 
+##### .infinite(value)
+
+Check if `value` is `Infinity` or `-Infinity`.
 
 ## FAQ
 
