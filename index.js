@@ -61,7 +61,7 @@ is.undefined = isOfType('undefined');
 is.null = x => x === null;
 is.string = isOfType('string');
 is.number = isOfType('number');
-is.boolean = (value) => value === true || value === false;
+is.boolean = value => value === true || value === false;
 is.symbol = isOfType('symbol');
 
 is.array = Array.isArray;
