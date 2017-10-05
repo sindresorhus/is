@@ -362,6 +362,7 @@ test('is.inRange', t => {
 
 test('is.domElement', t => {
 	const document = jsdom();
+
 	t.true(m.domElement(document.createElement('div')));
 	t.false(m.domElement('hello world'));
 	t.false(m.domElement([]));
@@ -371,5 +372,5 @@ test('is.domElement', t => {
 	t.false(m.domElement(0));
 	t.false(m.domElement(NaN));
 	t.false(m.domElement(Infinity));
-	t.false(m.domElement({}));
+	t.false(m.domElement({nodeType: 1, nodeName: 'div'}));
 });
