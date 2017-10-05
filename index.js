@@ -163,4 +163,12 @@ is.inRange = (x, range) => {
 
 is.infinite = x => x === Infinity || x === -Infinity;
 
+is.empty = value => {
+	return (
+		((is.string(value) || is.array(value)) && !value.length) ||
+		(!is.map(value) && !is.set(value) && is.object(value) && !Object.keys(value).length) ||
+		((is.map(value) || is.set(value)) && !value.size)
+	);
+};
+
 module.exports = is;

@@ -150,6 +150,11 @@ is.inRange(3, 10);
 Check if `value` is `Infinity` or `-Infinity`.
 
 
+##### .empty(value)
+
+Returns `true` if `value` is an empty string, array, object, map, or set.
+
+
 ## FAQ
 
 ### Why yet another type checking module?
