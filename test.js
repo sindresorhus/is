@@ -89,7 +89,11 @@ const types = new Map([
 		Object.create(null),
 		new Object() // eslint-disable-line no-new-object
 	]],
-	['integer', 6]
+	['integer', 6],
+	['infinite', [
+		Infinity,
+		-Infinity
+	]]
 ]);
 
 // This ensures a certain method matches only the types
@@ -125,7 +129,7 @@ test('is.string', t => {
 });
 
 test('is.number', t => {
-	testType(t, 'number', ['nan', 'integer']);
+	testType(t, 'number', ['nan', 'integer', 'infinite']);
 });
 
 test('is.boolean', t => {
@@ -360,9 +364,5 @@ test('is.inRange', t => {
 });
 
 test('is.infinite', t => {
-	t.true(m.infinite(Infinity));
-	t.true(m.infinite(-Infinity));
-	t.false(m.infinite(NaN));
-	t.false(m.infinite(5));
-	t.false(m.infinite('hello world'));
+	testType(t, 'infinite', ['number']);
 });
