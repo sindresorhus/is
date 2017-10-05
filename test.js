@@ -8,6 +8,8 @@ const isNode8orHigher = Number(process.versions.node.split('.')[0]) >= 8;
 const PromiseSubclassFixture = class extends Promise {};
 const ErrorSubclassFixture = class extends Error {};
 
+const document = jsdom();
+
 const types = new Map([
 	['undefined', undefined],
 	['null', null],
@@ -90,7 +92,8 @@ const types = new Map([
 		Object.create(null),
 		new Object() // eslint-disable-line no-new-object
 	]],
-	['integer', 6]
+	['integer', 6],
+	['domElement', document.createElement('div')]
 ]);
 
 // This ensures a certain method matches only the types
@@ -361,16 +364,6 @@ test('is.inRange', t => {
 });
 
 test('is.domElement', t => {
-	const document = jsdom();
-
-	t.true(m.domElement(document.createElement('div')));
-	t.false(m.domElement('hello world'));
-	t.false(m.domElement([]));
-	t.false(m.domElement(new Map()));
-	t.false(m.domElement(null));
-	t.false(m.domElement(undefined));
-	t.false(m.domElement(0));
-	t.false(m.domElement(NaN));
-	t.false(m.domElement(Infinity));
+	testType(t, 'domElement');
 	t.false(m.domElement({nodeType: 1, nodeName: 'div'}));
 });

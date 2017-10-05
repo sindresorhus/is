@@ -161,6 +161,10 @@ is.inRange = (x, range) => {
 	throw new TypeError(`Invalid range: ${util.inspect(range)}`);
 };
 
-is.domElement = x => is.object(x) && x.nodeType === 1 && is.string(x.nodeName) && !is.plainObject(x);
+is.domElement = x => {
+	const propsToCheck = ['innerHTML', 'ownerDocument', 'style', 'attributes', 'nodeValue'];
+	return is.object(x) && x.nodeType === 1 && is.string(x.nodeName) &&
+				!is.plainObject(x) && propsToCheck.every(prop => prop in x);
+};
 
 module.exports = is;
