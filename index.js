@@ -161,4 +161,6 @@ is.inRange = (x, range) => {
 	throw new TypeError(`Invalid range: ${util.inspect(range)}`);
 };
 
+is.infinite = x => x === Infinity || x === -Infinity;
+
 module.exports = is;
