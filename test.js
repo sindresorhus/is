@@ -358,3 +358,11 @@ test('is.inRange', t => {
 		m.inRange(0, [1, 2, 3]);
 	});
 });
+
+test('is.infinite', t => {
+	t.true(m.infinite(Infinity));
+	t.true(m.infinite(-Infinity));
+	t.false(m.infinite(NaN));
+	t.false(m.infinite(5));
+	t.false(m.infinite('hello world'));
+});
