@@ -93,7 +93,20 @@ const types = new Map([
 		new Object() // eslint-disable-line no-new-object
 	]],
 	['integer', 6],
-	['domElement', document.createElement('div')]
+	['domElement', ['div',
+		'input',
+		'span',
+		'img',
+		'canvas',
+		'script'].map(el => document.createElement(el))],
+	['non-domElements', [
+		document.createTextNode('data'),
+		document.createProcessingInstruction('xml-stylesheet', 'href="mycss.css" type="text/css"'),
+		document.createComment('This is a comment'),
+		document,
+		document.implementation.createDocumentType('svg:svg', '-//W3C//DTD SVG 1.1//EN', 'http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd'),
+		document.createDocumentFragment()
+	]]
 ]);
 
 // This ensures a certain method matches only the types

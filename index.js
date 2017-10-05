@@ -162,8 +162,9 @@ is.inRange = (x, range) => {
 };
 
 is.domElement = x => {
+	const ELEMENT_NODE = 1;
 	const propsToCheck = ['innerHTML', 'ownerDocument', 'style', 'attributes', 'nodeValue'];
-	return is.object(x) && x.nodeType === 1 && is.string(x.nodeName) &&
+	return is.object(x) && x.nodeType === ELEMENT_NODE && is.string(x.nodeName) &&
 				!is.plainObject(x) && propsToCheck.every(prop => prop in x);
 };
 
