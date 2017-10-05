@@ -375,6 +375,12 @@ test('is.infinite', t => {
 });
 
 test('is.empty', t => {
+	t.true(m.empty(null));
+	t.true(m.empty(undefined));
+
+	t.true(m.empty(false));
+	t.false(m.empty(true));
+
 	t.true(m.empty(''));
 	t.false(m.empty('🦄'));
 

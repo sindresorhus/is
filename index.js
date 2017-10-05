@@ -163,12 +163,10 @@ is.inRange = (x, range) => {
 
 is.infinite = x => x === Infinity || x === -Infinity;
 
-is.empty = value => {
-	return (
-		((is.string(value) || is.array(value)) && !value.length) ||
-		(!is.map(value) && !is.set(value) && is.object(value) && !Object.keys(value).length) ||
-		((is.map(value) || is.set(value)) && !value.size)
-	);
-};
+const isEmptyStringOrArray = x => (is.string(x) || is.array(x)) && x.length === 0;
+const isEmptyObject = x => !is.map(x) && !is.set(x) && is.object(x) && Object.keys(x).length === 0;
+const isEmptyMapOrSet = x => (is.map(x) || is.set(x)) && x.size === 0;
+
+is.empty = x => !x || isEmptyStringOrArray(x) || isEmptyObject(x) || isEmptyMapOrSet(x);
 
 module.exports = is;

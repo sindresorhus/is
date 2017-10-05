@@ -152,7 +152,7 @@ Check if `value` is `Infinity` or `-Infinity`.
 
 ##### .empty(value)
 
-Returns `true` if `value` is an empty string, array, object, map, or set.
+Returns `true` if `value` is falsy or an empty string, array, object, map, or set.
 
 
 ## FAQ
