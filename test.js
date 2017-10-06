@@ -398,3 +398,32 @@ test('is.domElement', t => {
 test('is.infinite', t => {
 	testType(t, 'infinite', ['number']);
 });
+
+test('is.empty', t => {
+	t.true(m.empty(null));
+	t.true(m.empty(undefined));
+
+	t.true(m.empty(false));
+	t.false(m.empty(true));
+
+	t.true(m.empty(''));
+	t.false(m.empty('🦄'));
+
+	t.true(m.empty([]));
+	t.false(m.empty(['🦄']));
+
+	t.true(m.empty({}));
+	t.false(m.empty({unicorn: '🦄'}));
+
+	const tempMap = new Map();
+	t.true(m.empty(tempMap));
+
+	tempMap.set('unicorn', '🦄');
+	t.false(m.empty(tempMap));
+
+	const tempSet = new Set();
+	t.true(m.empty(tempSet));
+
+	tempSet.add(1);
+	t.false(m.empty(tempSet));
+});
