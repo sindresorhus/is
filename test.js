@@ -404,19 +404,15 @@ test('is.empty', t => {
 });
 
 test('is.any', t => {
-	t.true(m.any([null, false], ['null', 'object']));
-	t.true(m.any(['🦄', []], ['array', 'boolean']));
-	t.true(m.any([{}, []], ['object', 'string']));
-	t.false(m.any([null, []], ['string', 'set']));
-	t.false(m.any([new Set(), true], ['map', 'string']));
-	t.false(m.any(['🦄', null], ['set', 'boolean']));
+	t.true(m.any(m.string, {}, true, '🦄'));
+	t.true(m.any(m.object, false, {}, 'unicorns'));
+	t.false(m.any(m.boolean, '🦄', [], 3));
+	t.false(m.any(m.integer, true, 'lol', {}));
 });
 
 test('is.all', t => {
-	t.true(m.all([() => {}, {}], ['object']));
-	t.true(m.all(['🦄', 'unicorns'], ['string']));
-	t.true(m.any([new Set()], ['object', 'set']));
-	t.false(m.any([null, []], ['string', 'set']));
-	t.false(m.any([new Set(), true], ['map', 'string']));
-	t.false(m.any(['🦄', null], ['set', 'boolean']));
+	t.true(m.all(m.object, {}, new Set(), new Map()));
+	t.true(m.all(m.boolean, true, false));
+	t.false(m.all(m.string, '🦄', []));
+	t.false(m.all(m.set, new Map(), {}));
 });

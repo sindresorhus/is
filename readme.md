@@ -155,27 +155,27 @@ Check if `value` is `Infinity` or `-Infinity`.
 Returns `true` if `value` is falsy or an empty string, array, object, map, or set.
 
 
-##### .any(values, types)
+##### .any(predicate, ...values)
 
-Returns `true` if **any** of `values`'s (array) types are in `types` (array).
+Returns `true` if **any** of the input `values` returns true in the `predicate`:
 
 ```js
-is.any(['🦄', {}], ['string', 'boolean']);
+is.any(is.string, {}, true, '🦄');
 //=> true
 
-is.any([[], {}], ['null', 'integer']);
+is.any(is.boolean, 'unicorns', [], new Map());
 //=> false
 ```
 
-##### .all(values, types)
+##### .all(predicate, ...values)
 
-Returns `true` if **all** of `values`'s (array) types are in `types` (array).
+Returns `true` if **all** of the input `values` returns true in the `predicate`:
 
 ```js
-is.all([new Set(), new Map(), {}], ['object']);
+is.all(is.object, {}, new Map(), new Set());
 //=> true
 
-is.all([false, '🦄'], ['string', 'array']);
+is.all(is.string, '🦄', [], 'unicorns');
 //=> false
 ```
 
