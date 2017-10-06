@@ -169,8 +169,9 @@ const isEmptyMapOrSet = x => (is.map(x) || is.set(x)) && x.size === 0;
 
 is.empty = x => !x || isEmptyStringOrArray(x) || isEmptyObject(x) || isEmptyMapOrSet(x);
 
-is.any = (predicate, ...values) => {
+is.any = function (predicate, values) {
 	let ret = false;
+	values = Array.prototype.slice.call(arguments, 1);
 
 	values.forEach(value => {
 		if (predicate(value)) {
@@ -181,8 +182,9 @@ is.any = (predicate, ...values) => {
 	return ret;
 };
 
-is.all = (predicate, ...values) => {
+is.all = function (predicate, values) {
 	let ret = true;
+	values = Array.prototype.slice.call(arguments, 1);
 
 	values.forEach(value => {
 		if (!predicate(value)) {
