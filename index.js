@@ -169,4 +169,121 @@ const isEmptyMapOrSet = x => (is.map(x) || is.set(x)) && x.size === 0;
 
 is.empty = x => !x || isEmptyStringOrArray(x) || isEmptyObject(x) || isEmptyMapOrSet(x);
 
+const isType = (value, type) => {
+	switch (String(type).toLowerCase()) {
+		case 'undefined':
+			return is.undefined(value);
+		case 'null':
+			return is.null(value);
+		case 'string':
+			return is.string(value);
+		case 'number':
+			return is.number(value);
+		case 'boolean':
+			return is.boolean(value);
+		case 'symbol':
+			return is.symbol(value);
+		case 'array':
+			return is.array(value);
+		case 'function':
+			return is.function(value);
+		case 'buffer':
+			return is.buffer(value);
+		case 'object':
+			return is.object(value);
+		case 'regexp':
+			return is.regExp(value);
+		case 'date':
+			return is.date(value);
+		case 'error':
+			return is.error(value);
+		case 'nativepromise':
+			return is.nativePromise(value);
+		case 'promise':
+			return is.promise(value);
+		case 'generator':
+			return is.generator(value);
+		case 'generatorfunction':
+			return is.generatorFunction(value);
+		case 'map':
+			return is.map(value);
+		case 'set':
+			return is.set(value);
+		case 'weakmap':
+			return is.weakMap(value);
+		case 'weakset':
+			return is.weakSet(value);
+		case 'int8array':
+			return is.int8Array(value);
+		case 'uint8array':
+			return is.uint8Array(value);
+		case 'uint8clampedarray':
+			return is.uint8ClampedArray(value);
+		case 'int16array':
+			return is.int16Array(value);
+		case 'uint16array':
+			return is.uint16Array(value);
+		case 'int32array':
+			return is.int32Array(value);
+		case 'uint32array':
+			return is.uint32Array(value);
+		case 'float32array':
+			return is.float32Array(value);
+		case 'float64arrat':
+			return is.float64Array(value);
+		case 'arraybuffer':
+			return is.arrayBuffer(value);
+		case 'sharedarraybuffer':
+			return is.sharedArrayBuffer(value);
+		case 'dataview':
+			return is.dataView(value);
+		case 'nan':
+			return is.nan(value);
+		case 'nullorundefined':
+			return is.nullOrUndefined(value);
+		case 'primitive':
+			return is.primitive(value);
+		case 'integer':
+			return is.integer(value);
+		case 'plainobject':
+			return is.plainObject(value);
+		case 'iterable':
+			return is.iterable(value);
+		case 'class':
+			return is.class(value);
+		case 'typedarray':
+			return is.typedArray(value);
+		default:
+			return false;
+	}
+};
+
+is.any = (values, types) => {
+	let ret = false;
+
+	values.forEach(value => {
+		types.forEach(type => {
+			if (isType(value, type)) {
+				ret = true;
+			}
+		});
+	});
+
+	return ret;
+};
+
+is.all = (values, types) => {
+	let ret = true;
+
+	values.forEach(value => {
+		types.forEach(type => {
+			if (!isType(value, type)) {
+				ret = false;
+			}
+		});
+	});
+
+	return ret;
+};
+
 module.exports = is;

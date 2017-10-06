@@ -402,3 +402,21 @@ test('is.empty', t => {
 	tempSet.add(1);
 	t.false(m.empty(tempSet));
 });
+
+test('is.any', t => {
+	t.true(m.any([null, false], ['null', 'object']));
+	t.true(m.any(['🦄', []], ['array', 'boolean']));
+	t.true(m.any([{}, []], ['object', 'string']));
+	t.false(m.any([null, []], ['string', 'set']));
+	t.false(m.any([new Set(), true], ['map', 'string']));
+	t.false(m.any(['🦄', null], ['set', 'boolean']));
+});
+
+test('is.all', t => {
+	t.true(m.all([() => {}, {}], ['object']));
+	t.true(m.all(['🦄', 'unicorns'], ['string']));
+	t.true(m.any([new Set()], ['object', 'set']));
+	t.false(m.any([null, []], ['string', 'set']));
+	t.false(m.any([new Set(), true], ['map', 'string']));
+	t.false(m.any(['🦄', null], ['set', 'boolean']));
+});

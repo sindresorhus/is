@@ -155,6 +155,30 @@ Check if `value` is `Infinity` or `-Infinity`.
 Returns `true` if `value` is falsy or an empty string, array, object, map, or set.
 
 
+##### .any(values, types)
+
+Returns `true` if **any** of `values`'s (array) types are in `types` (array).
+
+```js
+is.any(['🦄', {}], ['string', 'boolean']);
+//=> true
+
+is.any([[], {}], ['null', 'integer']);
+//=> false
+```
+
+##### .all(values, types)
+
+Returns `true` if **all** of `values`'s (array) types are in `types` (array).
+
+```js
+is.all([new Set(), new Map(), {}], ['object']);
+//=> true
+
+is.all([false, '🦄'], ['string', 'array']);
+//=> false
+```
+
 ## FAQ
 
 ### Why yet another type checking module?
