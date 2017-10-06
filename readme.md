@@ -177,7 +177,7 @@ The most common mistakes I noticed in these modules was using `instanceof` for t
 - [is-array-sorted](https://github.com/sindresorhus/is-array-sorted) - Check if an Array is sorted
 - [is-error-constructor](https://github.com/sindresorhus/is-error-constructor) - Check if a value is an error constructor
 - [is-empty-iterable](https://github.com/sindresorhus/is-empty-iterable) - Check if an Iterable is empty
-- [is-blob] (https://github.com/sindresorhus/is-blob) - Check if a value is a Blob - File-like object of immutable, raw data
+- [is-blob](https://github.com/sindresorhus/is-blob) - Check if a value is a Blob - File-like object of immutable, raw data
 
 
 ## Created by
