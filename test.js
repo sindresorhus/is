@@ -408,6 +408,14 @@ test('is.any', t => {
 	t.true(m.any(m.object, false, {}, 'unicorns'));
 	t.false(m.any(m.boolean, '🦄', [], 3));
 	t.false(m.any(m.integer, true, 'lol', {}));
+
+	t.throws(() => {
+		m.any(null, true);
+	});
+
+	t.throws(() => {
+		m.any(m.string);
+	});
 });
 
 test('is.all', t => {
@@ -415,4 +423,12 @@ test('is.all', t => {
 	t.true(m.all(m.boolean, true, false));
 	t.false(m.all(m.string, '🦄', []));
 	t.false(m.all(m.set, new Map(), {}));
+
+	t.throws(() => {
+		m.all(null, true);
+	});
+
+	t.throws(() => {
+		m.all(m.string);
+	});
 });

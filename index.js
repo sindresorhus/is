@@ -169,30 +169,35 @@ const isEmptyMapOrSet = x => (is.map(x) || is.set(x)) && x.size === 0;
 
 is.empty = x => !x || isEmptyStringOrArray(x) || isEmptyObject(x) || isEmptyMapOrSet(x);
 
-is.any = function (predicate, values) {
-	let ret = false;
-	values = Array.prototype.slice.call(arguments, 1);
+const isAnyOrAll = (all, predicate, values) => {
+	// `values` is the calling function's "arguments object".
+	// We have to do it this way to keep node v4 support.
+	// So here we convert it to an array and slice off the first item.
+	values = Array.prototype.slice.call(values, 1);
 
-	values.forEach(value => {
-		if (predicate(value)) {
-			ret = true;
-		}
-	});
+	if (is.function(predicate) === false) {
+		throw new TypeError(`Invalid predicate: ${util.inspect(predicate)}`);
+	}
 
-	return ret;
+	if (values.length === 0) {
+		throw new TypeError(`Invalid number of values: ${util.inspect(values.length)}`);
+	}
+
+	if (all) {
+		return values.every(predicate);
+	}
+
+	return values.some(predicate);
 };
 
-is.all = function (predicate, values) {
-	let ret = true;
-	values = Array.prototype.slice.call(arguments, 1);
+// We have to use anonymous functions for the any() and all() methods
+// to get the arguments since we can't use rest parameters in node v4.
+is.any = function (predicate) {
+	return isAnyOrAll(false, predicate, arguments);
+};
 
-	values.forEach(value => {
-		if (!predicate(value)) {
-			ret = false;
-		}
-	});
-
-	return ret;
+is.all = function (predicate) {
+	return isAnyOrAll(true, predicate, arguments);
 };
 
 module.exports = is;
