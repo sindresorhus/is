@@ -161,13 +161,17 @@ is.inRange = (x, range) => {
 	throw new TypeError(`Invalid range: ${util.inspect(range)}`);
 };
 
-const NODE_TYPE_ELEMENT_NODE = 1;
-const DOM_PROPERTIES_TO_CHECK = ['innerHTML', 'ownerDocument', 'style', 'attributes', 'nodeValue'];
+const NODE_TYPE_ELEMENT = 1;
+const DOM_PROPERTIES_TO_CHECK = [
+	'innerHTML',
+	'ownerDocument',
+	'style',
+	'attributes',
+	'nodeValue'
+];
 
-is.domElement = x => {
-	return is.object(x) && x.nodeType === NODE_TYPE_ELEMENT_NODE && is.string(x.nodeName) &&
-				!is.plainObject(x) && DOM_PROPERTIES_TO_CHECK.every(property => property in x);
-};
+is.domElement = x => is.object(x) && x.nodeType === NODE_TYPE_ELEMENT && is.string(x.nodeName) &&
+	!is.plainObject(x) && DOM_PROPERTIES_TO_CHECK.every(property => property in x);
 
 is.infinite = x => x === Infinity || x === -Infinity;
 
