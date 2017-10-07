@@ -169,7 +169,7 @@ const isEmptyMapOrSet = x => (is.map(x) || is.set(x)) && x.size === 0;
 
 is.empty = x => !x || isEmptyStringOrArray(x) || isEmptyObject(x) || isEmptyMapOrSet(x);
 
-const isAnyOrAll = (all, predicate, values) => {
+const predicateOnArray = (method, predicate, values) => {
 	// `values` is the calling function's "arguments object".
 	// We have to do it this way to keep node v4 support.
 	// So here we convert it to an array and slice off the first item.
@@ -180,24 +180,20 @@ const isAnyOrAll = (all, predicate, values) => {
 	}
 
 	if (values.length === 0) {
-		throw new TypeError(`Invalid number of values: ${util.inspect(values.length)}`);
+		throw new TypeError(`Invalid number of values`);
 	}
 
-	if (all) {
-		return values.every(predicate);
-	}
-
-	return values.some(predicate);
+	return method.call(values, predicate);
 };
 
 // We have to use anonymous functions for the any() and all() methods
 // to get the arguments since we can't use rest parameters in node v4.
 is.any = function (predicate) {
-	return isAnyOrAll(false, predicate, arguments);
+	return predicateOnArray(Array.prototype.some, predicate, arguments);
 };
 
 is.all = function (predicate) {
-	return isAnyOrAll(true, predicate, arguments);
+	return predicateOnArray(Array.prototype.every, predicate, arguments);
 };
 
 module.exports = is;
