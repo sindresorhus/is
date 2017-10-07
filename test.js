@@ -1,11 +1,15 @@
 import util from 'util';
 import test from 'ava';
+import {jsdom} from 'jsdom';
 import m from '.';
 
 const isNode8orHigher = Number(process.versions.node.split('.')[0]) >= 8;
 
 const PromiseSubclassFixture = class extends Promise {};
 const ErrorSubclassFixture = class extends Error {};
+
+const document = jsdom();
+const createDomElement = el => document.createElement(el);
 
 const types = new Map([
 	['undefined', undefined],
@@ -90,6 +94,22 @@ const types = new Map([
 		new Object() // eslint-disable-line no-new-object
 	]],
 	['integer', 6],
+	['domElement', [
+		'div',
+		'input',
+		'span',
+		'img',
+		'canvas',
+		'script'
+	].map(createDomElement)],
+	['non-domElements', [
+		document.createTextNode('data'),
+		document.createProcessingInstruction('xml-stylesheet', 'href="mycss.css" type="text/css"'),
+		document.createComment('This is a comment'),
+		document,
+		document.implementation.createDocumentType('svg:svg', '-//W3C//DTD SVG 1.1//EN', 'http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd'),
+		document.createDocumentFragment()
+	]],
 	['infinite', [
 		Infinity,
 		-Infinity
@@ -368,6 +388,11 @@ test('is.inRange', t => {
 	t.throws(() => {
 		m.inRange(0, [1, 2, 3]);
 	});
+});
+
+test('is.domElement', t => {
+	testType(t, 'domElement');
+	t.false(m.domElement({nodeType: 1, nodeName: 'div'}));
 });
 
 test('is.infinite', t => {

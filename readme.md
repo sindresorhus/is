@@ -145,10 +145,13 @@ Check if `value` (number) is in the range of `0` to `upperBound`.
 is.inRange(3, 10);
 ```
 
+##### .domElement(value)
+
+Returns `true` if `value` is a DOM Element.
+
 ##### .infinite(value)
 
 Check if `value` is `Infinity` or `-Infinity`.
-
 
 ##### .empty(value)
 
