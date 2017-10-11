@@ -158,6 +158,30 @@ Check if `value` is `Infinity` or `-Infinity`.
 Returns `true` if `value` is falsy or an empty string, array, object, map, or set.
 
 
+##### .any(predicate, ...values)
+
+Returns `true` if **any** of the input `values` returns true in the `predicate`:
+
+```js
+is.any(is.string, {}, true, '🦄');
+//=> true
+
+is.any(is.boolean, 'unicorns', [], new Map());
+//=> false
+```
+
+##### .all(predicate, ...values)
+
+Returns `true` if **all** of the input `values` returns true in the `predicate`:
+
+```js
+is.all(is.object, {}, new Map(), new Set());
+//=> true
+
+is.all(is.string, '🦄', [], 'unicorns');
+//=> false
+```
+
 ## FAQ
 
 ### Why yet another type checking module?
