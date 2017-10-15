@@ -85,7 +85,10 @@ is.promise = x => is.nativePromise(x) || hasPromiseAPI(x);
 is.generator = x => is.iterable(x) && is.function(x.next) && is.function(x.throw);
 
 // TODO: Change to use `isObjectOfType` once Node.js 6 or higher is targeted
-is.generatorFunction = x => is.function(x) && is.function(x.constructor) && x.constructor.name === 'GeneratorFunction';
+const isFunctionOfType = type => x => is.function(x) && is.function(x.constructor) && x.constructor.name === type;
+
+is.generatorFunction = isFunctionOfType('GeneratorFunction');
+is.asyncFunction = isFunctionOfType('AsyncFunction');
 
 is.regExp = isObjectOfType('RegExp');
 is.date = isObjectOfType('Date');
