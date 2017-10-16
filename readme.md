@@ -84,6 +84,18 @@ Returns `true` for any object that implements its own `.next()` and `.throw()` m
 
 ##### .generatorFunction(value)
 
+##### .asyncFunction(value)
+
+Returns `true` for any `async` function that can be called with the `await` operator. 
+
+```js
+is.asyncFunction(async () => {});
+// => true
+
+is.asyncFunction(() => {});
+// => false
+```
+
 ##### .map(value)
 ##### .set(value)
 ##### .weakMap(value)

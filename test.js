@@ -68,6 +68,10 @@ const types = new Map([
 	['generatorFunction', function * () {
 		yield 4;
 	}],
+	['asyncFunction', [
+		async function () {},
+		async () => {}
+	]],
 	['map', new Map()],
 	['set', new Set()],
 	['weakMap', new WeakMap()],
@@ -172,7 +176,7 @@ test('is.array', t => {
 });
 
 test('is.function', t => {
-	testType(t, 'function', ['generatorFunction']);
+	testType(t, 'function', ['generatorFunction', 'asyncFunction']);
 });
 
 test('is.buffer', t => {
@@ -214,6 +218,12 @@ test('is.generator', t => {
 test('is.generatorFunction', t => {
 	testType(t, 'generatorFunction', ['function']);
 });
+
+if (isNode8orHigher) {
+	test('is.asyncFunction', t => {
+		testType(t, 'asyncFunction', ['function']);
+	});
+}
 
 test('is.map', t => {
 	testType(t, 'map');
