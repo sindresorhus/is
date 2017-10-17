@@ -128,6 +128,11 @@ is.asyncFunction(() => {});
 JavaScript primitives are as follows: `null`, `undefined`, `string`, `number`, `boolean`, `symbol`.
 
 ##### .integer(value)
+
+##### .safeInteger(value)
+
+Returns `true` if `value` is a [safe integer](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number/isSafeInteger).
+
 ##### .plainObject(value)
 
 An object is plain if it's created by either `{}`, `new Object()`, or `Object.create(null)`.

@@ -124,6 +124,7 @@ const primitiveTypes = new Set([
 is.primitive = x => is.null(x) || primitiveTypes.has(typeof x);
 
 is.integer = Number.isInteger;
+is.safeInteger = Number.isSafeInteger;
 
 is.plainObject = x => {
 	// From: https://github.com/sindresorhus/is-plain-obj/blob/master/index.js
