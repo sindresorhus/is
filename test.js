@@ -419,6 +419,26 @@ test('is.infinite', t => {
 	testType(t, 'infinite', ['number']);
 });
 
+test('is.even', t => {
+	for (const el of [-6, 2, 4]) {
+		t.true(m.even(el));
+	}
+
+	for (const el of [-3, 1, 5]) {
+		t.false(m.even(el));
+	}
+});
+
+test('is.odd', t => {
+	for (const el of [-5, 7, 13]) {
+		t.true(m.odd(el));
+	}
+
+	for (const el of [-8, 8, 10]) {
+		t.false(m.odd(el));
+	}
+});
+
 test('is.empty', t => {
 	t.true(m.empty(null));
 	t.true(m.empty(undefined));
