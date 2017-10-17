@@ -182,6 +182,10 @@ Returns `true` if `value` is an odd integer.
 
 Returns `true` if `value` is falsy or an empty string, array, object, map, or set.
 
+##### .emptyOrWhitespace(value)
+
+Returns `true` if `is.empty(value)` or a string that is all whitespace.
+
 
 ##### .any(predicate, ...values)
 

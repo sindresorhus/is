@@ -468,6 +468,13 @@ test('is.empty', t => {
 	t.false(m.empty(tempSet));
 });
 
+test('is.emptyOrWhitespace', t => {
+	t.true(m.emptyOrWhitespace(''));
+	t.true(m.emptyOrWhitespace('  '));
+	t.false(m.emptyOrWhitespace('🦄'));
+	t.false(m.emptyOrWhitespace('unicorn'));
+});
+
 test('is.any', t => {
 	t.true(m.any(m.string, {}, true, '🦄'));
 	t.true(m.any(m.object, false, {}, 'unicorns'));
