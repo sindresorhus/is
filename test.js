@@ -98,6 +98,10 @@ const types = new Map([
 		new Object() // eslint-disable-line no-new-object
 	]],
 	['integer', 6],
+	['safeInteger', [
+		Math.pow(2, 53) - 1,
+		-Math.pow(2, 53) + 1
+	]],
 	['domElement', [
 		'div',
 		'input',
@@ -160,7 +164,7 @@ test('is.string', t => {
 });
 
 test('is.number', t => {
-	testType(t, 'number', ['nan', 'integer', 'infinite']);
+	testType(t, 'number', ['nan', 'integer', 'safeInteger', 'infinite']);
 });
 
 test('is.boolean', t => {
@@ -312,8 +316,14 @@ test('is.primitive', t => {
 });
 
 test('is.integer', t => {
-	testType(t, 'integer', ['number']);
+	testType(t, 'integer', ['number', 'safeInteger']);
 	t.false(m.integer(1.4));
+});
+
+test('is.safeInteger', t => {
+	testType(t, 'safeInteger', ['number', 'integer']);
+	t.false(m.safeInteger(Math.pow(2, 53)));
+	t.false(m.safeInteger(-Math.pow(2, 53)));
 });
 
 test('is.plainObject', t => {
