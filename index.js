@@ -178,6 +178,10 @@ is.domElement = x => is.object(x) && x.nodeType === NODE_TYPE_ELEMENT && is.stri
 
 is.infinite = x => x === Infinity || x === -Infinity;
 
+const isAbsoluteMod2 = value => x => is.integer(x) && Math.abs(x % 2) === value;
+is.even = isAbsoluteMod2(0);
+is.odd = isAbsoluteMod2(1);
+
 const isEmptyStringOrArray = x => (is.string(x) || is.array(x)) && x.length === 0;
 const isEmptyObject = x => !is.map(x) && !is.set(x) && is.object(x) && Object.keys(x).length === 0;
 const isEmptyMapOrSet = x => (is.map(x) || is.set(x)) && x.size === 0;

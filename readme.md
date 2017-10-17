@@ -165,6 +165,14 @@ Returns `true` if `value` is a DOM Element.
 
 Check if `value` is `Infinity` or `-Infinity`.
 
+##### .even(value)
+
+Returns `true` if `value` is an even integer.
+
+##### .odd(value)
+
+Returns `true` if `value` is an odd integer.
+
 ##### .empty(value)
 
 Returns `true` if `value` is falsy or an empty string, array, object, map, or set.
