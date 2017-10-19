@@ -475,6 +475,15 @@ test('is.emptyOrWhitespace', t => {
 	t.false(m.emptyOrWhitespace('unicorn'));
 });
 
+test('is.emoji', t => {
+	t.true(m.emoji('🙏'));
+	t.true(m.emoji('👑'));
+	t.true(m.emoji('\uD83D\uDC04'));
+	t.true(m.emoji('9️⃣'));
+	t.true(m.emoji('🎌'));
+	t.false(m.emoji(':unicorn:'));
+});
+
 test('is.any', t => {
 	t.true(m.any(m.string, {}, true, '🦄'));
 	t.true(m.any(m.object, false, {}, 'unicorns'));

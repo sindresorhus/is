@@ -86,7 +86,7 @@ Returns `true` for any object that implements its own `.next()` and `.throw()` m
 
 ##### .asyncFunction(value)
 
-Returns `true` for any `async` function that can be called with the `await` operator. 
+Returns `true` for any `async` function that can be called with the `await` operator.
 
 ```js
 is.asyncFunction(async () => {});
@@ -181,6 +181,8 @@ Returns `true` if `value` is an odd integer.
 ##### .empty(value)
 
 Returns `true` if `value` is falsy or an empty string, array, object, map, or set.
+
+##### .emoji(value)
 
 ##### .emptyOrWhitespace(value)
 
