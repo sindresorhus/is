@@ -111,6 +111,9 @@ is.float64Array = isObjectOfType('Float64Array');
 is.arrayBuffer = isObjectOfType('ArrayBuffer');
 is.sharedArrayBuffer = isObjectOfType('SharedArrayBuffer');
 
+is.truthy = x => !!x; // eslint-disable-line no-implicit-coercion
+is.falsy = x => !x;
+
 is.nan = Number.isNaN;
 is.nullOrUndefined = x => is.null(x) || is.undefined(x);
 
@@ -188,7 +191,7 @@ const isEmptyStringOrArray = x => (is.string(x) || is.array(x)) && x.length === 
 const isEmptyObject = x => !is.map(x) && !is.set(x) && is.object(x) && Object.keys(x).length === 0;
 const isEmptyMapOrSet = x => (is.map(x) || is.set(x)) && x.size === 0;
 
-is.empty = x => !x || isEmptyStringOrArray(x) || isEmptyObject(x) || isEmptyMapOrSet(x);
+is.empty = x => is.falsy(x) || isEmptyStringOrArray(x) || isEmptyObject(x) || isEmptyMapOrSet(x);
 is.emptyOrWhitespace = x => is.empty(x) || isWhiteSpaceString(x);
 
 const predicateOnArray = (method, predicate, values) => {
