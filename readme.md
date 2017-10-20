@@ -121,6 +121,22 @@ is.asyncFunction(() => {});
 
 #### Miscellaneous
 
+##### .truthy(value)
+
+Returns `true` for all values that evaluate to true in a boolean context:
+
+```js
+is.truthy('🦄');
+//=> true
+
+is.truthy(undefined);
+//=> false
+```
+
+##### .falsy(value)
+
+Returns `true` if `value` is one of: `false`, `0`, `''`, `null`, `undefined`, `NaN`. 
+
 ##### .nan(value)
 ##### .nullOrUndefined(value)
 ##### .primitive(value)

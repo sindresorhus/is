@@ -289,6 +289,23 @@ test('is.dataView', t => {
 	testType(t, 'arrayBuffer');
 });
 
+test('is.truthy', t => {
+	t.true(m.truthy('unicorn'));
+	t.true(m.truthy('🦄'));
+	t.true(m.truthy(new Set()));
+	t.true(m.truthy(Symbol('🦄')));
+	t.true(m.truthy(true));
+});
+
+test('is.falsy', t => {
+	t.true(m.falsy(false));
+	t.true(m.falsy(0));
+	t.true(m.falsy(''));
+	t.true(m.falsy(null));
+	t.true(m.falsy(undefined));
+	t.true(m.falsy(NaN));
+});
+
 test('is.nan', t => {
 	testType(t, 'nan');
 });
