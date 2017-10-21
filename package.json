@@ -1,6 +1,6 @@
 {
   "name": "@sindresorhus/is",
-  "version": "0.3.0",
+  "version": "0.4.0",
   "description": "Type check values: `is.string('🦄') //=> true`",
   "license": "MIT",
   "repository": "sindresorhus/is",
