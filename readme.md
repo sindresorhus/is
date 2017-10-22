@@ -160,6 +160,20 @@ Returns `true` for instances created by a ES2015 class.
 
 ##### .typedArray(value)
 
+##### .arrayLike(value)
+
+A `value` is array-like if it is not a function and has a `value.length` that is a safe integer greater than or equal to 0.
+
+```js
+is.arrayLike(document.forms);
+//=> true
+
+function () {
+    is.arrayLike(arguments);
+    //=> true
+}
+```
+
 ##### .inRange(value, range)
 
 Check if `value` (number) is in the given `range`. The range is an array of two values, lower bound and upper bound, in no specific order.

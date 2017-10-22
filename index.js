@@ -155,6 +155,9 @@ const typedArrayTypes = new Set([
 ]);
 is.typedArray = x => typedArrayTypes.has(getObjectType(x));
 
+const isValidLength = x => is.safeInteger(x) && x > -1;
+is.arrayLike = x => !is.nullOrUndefined(x) && !is.function(x) && isValidLength(x.length);
+
 is.inRange = (x, range) => {
 	if (is.number(range)) {
 		return x >= Math.min(0, range) && x <= Math.max(range, 0);
