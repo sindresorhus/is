@@ -86,7 +86,7 @@ Returns `true` for any object that implements its own `.next()` and `.throw()` m
 
 ##### .asyncFunction(value)
 
-Returns `true` for any `async` function that can be called with the `await` operator. 
+Returns `true` for any `async` function that can be called with the `await` operator.
 
 ```js
 is.asyncFunction(async () => {});
@@ -135,7 +135,7 @@ is.truthy(undefined);
 
 ##### .falsy(value)
 
-Returns `true` if `value` is one of: `false`, `0`, `''`, `null`, `undefined`, `NaN`. 
+Returns `true` if `value` is one of: `false`, `0`, `''`, `null`, `undefined`, `NaN`.
 
 ##### .nan(value)
 ##### .nullOrUndefined(value)
