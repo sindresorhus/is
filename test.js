@@ -392,6 +392,18 @@ test('is.typedArray', t => {
 	t.false(m.typedArray({}));
 });
 
+test('is.arrayLike', t => {
+	(() => {
+		t.true(m.arrayLike(arguments));
+	})();
+	t.true(m.arrayLike([]));
+	t.true(m.arrayLike('unicorn'));
+
+	t.false(m.arrayLike({}));
+	t.false(m.arrayLike(() => {}));
+	t.false(m.arrayLike(new Map()));
+});
+
 test('is.inRange', t => {
 	const x = 3;
 
