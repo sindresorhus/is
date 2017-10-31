@@ -1,0 +1,19 @@
+{
+    "compileOnSave": true,
+    "compilerOptions": {
+        "target": "es6",
+        "moduleResolution": "node",
+        "strict": true,
+        "alwaysStrict": true,
+        "declaration": true,
+        "outDir": ".",
+        "noImplicitAny": true,
+        "suppressImplicitAnyIndexErrors": true
+    },
+    "include": [
+        "index.ts"
+    ],
+    "exclude": [
+        "node_modules"
+    ]
+}

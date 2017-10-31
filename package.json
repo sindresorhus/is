@@ -16,10 +16,13 @@
     "node": ">=4"
   },
   "scripts": {
-    "test": "xo && ava"
+    "test": "xo && ava",
+    "build": "tsc",
+    "prepublish": "tsc"    
   },
   "files": [
-    "index.js"
+    "index.js",
+    "index.d.ts"
   ],
   "keywords": [
     "type",
@@ -43,8 +46,10 @@
     "compare"
   ],
   "devDependencies": {
+    "@types/node": "^8.0.47",
     "ava": "*",
     "jsdom": "^9.12.0",
+    "typescript": "^2.6.1",
     "xo": "*"
   }
 }
