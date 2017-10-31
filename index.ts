@@ -1,4 +1,4 @@
-const {inspect} = require('util');
+const util = require('util');
 
 //const toString = Object.prototype.toString;
 const getObjectType = (x: any) => toString.call(x).slice(8, -1) as string;
@@ -171,7 +171,7 @@ namespace is {
 			return x >= Math.min.apply(null, range) && x <= Math.max.apply(null, range);
 		}
 
-		throw new TypeError(`Invalid range: ${inspect(range)}`);
+		throw new TypeError(`Invalid range: ${util.inspect(range)}`);
 	};
 
 	const NODE_TYPE_ELEMENT = 1;
@@ -208,7 +208,7 @@ namespace is {
 		values = Array.prototype.slice.call(values, 1);
 
 		if (is.func(predicate) === false) {
-			throw new TypeError(`Invalid predicate: ${inspect(predicate)}`);
+			throw new TypeError(`Invalid predicate: ${util.inspect(predicate)}`);
 		}
 
 		if (values.length === 0) {
