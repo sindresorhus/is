@@ -16,9 +16,9 @@
     "node": ">=4"
   },
   "scripts": {
-    "test": "xo && ava",
+    "test": "tsc && ava",
     "build": "tsc",
-    "prepublish": "tsc"    
+    "prepublish": "tsc"
   },
   "files": [
     "index.js",
@@ -49,7 +49,6 @@
     "@types/node": "^8.0.47",
     "ava": "*",
     "jsdom": "^9.12.0",
-    "typescript": "^2.6.1",
-    "xo": "*"
+    "typescript": "^2.6.1"
   }
 }
