@@ -1,12 +1,12 @@
-const util = require('util');
+import * as util from "util";
 
-//const toString = Object.prototype.toString;
+const toString = Object.prototype.toString;
 const getObjectType = (x: any) => toString.call(x).slice(8, -1) as string;
-const isOfType = (type: string) => (x: any) => typeof x === type; // eslint-disable-line valid-typeof
+const isOfType = (type: string) => (x: any) => typeof x === type;
 const isObjectOfType = (type: string) => (x: any) => getObjectType(x) === type;
 
 //export default is
-function is (value: any) {
+function is(value: any) {
 	if (value === null) {
 		return 'null';
 	}
@@ -112,30 +112,32 @@ namespace is {
 	export const arrayBuffer = isObjectOfType('ArrayBuffer');
 	export const sharedArrayBuffer = isObjectOfType('SharedArrayBuffer');
 
-	export const truthy = (x: any) => !!x; // eslint-disable-line no-implicit-coercion
+	export const truthy = (x: any) => Boolean(x);
 	export const falsy = (x: any) => !x;
 
-	// the tests are designed for Number.isNaN rather than global isNaN
+	// Number.isNaN is currently not supported and isNaN() is typeguarded to only accept number
+	// see https://github.com/Microsoft/TypeScript/issues/15149
 	export const nan = (x: any) => is.number(x) && isNaN(Number(x)); 
 	
 	export const nullOrUndefined = (x: any) => is.null_(x) || is.undefined(x);
 
-	const primitiveTypes = new Set<string>([
+	const primitiveTypes = new Set([
 		'undefined',
 		'string',
 		'number',
 		'boolean',
 		'symbol'
 	]);
+
 	export const primitive = (x: any) => is.null_(x) || primitiveTypes.has(typeof x);
 
-	export const integer = Number.isInteger;
-	export const safeInteger = Number.isSafeInteger;
+	export const integer = (x: any) => is.number(x) && isFinite(x) && (x | 0) === x;
+	// Target es5 requires ugly constant here: https://github.com/Microsoft/TypeScript/issues/9937
+	export const safeInteger = (x: any) => is.number(x) && Math.abs(x) <= 9007199254740991;
 
 	export const plainObject = (x: any) => {
 		// From: https://github.com/sindresorhus/is-plain-obj/blob/master/index.js
 		let prototype;
-		// eslint-disable-next-line no-return-assign
 		return getObjectType(x) === 'Object' &&
 			(prototype = Object.getPrototypeOf(x), prototype === null ||
 				prototype === Object.getPrototypeOf({}));
@@ -145,7 +147,7 @@ namespace is {
 
 	export const class_ = (x: any) => is.func(x) && x.toString().startsWith('class ');
 
-	const typedArrayTypes = new Set<string>([
+	const typedArrayTypes = new Set([
 		'Int8Array',
 		'Uint8Array',
 		'Uint8ClampedArray',
@@ -167,8 +169,7 @@ namespace is {
 		}
 
 		if (is.array(range) && range.length === 2) {
-			// TODO: Use spread operator here when targeting Node.js 6 or higher
-			return x >= Math.min.apply(null, range) && x <= Math.max.apply(null, range);
+			return x >= Math.min(...range) && x <= Math.max(...range);
 		}
 
 		throw new TypeError(`Invalid range: ${util.inspect(range)}`);
@@ -201,12 +202,7 @@ namespace is {
 	export const emptyOrWhitespace = (x: any) => is.empty(x) || isWhiteSpaceString(x);
 
 	type ArrayMethod = (fn: (value: any, index: number, arr: any[]) => boolean, thisArg?: any) => boolean
-	const predicateOnArray = (method: ArrayMethod, predicate: any, values: IArguments) => {
-		// `values` is the calling function's "arguments object".
-		// We have to do it this way to keep node v4 support.
-		// So here we convert it to an array and slice off the first item.
-		values = Array.prototype.slice.call(values, 1);
-
+	const predicateOnArray = (method: ArrayMethod, predicate: any, values: any[]) => {
 		if (is.func(predicate) === false) {
 			throw new TypeError(`Invalid predicate: ${util.inspect(predicate)}`);
 		}
@@ -218,20 +214,22 @@ namespace is {
 		return method.call(values, predicate);
 	};
 
-	// We have to use anonymous functions for the any() and all() methods
-	// to get the arguments since we can't use rest parameters in node v4.
-	export const any = function (predicate: any) {
-		return predicateOnArray(Array.prototype.some, predicate, arguments);
+	export const any = function (predicate: any, ...values: any[]) {
+		return predicateOnArray(Array.prototype.some, predicate, values);
 	};
 
-	export const all = function (predicate: any) {
-		return predicateOnArray(Array.prototype.every, predicate, arguments);
+	export const all = function (predicate: any, ...values: any[]) {
+		return predicateOnArray(Array.prototype.every, predicate, values);
 	};
 }
 
-// Some few keywords are reserved
-module.exports = Object.assign(is, {
-	class: is.class_,
-	function: is.func,
-	null: is.null_
-})
+// Some few keywords are reserved, but we'll populate them for the node-folks
+// see https://github.com/Microsoft/TypeScript/issues/2536
+Object.defineProperties(is, { 
+	"class": { value: is.class_ },
+	"function": { value: is.func },
+	"null": { value: is.null_ }
+});
+
+
+export default is

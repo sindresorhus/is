@@ -22,7 +22,8 @@
   },
   "files": [
     "index.js",
-    "index.d.ts"
+    "index.d.ts",
+    "index.js.map"
   ],
   "keywords": [
     "type",

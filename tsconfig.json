@@ -1,19 +1,17 @@
 {
     "compileOnSave": true,
     "compilerOptions": {
-        "target": "es6",
-        "moduleResolution": "node",
+        "target": "es5",
         "strict": true,
-        "alwaysStrict": true,
         "declaration": true,
+        "sourceMap": true,
         "outDir": ".",
-        "noImplicitAny": true,
-        "suppressImplicitAnyIndexErrors": true
+        "lib": [
+            "es2015"
+        ]
     },
     "include": [
         "index.ts"
     ],
-    "exclude": [
-        "node_modules"
-    ]
+    "exclude": []
 }
