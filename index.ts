@@ -1,9 +1,9 @@
 import * as util from "util";
 
 const toString = Object.prototype.toString;
-const getObjectType = (x: any) => toString.call(x).slice(8, -1) as string;
-const isOfType = (type: string) => (x: any) => typeof x === type;
-const isObjectOfType = (type: string) => (x: any) => getObjectType(x) === type;
+const getObjectType = (value: any) => toString.call(value).slice(8, -1) as string;
+const isOfType = (type: string) => (value: any) => typeof value === type;
+const isObjectOfType = (type: string) => (value: any) => getObjectType(value) === type;
 
 //export default is
 function is(value: any) {
@@ -61,32 +61,32 @@ namespace is {
 	export const undefined = isOfType('undefined');
 	export const string = isOfType('string');
 	export const number = isOfType('number');
-	export const boolean = (x: any) => x === true || x === false;
+	export const boolean = (value: any) => value === true || value === false;
 	export const symbol = isOfType('symbol');
 	export const func = isOfType('function');
-	export const null_ = (x: any) => x === null;
+	export const null_ = (value: any) => value === null;
 
 	export const array = Array.isArray;
 	export const buffer = Buffer.isBuffer;
 
-	const isObject = (x: any) => typeof x === 'object';
+	const isObject = (value: any) => typeof value === 'object';
 
-	export const object = (x: any) => !is.nullOrUndefined(x) && (is.func(x) || isObject(x));
+	export const object = (value: any) => !is.nullOrUndefined(value) && (is.func(value) || isObject(value));
 
 	export const nativePromise = isObjectOfType('Promise');
 
-	const hasPromiseAPI = (x: any) =>
-		!is.null_(x) &&
-		isObject(x) &&
-		is.func(x.then) &&
-		is.func(x.catch);
+	const hasPromiseAPI = (value: any) =>
+		!is.null_(value) &&
+		isObject(value) &&
+		is.func(value.then) &&
+		is.func(value.catch);
 
-	export const promise = (x: any) => is.nativePromise(x) || hasPromiseAPI(x);
+	export const promise = (value: any) => is.nativePromise(value) || hasPromiseAPI(value);
 
-	export const generator = (x: any) => is.iterable(x) && is.func(x.next) && is.func(x.throw);
+	export const generator = (value: any) => is.iterable(value) && is.func(value.next) && is.func(value.throw);
 
 	// TODO: Change to use `isObjectOfType` once Node.js 6 or higher is targeted
-	const isFunctionOfType = (type: string) => (x: any) => is.func(x) && is.func(x.constructor) && x.constructor.name === type;
+	const isFunctionOfType = (type: string) => (value: any) => is.func(value) && is.func(value.constructor) && value.constructor.name === type;
 
 	export const generatorFunction = isFunctionOfType('GeneratorFunction');
 	export const asyncFunction = isFunctionOfType('AsyncFunction');
@@ -112,14 +112,14 @@ namespace is {
 	export const arrayBuffer = isObjectOfType('ArrayBuffer');
 	export const sharedArrayBuffer = isObjectOfType('SharedArrayBuffer');
 
-	export const truthy = (x: any) => Boolean(x);
-	export const falsy = (x: any) => !x;
+	export const truthy = (value: any) => Boolean(value);
+	export const falsy = (value: any) => !value;
 
 	// Number.isNaN is currently not supported and isNaN() is typeguarded to only accept number
 	// see https://github.com/Microsoft/TypeScript/issues/15149
-	export const nan = (x: any) => is.number(x) && isNaN(Number(x)); 
+	export const nan = (value: any) => is.number(value) && isNaN(Number(value)); 
 	
-	export const nullOrUndefined = (x: any) => is.null_(x) || is.undefined(x);
+	export const nullOrUndefined = (value: any) => is.null_(value) || is.undefined(value);
 
 	const primitiveTypes = new Set([
 		'undefined',
@@ -129,23 +129,23 @@ namespace is {
 		'symbol'
 	]);
 
-	export const primitive = (x: any) => is.null_(x) || primitiveTypes.has(typeof x);
+	export const primitive = (value: any) => is.null_(value) || primitiveTypes.has(typeof value);
 
-	export const integer = (x: any) => is.number(x) && isFinite(x) && (x | 0) === x;
+	export const integer = (value: any) => is.number(value) && isFinite(value) && (value | 0) === value;
 	// Target es5 requires ugly constant here: https://github.com/Microsoft/TypeScript/issues/9937
-	export const safeInteger = (x: any) => is.number(x) && Math.abs(x) <= 9007199254740991;
+	export const safeInteger = (value: any) => is.number(value) && Math.abs(value) <= 9007199254740991;
 
-	export const plainObject = (x: any) => {
+	export const plainObject = (value: any) => {
 		// From: https://github.com/sindresorhus/is-plain-obj/blob/master/index.js
 		let prototype;
-		return getObjectType(x) === 'Object' &&
-			(prototype = Object.getPrototypeOf(x), prototype === null ||
+		return getObjectType(value) === 'Object' &&
+			(prototype = Object.getPrototypeOf(value), prototype === null ||
 				prototype === Object.getPrototypeOf({}));
 	};
 
-	export const iterable = (x: any) => !is.nullOrUndefined(x) && is.func(x[Symbol.iterator]);
+	export const iterable = (value: any) => !is.nullOrUndefined(value) && is.func(value[Symbol.iterator]);
 
-	export const class_ = (x: any) => is.func(x) && x.toString().startsWith('class ');
+	export const class_ = (value: any) => is.func(value) && value.toString().startsWith('class ');
 
 	const typedArrayTypes = new Set([
 		'Int8Array',
@@ -158,18 +158,18 @@ namespace is {
 		'Float32Array',
 		'Float64Array'
 	]);
-	export const typedArray = (x: any) => typedArrayTypes.has(getObjectType(x));
+	export const typedArray = (value: any) => typedArrayTypes.has(getObjectType(value));
 
-	const isValidLength = (x: any) => is.safeInteger(x) && x > -1;
-	export const arrayLike = (x: any) => !is.nullOrUndefined(x) && !is.func(x) && isValidLength(x.length);
+	const isValidLength = (value: any) => is.safeInteger(value) && value > -1;
+	export const arrayLike = (value: any) => !is.nullOrUndefined(value) && !is.func(value) && isValidLength(value.length);
 
-	export const inRange = (x: number, range: number | number[]) => {
+	export const inRange = (value: number, range: number | number[]) => {
 		if (is.number(range)) {
-			return x >= Math.min(0, range as number) && x <= Math.max(range as number, 0);
+			return value >= Math.min(0, range as number) && value <= Math.max(range as number, 0);
 		}
 
 		if (is.array(range) && range.length === 2) {
-			return x >= Math.min(...range) && x <= Math.max(...range);
+			return value >= Math.min(...range) && value <= Math.max(...range);
 		}
 
 		throw new TypeError(`Invalid range: ${util.inspect(range)}`);
@@ -184,22 +184,22 @@ namespace is {
 		'nodeValue'
 	];
 
-	export const domElement = (x: any) => is.object(x) && x.nodeType === NODE_TYPE_ELEMENT && is.string(x.nodeName) &&
-		!is.plainObject(x) && DOM_PROPERTIES_TO_CHECK.every(property => property in x);
+	export const domElement = (value: any) => is.object(value) && value.nodeType === NODE_TYPE_ELEMENT && is.string(value.nodeName) &&
+		!is.plainObject(value) && DOM_PROPERTIES_TO_CHECK.every(property => property in value);
 
-	export const infinite = (x: any) => x === Infinity || x === -Infinity;
+	export const infinite = (value: any) => value === Infinity || value === -Infinity;
 
-	const isAbsoluteMod2 = (value: number) => (x: number) => is.integer(x) && Math.abs(x % 2) === value;
+	const isAbsoluteMod2 = (value: number) => (rem: number) => is.integer(rem) && Math.abs(rem % 2) === value;
 	export const even = isAbsoluteMod2(0);
 	export const odd = isAbsoluteMod2(1);
 
-	const isWhiteSpaceString = (x: any) => is.string(x) && /\S/.test(x) === false;
-	const isEmptyStringOrArray = (x: any) => (is.string(x) || is.array(x)) && x.length === 0;
-	const isEmptyObject = (x: any) => !is.map(x) && !is.set(x) && is.object(x) && Object.keys(x).length === 0;
-	const isEmptyMapOrSet = (x: any) => (is.map(x) || is.set(x)) && x.size === 0;
+	const isWhiteSpaceString = (value: any) => is.string(value) && /\S/.test(value) === false;
+	const isEmptyStringOrArray = (value: any) => (is.string(value) || is.array(value)) && value.length === 0;
+	const isEmptyObject = (value: any) => !is.map(value) && !is.set(value) && is.object(value) && Object.keys(value).length === 0;
+	const isEmptyMapOrSet = (value: any) => (is.map(value) || is.set(value)) && value.size === 0;
 
-	export const empty = (x: any) => is.falsy(x) || isEmptyStringOrArray(x) || isEmptyObject(x) || isEmptyMapOrSet(x);
-	export const emptyOrWhitespace = (x: any) => is.empty(x) || isWhiteSpaceString(x);
+	export const empty = (value: any) => is.falsy(value) || isEmptyStringOrArray(value) || isEmptyObject(value) || isEmptyMapOrSet(value);
+	export const emptyOrWhitespace = (value: any) => is.empty(value) || isWhiteSpaceString(value);
 
 	type ArrayMethod = (fn: (value: any, index: number, arr: any[]) => boolean, thisArg?: any) => boolean
 	const predicateOnArray = (method: ArrayMethod, predicate: any, values: any[]) => {
@@ -230,6 +230,5 @@ Object.defineProperties(is, {
 	"function": { value: is.func },
 	"null": { value: is.null_ }
 });
-
 
 export default is
