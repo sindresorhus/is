@@ -22,9 +22,9 @@
     "prepublish": "npm run build"
   },
   "files": [
-    "index.js",
-    "index.d.ts",
-    "index.js.map"
+    "dist/src/index.js",
+    "dist/src/index.d.ts",
+    "dist/src/index.js.map"
   ],
   "keywords": [
     "type",
