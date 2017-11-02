@@ -5,7 +5,6 @@ const getObjectType = (value: any) => toString.call(value).slice(8, -1) as strin
 const isOfType = (type: string) => (value: any) => typeof value === type;
 const isObjectOfType = (type: string) => (value: any) => getObjectType(value) === type;
 
-//export default is
 function is(value: any) {
 	if (value === null) {
 		return 'null';
@@ -33,7 +32,7 @@ function is(value: any) {
 		return 'symbol';
 	}
 
-	if (is.func(value)) {
+	if (is.function_(value)) {
 		return 'Function';
 	}
 
@@ -63,7 +62,7 @@ namespace is {
 	export const number = isOfType('number');
 	export const boolean = (value: any) => value === true || value === false;
 	export const symbol = isOfType('symbol');
-	export const func = isOfType('function');
+	export const function_ = isOfType('function');
 	export const null_ = (value: any) => value === null;
 
 	export const array = Array.isArray;
@@ -71,22 +70,22 @@ namespace is {
 
 	const isObject = (value: any) => typeof value === 'object';
 
-	export const object = (value: any) => !is.nullOrUndefined(value) && (is.func(value) || isObject(value));
+	export const object = (value: any) => !is.nullOrUndefined(value) && (is.function_(value) || isObject(value));
 
 	export const nativePromise = isObjectOfType('Promise');
 
 	const hasPromiseAPI = (value: any) =>
 		!is.null_(value) &&
 		isObject(value) &&
-		is.func(value.then) &&
-		is.func(value.catch);
+		is.function_(value.then) &&
+		is.function_(value.catch);
 
 	export const promise = (value: any) => is.nativePromise(value) || hasPromiseAPI(value);
 
-	export const generator = (value: any) => is.iterable(value) && is.func(value.next) && is.func(value.throw);
+	export const generator = (value: any) => is.iterable(value) && is.function_(value.next) && is.function_(value.throw);
 
 	// TODO: Change to use `isObjectOfType` once Node.js 6 or higher is targeted
-	const isFunctionOfType = (type: string) => (value: any) => is.func(value) && is.func(value.constructor) && value.constructor.name === type;
+	const isFunctionOfType = (type: string) => (value: any) => is.function_(value) && is.function_(value.constructor) && value.constructor.name === type;
 
 	export const generatorFunction = isFunctionOfType('GeneratorFunction');
 	export const asyncFunction = isFunctionOfType('AsyncFunction');
@@ -115,9 +114,7 @@ namespace is {
 	export const truthy = (value: any) => Boolean(value);
 	export const falsy = (value: any) => !value;
 
-	// Number.isNaN is currently not supported and isNaN() is typeguarded to only accept number
-	// see https://github.com/Microsoft/TypeScript/issues/15149
-	export const nan = (value: any) => is.number(value) && isNaN(Number(value)); 
+	export const nan = (value: any) => Number.isNaN(value); 
 	
 	export const nullOrUndefined = (value: any) => is.null_(value) || is.undefined(value);
 
@@ -131,9 +128,8 @@ namespace is {
 
 	export const primitive = (value: any) => is.null_(value) || primitiveTypes.has(typeof value);
 
-	export const integer = (value: any) => is.number(value) && isFinite(value) && (value | 0) === value;
-	// Target es5 requires ugly constant here: https://github.com/Microsoft/TypeScript/issues/9937
-	export const safeInteger = (value: any) => is.number(value) && Math.abs(value) <= 9007199254740991;
+	export const integer = (value: any) => Number.isInteger(value);
+	export const safeInteger = (value: any) => Number.isSafeInteger(value);
 
 	export const plainObject = (value: any) => {
 		// From: https://github.com/sindresorhus/is-plain-obj/blob/master/index.js
@@ -143,9 +139,9 @@ namespace is {
 				prototype === Object.getPrototypeOf({}));
 	};
 
-	export const iterable = (value: any) => !is.nullOrUndefined(value) && is.func(value[Symbol.iterator]);
+	export const iterable = (value: any) => !is.nullOrUndefined(value) && is.function_(value[Symbol.iterator]);
 
-	export const class_ = (value: any) => is.func(value) && value.toString().startsWith('class ');
+	export const class_ = (value: any) => is.function_(value) && value.toString().startsWith('class ');
 
 	const typedArrayTypes = new Set([
 		'Int8Array',
@@ -161,7 +157,7 @@ namespace is {
 	export const typedArray = (value: any) => typedArrayTypes.has(getObjectType(value));
 
 	const isValidLength = (value: any) => is.safeInteger(value) && value > -1;
-	export const arrayLike = (value: any) => !is.nullOrUndefined(value) && !is.func(value) && isValidLength(value.length);
+	export const arrayLike = (value: any) => !is.nullOrUndefined(value) && !is.function_(value) && isValidLength(value.length);
 
 	export const inRange = (value: number, range: number | number[]) => {
 		if (is.number(range)) {
@@ -203,7 +199,7 @@ namespace is {
 
 	type ArrayMethod = (fn: (value: any, index: number, arr: any[]) => boolean, thisArg?: any) => boolean
 	const predicateOnArray = (method: ArrayMethod, predicate: any, values: any[]) => {
-		if (is.func(predicate) === false) {
+		if (is.function_(predicate) === false) {
 			throw new TypeError(`Invalid predicate: ${util.inspect(predicate)}`);
 		}
 
@@ -227,7 +223,7 @@ namespace is {
 // see https://github.com/Microsoft/TypeScript/issues/2536
 Object.defineProperties(is, { 
 	"class": { value: is.class_ },
-	"function": { value: is.func },
+	"function": { value: is.function_ },
 	"null": { value: is.null_ }
 });
 

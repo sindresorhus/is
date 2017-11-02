@@ -39,7 +39,7 @@ const types = new Map<string, Test>([
 	],['array',
 		{ is: m.array, fixtures: [[1, 2], new Array(2)] }
 	],['function',
-		{ is: m.func, fixtures: [
+		{ is: m.function_, fixtures: [
 			function foo() {}, // eslint-disable-line func-names
 			function () {},
 			() => {},
@@ -411,6 +411,8 @@ test('is.class', t => {
 });
 
 test('is.typedArray', t => {
+	// Typescript currently does not support empty constructors for these
+	// see https://github.com/Microsoft/TypeScript/issues/19680
 	const typedArrays = [
 		new Int8Array(0),
 		new Uint8Array(0),
