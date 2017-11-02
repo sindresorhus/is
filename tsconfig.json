@@ -1,7 +1,11 @@
 {
     "compileOnSave": true,
     "compilerOptions": {
-        "target": "es5",
+        /* es2015 requires moduleResolution and module to be set, 
+        see https://github.com/Microsoft/TypeScript/issues/8189 */
+        "target": "es2015",
+        "moduleResolution": "node",
+        "module": "none",
         "strict": true,
         "declaration": true,
         "sourceMap": true,
@@ -9,9 +13,5 @@
         "lib": [
             "es2015", "dom", "scripthost"
         ]
-    },
-    "include": [
-        "src/**/*.ts",
-        "tests/**/*.ts"
-    ]
+    }
 }
