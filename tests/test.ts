@@ -1,147 +1,183 @@
-import util from 'util';
-import test from 'ava';
-import {jsdom} from 'jsdom';
-import m from '.';
+import * as util from 'util';
+import test, { TestContext, Context } from 'ava';
+import * as jsdom from 'jsdom';
+import m from '../src';
 
 const isNode8orHigher = Number(process.versions.node.split('.')[0]) >= 8;
 
-const PromiseSubclassFixture = class extends Promise {};
-const ErrorSubclassFixture = class extends Error {};
+class PromiseSubclassFixture<T> extends Promise<T> {};
+class ErrorSubclassFixture extends Error {};
 
-const document = jsdom();
-const createDomElement = el => document.createElement(el);
+const document = new jsdom.JSDOM().window.document
+const createDomElement = (el: string) => document.createElement(el);
 
-const types = new Map([
-	['undefined', undefined],
-	['null', null],
-	['string', [
-		'🦄',
-		'hello world',
-		''
-	]],
-	['number', [
-		6,
-		1.4,
-		0,
-		-0,
-		Infinity,
-		-Infinity
-	]],
-	['boolean', [
-		true,
-		false
-	]],
-	['symbol', Symbol('🦄')],
-	['array', [
-		[1, 2],
-		new Array(2)
-	]],
-	['function', [
-		function foo() {}, // eslint-disable-line func-names
-		function () {},
-		() => {},
-		async function () {},
-		function * () {}
-	]],
-	['buffer', Buffer.from('🦄')],
-	['object', [
-		{x: 1},
-		Object.create({x: 1})
-	]],
-	['regExp', [
-		/\w/,
-		new RegExp('\\w')
-	]],
-	['date', new Date()],
-	['error', [
-		new Error('🦄'),
-		new ErrorSubclassFixture()
-	]],
-	['nativePromise', [
-		Promise.resolve(),
-		PromiseSubclassFixture.resolve()
-	]],
-	['promise', {then() {}, catch() {}}],
-	['generator', (function * () {
-		yield 4;
-	})()],
-	['generatorFunction', function * () {
-		yield 4;
-	}],
-	['asyncFunction', [
-		async function () {},
-		async () => {}
-	]],
-	['map', new Map()],
-	['set', new Set()],
-	['weakMap', new WeakMap()],
-	['int8Array', new Int8Array()],
-	['uint8Array', new Uint8Array()],
-	['uint8ClampedArray', new Uint8ClampedArray()],
-	['uint16Array', new Uint16Array()],
-	['int32Array', new Int32Array()],
-	['uint32Array', new Uint32Array()],
-	['float32Array', new Float32Array()],
-	['float64Array', new Float64Array()],
-	['arrayBuffer', new ArrayBuffer(10)],
-	['nan', [
-		NaN,
-		Number.NaN
-	]],
-	['nullOrUndefined', [
-		null,
-		undefined
-	]],
-	['plainObject', [
-		{x: 1},
-		Object.create(null),
-		new Object() // eslint-disable-line no-new-object
-	]],
-	['integer', 6],
-	['safeInteger', [
-		Math.pow(2, 53) - 1,
-		-Math.pow(2, 53) + 1
-	]],
-	['domElement', [
-		'div',
-		'input',
-		'span',
-		'img',
-		'canvas',
-		'script'
-	].map(createDomElement)],
-	['non-domElements', [
-		document.createTextNode('data'),
-		document.createProcessingInstruction('xml-stylesheet', 'href="mycss.css" type="text/css"'),
-		document.createComment('This is a comment'),
-		document,
-		document.implementation.createDocumentType('svg:svg', '-//W3C//DTD SVG 1.1//EN', 'http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd'),
-		document.createDocumentFragment()
-	]],
-	['infinite', [
-		Infinity,
-		-Infinity
-	]]
+type Test = { is: (value: any) => boolean, fixtures: any[] }
+const types = new Map<string, Test>([
+	['undefined', 
+		{ is: m.undefined, fixtures: [undefined] }
+	],['null', 
+		{ is: m.null_, fixtures: [null] }
+	],['string',
+		{ is: m.string, fixtures: [
+			'🦄',
+			'hello world',
+			''
+		] }
+	],['number',
+		{ is: m.number, fixtures: [
+			6,
+			1.4,
+			0,
+			-0,
+			Infinity,
+			-Infinity
+		] }
+	],['boolean',
+		{ is: m.boolean, fixtures: [true, false] }
+	],['symbol',
+		{ is: m.symbol, fixtures: [Symbol('🦄')] }
+	],['array',
+		{ is: m.array, fixtures: [[1, 2], new Array(2)] }
+	],['function',
+		{ is: m.func, fixtures: [
+			function foo() {}, // eslint-disable-line func-names
+			function () {},
+			() => {},
+			async function () {},
+			function * (): any {}
+		] }
+	],['buffer',
+		{ is: m.buffer, fixtures: [Buffer.from('🦄')] }
+	],['object',
+		{ is: m.object, fixtures: [
+			{x: 1},
+			Object.create({x: 1})
+		] }
+	],['regExp',
+		{ is: m.regExp, fixtures: [
+			/\w/,
+			new RegExp('\\w')
+		] }
+	],['date',
+		{ is: m.date, fixtures: [new Date()] }
+	],['error',
+		{ is: m.error, fixtures: [
+			new Error('🦄'),
+			new ErrorSubclassFixture()
+		] }
+	],['nativePromise',
+		{ is: m.nativePromise, fixtures: [
+			Promise.resolve(),
+
+			// currently out of order, see https://github.com/Microsoft/TypeScript/issues/15202
+			//PromiseSubclassFixture.resolve()
+		] }
+	],['promise',
+		{ is: m.promise, fixtures: [{then() {}, catch() {}}] }
+	],['generator',
+		{ is: m.generator, fixtures: [(function * () {
+			yield 4;
+		})()] }
+	],['generatorFunction',
+		{ is: m.generatorFunction, fixtures: [function * () {
+			yield 4;
+		}] }
+	],['asyncFunction',
+		{ is: m.asyncFunction, fixtures: [
+			async function () {},
+			async () => {}
+		] }
+	],['map',
+		{ is: m.map, fixtures: [new Map()] }
+	],['set',
+		{ is: m.set, fixtures: [new Set()] }
+	],['weakSet',
+		{ is: m.weakSet, fixtures: [new WeakSet()] }
+	],['weakMap',
+		{ is: m.weakMap, fixtures: [new WeakMap()] }
+	],['int8Array',
+		{ is: m.int8Array, fixtures: [new Int8Array(0)] }
+	],['uint8Array',
+		{ is: m.uint8Array, fixtures: [new Uint8Array(0)] }
+	],['uint8ClampedArray',
+		{ is: m.uint8ClampedArray, fixtures: [new Uint8ClampedArray(0)] }
+	],['int16Array',
+		{ is: m.int16Array, fixtures: [new Int16Array(0)]}
+	],['uint16Array',
+		{ is: m.uint16Array, fixtures: [new Uint16Array(0)] }
+	],['int32Array',
+		{ is: m.int32Array, fixtures: [new Int32Array(0)] }
+	],['uint32Array',
+		{ is: m.uint32Array, fixtures: [new Uint32Array(0)] }
+	],['float32Array',
+		{ is: m.float32Array, fixtures: [new Float32Array(0)] }
+	],['float64Array',
+		{ is: m.float64Array, fixtures: [new Float64Array(0)] }
+	],['arrayBuffer',
+		{ is: m.arrayBuffer, fixtures: [new ArrayBuffer(10)] }
+	],['nan',
+		{ is: m.nan, fixtures: [NaN, Number.NaN] }
+	],['nullOrUndefined',
+		{ is: m.nullOrUndefined, fixtures: [null, undefined] }
+	],['plainObject',
+		{ is: m.plainObject, fixtures: [
+			{x: 1},
+			Object.create(null),
+			new Object() // eslint-disable-line no-new-object
+		] }
+	],['integer',
+		{ is: m.integer, fixtures: [6] }
+	],['safeInteger',
+		{ is: m.safeInteger, fixtures: [
+			Math.pow(2, 53) - 1,
+			-Math.pow(2, 53) + 1
+		] }
+	],['domElement',
+		{ is: m.domElement, fixtures: [
+			'div',
+			'input',
+			'span',
+			'img',
+			'canvas',
+			'script'
+		].map(createDomElement) }
+	],['non-domElements',
+		{ is: value => !m.domElement(value), fixtures: [
+			document.createTextNode('data'),
+			document.createProcessingInstruction('xml-stylesheet', 'href="mycss.css" type="text/css"'),
+			document.createComment('This is a comment'),
+			document,
+			document.implementation.createDocumentType('svg:svg', '-//W3C//DTD SVG 1.1//EN', 'http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd'),
+			document.createDocumentFragment()
+		] }
+	],['infinite',
+		{ is: m.infinite, fixtures: [Infinity, -Infinity] }
+	]
 ]);
 
 // This ensures a certain method matches only the types
 // it's supposed to and none of the other methods' types
-const testType = (t, type, exclude) => {
-	for (const [key, value] of types) {
+const testType = (t: TestContext & Context<any>, type: string, exclude?: Array<string>) => {
+	const test = types.get(type)
+	if (test === undefined) {
+		t.fail(`is.${type} not defined`)
+		return
+	}
+	const { is } = test as Test
+
+	types.forEach(({ fixtures }, key) => {
 		// TODO: Automatically exclude value types in other tests that we have in the current one.
 		// Could reduce the use of `exclude`.
 		if (exclude && exclude.indexOf(key) !== -1) {
-			continue;
+			return;
 		}
 
 		const assert = key === type ? t.true.bind(t) : t.false.bind(t);
-		const is = m[type];
-		const fixtures = Array.isArray(value) ? value : [value];
 
 		for (const fixture of fixtures) {
 			assert(is(fixture), `Value: ${util.inspect(fixture)}`);
 		}
-	}
+	})
 };
 
 test('is', t => {
@@ -188,7 +224,9 @@ test('is.buffer', t => {
 });
 
 test('is.object', t => {
-	for (const el of types.get('object')) {
+	const testData = types.get('object')
+	if (testData === undefined) t.fail("is.object not defined")
+	for (const el of (testData as Test).fixtures) {
 		t.true(m.object(el));
 	}
 });
@@ -343,6 +381,7 @@ test('is.safeInteger', t => {
 	t.false(m.safeInteger(-Math.pow(2, 53)));
 });
 
+
 test('is.plainObject', t => {
 	testType(t, 'plainObject', ['object', 'promise']);
 });
@@ -367,20 +406,20 @@ test('is.class', t => {
 	];
 
 	for (const x of classDeclarations) {
-		t.true(m.class(x));
+		t.true(m.class_(x));
 	}
 });
 
 test('is.typedArray', t => {
 	const typedArrays = [
-		new Int8Array(),
-		new Uint8Array(),
-		new Uint8ClampedArray(),
-		new Uint16Array(),
-		new Int32Array(),
-		new Uint32Array(),
-		new Float32Array(),
-		new Float64Array()
+		new Int8Array(0),
+		new Uint8Array(0),
+		new Uint8ClampedArray(0),
+		new Uint16Array(0),
+		new Int32Array(0),
+		new Uint32Array(0),
+		new Float32Array(0),
+		new Float64Array(0)
 	];
 
 	for (const el of typedArrays) {
@@ -393,8 +432,8 @@ test('is.typedArray', t => {
 });
 
 test('is.arrayLike', t => {
-	(() => {
-		t.true(m.arrayLike(arguments));
+	((...args: any[]) => {
+		t.true(m.arrayLike(args));
 	})();
 	t.true(m.arrayLike([]));
 	t.true(m.arrayLike('unicorn'));
@@ -421,10 +460,6 @@ test('is.inRange', t => {
 	t.true(m.inRange(-2, -3));
 	t.false(m.inRange(x, 2));
 	t.false(m.inRange(-3, -2));
-
-	t.throws(() => {
-		m.inRange(0);
-	});
 
 	t.throws(() => {
 		m.inRange(0, []);
