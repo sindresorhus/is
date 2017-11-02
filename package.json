@@ -16,6 +16,7 @@
     "node": ">=4"
   },
   "scripts": {
+    "lint": "tslint --project .",
     "test": "tsc && ava dist/tests",
     "build": "tsc",
     "prepublish": "tsc"
@@ -51,6 +52,8 @@
     "@types/node": "^8.0.47",
     "ava": "*",
     "jsdom": "^11.3.0",
+    "tslint": "^5.8.0",
+    "tslint-xo": "^0.2.0",
     "typescript": "^2.6.1"
   }
 }
