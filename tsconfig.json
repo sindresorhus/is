@@ -5,13 +5,13 @@
         "strict": true,
         "declaration": true,
         "sourceMap": true,
-        "outDir": ".",
+        "outDir": "dist",
         "lib": [
-            "es2015"
+            "es2015", "dom", "scripthost"
         ]
     },
     "include": [
-        "index.ts"
-    ],
-    "exclude": []
+        "src/**/*.ts",
+        "tests/**/*.ts"
+    ]
 }

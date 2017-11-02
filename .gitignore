@@ -1,5 +1,4 @@
 node_modules
 yarn.lock
-index.js
-index.d.ts
-index.js.map
+dist/**/*.js*
+dist/**/*.d.ts
