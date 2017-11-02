@@ -17,9 +17,9 @@
   },
   "scripts": {
     "lint": "tslint --project .",
-    "test": "tsc && ava dist/tests",
     "build": "tsc",
-    "prepublish": "tsc"
+    "test": "npm run lint && npm run build && ava dist/tests",
+    "prepublish": "npm run build"
   },
   "files": [
     "index.js",
