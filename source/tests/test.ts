@@ -320,6 +320,10 @@ if (isNode8orHigher) {
 	test('is.promise', t => {
 		testType(t, 'promise', ['nativePromise']);
 	});
+
+	/*test('is.asyncFunction', t => {
+		testType(t, 'asyncFunction', ['function']);
+	});*/
 }
 
 test('is.generator', t => {
@@ -329,12 +333,6 @@ test('is.generator', t => {
 test('is.generatorFunction', t => {
 	testType(t, 'generatorFunction', ['function']);
 });
-
-if (isNode8orHigher) {
-	test('is.asyncFunction', t => {
-		testType(t, 'asyncFunction', ['function']);
-	});
-}
 
 test('is.map', t => {
 	testType(t, 'map');
@@ -502,8 +500,8 @@ test('is.typedArray', t => {
 });
 
 test('is.arrayLike', t => {
-	((...args: any[]) => {
-		t.true(m.arrayLike(args));
+	(() => {
+		t.true(m.arrayLike(arguments));
 	})();
 	t.true(m.arrayLike([]));
 	t.true(m.arrayLike('unicorn'));
