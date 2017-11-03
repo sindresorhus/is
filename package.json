@@ -19,12 +19,10 @@
     "lint": "tslint --project .",
     "build": "tsc",
     "test": "npm run lint && npm run build && ava dist/tests",
-    "prepublish": "npm run build"
+    "prepublish": "npm run build && del dist/tests"
   },
   "files": [
-    "dist/src/index.js",
-    "dist/src/index.d.ts",
-    "dist/src/index.js.map"
+    "dist"
   ],
   "keywords": [
     "type",
@@ -48,10 +46,11 @@
     "compare"
   ],
   "devDependencies": {
-    "@types/jsdom": "^11.0.3",
+    "@types/jsdom": "^2.0.31",
     "@types/node": "^8.0.47",
     "ava": "*",
-    "jsdom": "^11.3.0",
+    "del-cli": "^1.1.0",
+    "jsdom": "^9.12.0",
     "tslint": "^5.8.0",
     "tslint-xo": "^0.2.0",
     "typescript": "^2.6.1"

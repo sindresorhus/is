@@ -65,6 +65,7 @@ namespace is { // tslint:disable-line:no-namespace
 	export const number = isOfType('number');
 	export const function_ = isOfType('function');
 	export const null_ = (value: any) => value === null;
+
 	export const class_ = (value: any) => function_(value) && value.toString().startsWith('class ');
 	export const boolean = (value: any) => value === true || value === false;
 	// tslint:enable:variable-name
