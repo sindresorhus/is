@@ -166,7 +166,8 @@ namespace is { // tslint:disable-line:no-namespace
 		}
 
 		if (array(range) && range.length === 2) {
-			return value >= Math.min(...range) && value <= Math.max(...range);
+			// TODO: Use spread operator here when targeting Node.js 6 or higher
+			return value >= Math.min.apply(null, range) && value <= Math.max.apply(null, range);
 		}
 
 		throw new TypeError(`Invalid range: ${util.inspect(range)}`);
@@ -199,7 +200,12 @@ namespace is { // tslint:disable-line:no-namespace
 	export const emptyOrWhitespace = (value: any) => empty(value) || isWhiteSpaceString(value);
 
 	type ArrayMethod = (fn: (value: any, index: number, arr: any[]) => boolean, thisArg?: any) => boolean;
-	const predicateOnArray = (method: ArrayMethod, predicate: any, values: any[]) => {
+	const predicateOnArray = (method: ArrayMethod, predicate: any, args: IArguments) => {
+		// `args` is the calling function's "arguments object".
+		// We have to do it this way to keep node v4 support.
+		// So here we convert it to an array and slice off the first item.
+		const values = Array.prototype.slice.call(args, 1);
+
 		if (function_(predicate) === false) {
 			throw new TypeError(`Invalid predicate: ${util.inspect(predicate)}`);
 		}
@@ -211,14 +217,19 @@ namespace is { // tslint:disable-line:no-namespace
 		return method.call(values, predicate);
 	};
 
-	// tslint:disable-next-line:variable-name
-	export const any = (predicate: any, ...values: any[]) => {
-		return predicateOnArray(Array.prototype.some, predicate, values);
-	};
+	// We can't use rest parameters in node v4 due to the lack of the spread operator.
+	// Therefore We have to use anonymous functions for the any() and all() methods
+	// tslint:disable:only-arrow-functions no-function-expression
+	export function any(...predicate: any[]): any; // tslint:disable-line:variable-name
+	export function any(predicate: any) {
+		return predicateOnArray(Array.prototype.some, predicate, arguments);
+	}
 
-	export const all = (predicate: any, ...values: any[]) => {
-		return predicateOnArray(Array.prototype.every, predicate, values);
-	};
+	export function all(...predicate: any[]): any;
+	export function all(predicate: any) {
+		return predicateOnArray(Array.prototype.every, predicate, arguments);
+	}
+	// tslint:enable:only-arrow-functions no-function-expression
 }
 
 // Some few keywords are reserved, but we'll populate them for the node-folks
