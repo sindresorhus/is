@@ -21,6 +21,7 @@
     "test": "npm run lint && npm run build && ava dist/tests",
     "prepublish": "npm run build && del dist/tests"
   },
+  "main": "dist",
   "files": [
     "dist"
   ],
