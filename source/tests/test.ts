@@ -1,7 +1,7 @@
 import * as util from 'util';
 import test, {TestContext, Context} from 'ava';
 import {jsdom} from 'jsdom';
-import m from '..'; // tslint:disable-line:import-name
+import m from '..';
 
 const isNode8orHigher = Number(process.versions.node.split('.')[0]) >= 8;
 
@@ -17,44 +17,51 @@ interface Test {
 }
 
 const types = new Map<string, Test>([
-	['undefined',
-		{is: m.undefined, fixtures: [
+	['undefined', {
+		is: m.undefined, fixtures: [
 			undefined
-		]}
-	], ['null',
-		{is: m.null_, fixtures: [
+		]
+	}],
+	['null', {
+		is: m.null_, fixtures: [
 			null
-		]}
-	], ['string',
-		{is: m.string, fixtures: [
+		]
+	}],
+	['string', {
+		is: m.string, fixtures: [
 			'🦄',
 			'hello world',
 			''
-		]}
-	], ['number',
-		{is: m.number, fixtures: [
+		]
+	}],
+	['number', {
+		is: m.number, fixtures: [
 			6,
 			1.4,
 			0,
 			-0,
 			Infinity,
 			-Infinity
-		]}
-	], ['boolean',
-		{is: m.boolean, fixtures: [
+		]
+	}],
+	['boolean', {
+		is: m.boolean, fixtures: [
 			true, false
-		]}
-	], ['symbol',
-		{is: m.symbol, fixtures: [
+		]
+	}],
+	['symbol', {
+		is: m.symbol, fixtures: [
 			Symbol('🦄')
-		]}
-	], ['array',
-		{is: m.array, fixtures: [
+		]
+	}],
+	['array', {
+		is: m.array, fixtures: [
 			[1, 2],
 			new Array(2) // tslint:disable-line:prefer-array-literal
-		]}
-	], ['function',
-		{is: m.function_, fixtures: [
+		]
+	}],
+	['function', {
+		is: m.function_, fixtures: [
 			// tslint:disable:no-empty no-unused-variable only-arrow-functions no-function-expression
 			function foo() {}, // tslint:disable-line:no-unused
 			function() {},
@@ -62,135 +69,165 @@ const types = new Map<string, Test>([
 			async function() {},
 			function *(): any {}
 			// tslint:enable:no-empty no-unused-variable only-arrow-functions no-function-expression
-		]}
-	], ['buffer',
-		{is: m.buffer, fixtures: [
+		]
+	}],
+	['buffer', {
+		is: m.buffer, fixtures: [
 			Buffer.from('🦄')
-		]}
-	], ['object',
-		{is: m.object, fixtures: [
+		]
+	}],
+	['object', {
+		is: m.object, fixtures: [
 			{x: 1},
 			Object.create({x: 1})
-		]}
-	], ['regExp',
-		{is: m.regExp, fixtures: [
+		]
+	}],
+	['regExp', {
+		is: m.regExp, fixtures: [
 			/\w/,
 			new RegExp('\\w')
-		]}
-	], ['date',
-		{is: m.date, fixtures: [
+		]
+	}],
+	['date', {
+		is: m.date, fixtures: [
 			new Date()
-		]}
-	], ['error',
-		{is: m.error, fixtures: [
+		]
+	}],
+	['error', {
+		is: m.error, fixtures: [
 			new Error('🦄'),
 			new ErrorSubclassFixture()
-		]}
-	], ['nativePromise',
-		{is: m.nativePromise, fixtures: [
+		]
+	}],
+	['nativePromise', {
+		is: m.nativePromise, fixtures: [
 			Promise.resolve(),
 			// PromiseSubclassFixture.resolve()
-		]}
-	], ['promise',
-		{is: m.promise, fixtures: [
+		]
+	}],
+	['promise', {
+		is: m.promise, fixtures: [
 			{then() {}, catch() {}} // tslint:disable-line:no-empty
-		]}
-	], ['generator',
-		{is: m.generator, fixtures: [
+		]
+	}],
+	['generator', {
+		is: m.generator, fixtures: [
 			(function *() { yield 4; })() // tslint:disable-line
-		]}
-	], ['generatorFunction',
-		{is: m.generatorFunction, fixtures: [
+		]
+	}],
+	['generatorFunction', {
+		is: m.generatorFunction, fixtures: [
 			function *() { yield 4; } // tslint:disable-line
-		]}
-	], ['asyncFunction',
-		{is: m.asyncFunction, fixtures: [
+		]
+	}],
+	['asyncFunction', {
+		is: m.asyncFunction, fixtures: [
 			async function() {}, // tslint:disable-line:no-empty only-arrow-functions no-function-expression
 			async () => {} // tslint:disable-line:no-empty
-		]}
-	], ['map',
-		{is: m.map, fixtures: [
+		]
+	}],
+	['map', {
+		is: m.map, fixtures: [
 			new Map()
-		]}
-	], ['set',
-		{is: m.set, fixtures: [
+		]
+	}],
+	['set', {
+		is: m.set, fixtures: [
 			new Set()
-		]}
-	], ['weakSet',
-		{is: m.weakSet, fixtures: [
+		]
+	}],
+	['weakSet', {
+		is: m.weakSet, fixtures: [
 			new WeakSet()
-		]}
-	], ['weakMap',
-		{is: m.weakMap, fixtures: [
+		]
+	}],
+	['weakMap', {
+		is: m.weakMap, fixtures: [
 			new WeakMap()
-		]}
-	], ['int8Array',
-		{is: m.int8Array, fixtures: [
+		]
+	}],
+	['int8Array', {
+		is: m.int8Array, fixtures: [
 			new Int8Array(0)
-		]}
-	], ['uint8Array',
-		{is: m.uint8Array, fixtures: [
+		]
+	}],
+	['uint8Array', {
+		is: m.uint8Array, fixtures: [
 			new Uint8Array(0)
-		]}
-	], ['uint8ClampedArray',
-		{is: m.uint8ClampedArray, fixtures: [
+		]
+	}],
+	['uint8ClampedArray', {
+		is: m.uint8ClampedArray, fixtures: [
 			new Uint8ClampedArray(0)
-		]}
-	], ['int16Array',
-		{is: m.int16Array, fixtures: [
+		]
+	}],
+	['int16Array', {
+		is: m.int16Array, fixtures: [
 			new Int16Array(0)
-		]}
-	], ['uint16Array',
-		{is: m.uint16Array, fixtures: [
+		]
+	}],
+	['uint16Array', {
+		is: m.uint16Array, fixtures: [
 			new Uint16Array(0)
-		]}
-	], ['int32Array',
-		{is: m.int32Array, fixtures: [
+		]
+	}],
+	['int32Array', {
+		is: m.int32Array, fixtures: [
 			new Int32Array(0)
-		]}
-	], ['uint32Array',
-		{is: m.uint32Array, fixtures: [
+		]
+	}],
+	['uint32Array', {
+		is: m.uint32Array, fixtures: [
 			new Uint32Array(0)
-		]}
-	], ['float32Array',
-		{is: m.float32Array, fixtures: [
+		]
+	}],
+	['float32Array', {
+		is: m.float32Array, fixtures: [
 			new Float32Array(0)
-		]}
-	], ['float64Array',
-		{is: m.float64Array, fixtures: [
+		]
+	}],
+	['float64Array', {
+		is: m.float64Array, fixtures: [
 			new Float64Array(0)
-		]}
-	], ['arrayBuffer',
-		{is: m.arrayBuffer, fixtures: [
+		]
+	}],
+	['arrayBuffer', {
+		is: m.arrayBuffer, fixtures: [
 			new ArrayBuffer(10)
-		]}
-	], ['nan',
-		{is: m.nan, fixtures: [
+		]
+	}],
+	['nan', {
+		is: m.nan, fixtures: [
 			NaN,
 			Number.NaN
-		]}
-	], ['nullOrUndefined',
-		{is: m.nullOrUndefined, fixtures: [
+		]
+	}],
+	['nullOrUndefined', {
+		is: m.nullOrUndefined, fixtures: [
 			null,
 			undefined
-		]}
-	], ['plainObject',
-		{is: m.plainObject, fixtures: [
+		]
+	}],
+	['plainObject', {
+		is: m.plainObject, fixtures: [
 			{x: 1},
 			Object.create(null),
 			new Object()
-		]}
-	], ['integer',
-		{is: m.integer, fixtures: [
+		]
+	}],
+	['integer', {
+		is: m.integer, fixtures: [
 			6
-		]}
-	], ['safeInteger',
-		{is: m.safeInteger, fixtures: [
+		]
+	}],
+	['safeInteger', {
+		is: m.safeInteger, fixtures: [
 			Math.pow(2, 53) - 1,
 			-Math.pow(2, 53) + 1
-		]}
-	], ['domElement',
-		{is: m.domElement, fixtures: [
+		]
+	}],
+	['domElement', {
+		is: m.domElement, fixtures: [
 			'div',
 			'input',
 			'span',
@@ -198,25 +235,25 @@ const types = new Map<string, Test>([
 			'canvas',
 			'script'
 		].map(createDomElement) }
-	], ['non-domElements',
-		{is: value => !m.domElement(value), fixtures: [
+	], ['non-domElements', {
+		is: value => !m.domElement(value), fixtures: [
 			document.createTextNode('data'),
 			document.createProcessingInstruction('xml-stylesheet', 'href="mycss.css" type="text/css"'),
 			document.createComment('This is a comment'),
 			document,
 			document.implementation.createDocumentType('svg:svg', '-//W3C//DTD SVG 1.1//EN', 'http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd'), // tslint:disable-line
 			document.createDocumentFragment()
-		]}
-	], ['infinite',
-		{is:  m.infinite, fixtures: [
+		]
+	}],
+	['infinite', {
+		is:  m.infinite, fixtures: [
 			Infinity,
 			-Infinity
-		]}
-	]
+		]
+	}]
 ]);
 
-/* This ensures a certain method matches only the types
-	 it's supposed to and none of the other methods' types */
+// This ensures a certain method matches only the types it's supposed to and none of the other methods' types
 const testType = (t: TestContext & Context<any>, type: string, exclude?: string[]) => {
 	const testData = types.get(type);
 
@@ -228,11 +265,11 @@ const testType = (t: TestContext & Context<any>, type: string, exclude?: string[
 
 	const {is} = testData;
 
-	types.forEach(({fixtures}, key) => {
+	for (const [key, {fixtures}] of types) {
 		// TODO: Automatically exclude value types in other tests that we have in the current one.
 		// Could reduce the use of `exclude`.
 		if (exclude && exclude.indexOf(key) !== -1) {
-			return;
+			continue;
 		}
 
 		const assert = key === type ? t.true.bind(t) : t.false.bind(t);
@@ -240,7 +277,7 @@ const testType = (t: TestContext & Context<any>, type: string, exclude?: string[
 		for (const fixture of fixtures) {
 			assert(is(fixture), `Value: ${util.inspect(fixture)}`);
 		}
-	});
+	}
 };
 
 test('is', t => {
