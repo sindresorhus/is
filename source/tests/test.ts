@@ -18,24 +18,28 @@ interface Test {
 
 const types = new Map<string, Test>([
 	['undefined', {
-		is: m.undefined, fixtures: [
+		is: m.undefined,
+		fixtures: [
 			undefined
 		]
 	}],
 	['null', {
-		is: m.null_, fixtures: [
+		is: m.null_,
+		fixtures: [
 			null
 		]
 	}],
 	['string', {
-		is: m.string, fixtures: [
+		is: m.string,
+		fixtures: [
 			'🦄',
 			'hello world',
 			''
 		]
 	}],
 	['number', {
-		is: m.number, fixtures: [
+		is: m.number,
+		fixtures: [
 			6,
 			1.4,
 			0,
@@ -45,23 +49,27 @@ const types = new Map<string, Test>([
 		]
 	}],
 	['boolean', {
-		is: m.boolean, fixtures: [
+		is: m.boolean,
+		fixtures: [
 			true, false
 		]
 	}],
 	['symbol', {
-		is: m.symbol, fixtures: [
+		is: m.symbol,
+		fixtures: [
 			Symbol('🦄')
 		]
 	}],
 	['array', {
-		is: m.array, fixtures: [
+		is: m.array,
+		fixtures: [
 			[1, 2],
 			new Array(2) // tslint:disable-line:prefer-array-literal
 		]
 	}],
 	['function', {
-		is: m.function_, fixtures: [
+		is: m.function_,
+		fixtures: [
 			// tslint:disable:no-empty no-unused-variable only-arrow-functions no-function-expression
 			function foo() {}, // tslint:disable-line:no-unused
 			function() {},
@@ -72,162 +80,192 @@ const types = new Map<string, Test>([
 		]
 	}],
 	['buffer', {
-		is: m.buffer, fixtures: [
+		is: m.buffer,
+		fixtures: [
 			Buffer.from('🦄')
 		]
 	}],
 	['object', {
-		is: m.object, fixtures: [
+		is: m.object,
+		fixtures: [
 			{x: 1},
 			Object.create({x: 1})
 		]
 	}],
 	['regExp', {
-		is: m.regExp, fixtures: [
+		is: m.regExp,
+		fixtures: [
 			/\w/,
 			new RegExp('\\w')
 		]
 	}],
 	['date', {
-		is: m.date, fixtures: [
+		is: m.date,
+		fixtures: [
 			new Date()
 		]
 	}],
 	['error', {
-		is: m.error, fixtures: [
+		is: m.error,
+		fixtures: [
 			new Error('🦄'),
 			new ErrorSubclassFixture()
 		]
 	}],
 	['nativePromise', {
-		is: m.nativePromise, fixtures: [
+		is: m.nativePromise,
+		fixtures: [
 			Promise.resolve(),
 			// PromiseSubclassFixture.resolve()
 		]
 	}],
 	['promise', {
-		is: m.promise, fixtures: [
+		is: m.promise,
+		fixtures: [
 			{then() {}, catch() {}} // tslint:disable-line:no-empty
 		]
 	}],
 	['generator', {
-		is: m.generator, fixtures: [
+		is: m.generator,
+		fixtures: [
 			(function *() { yield 4; })() // tslint:disable-line
 		]
 	}],
 	['generatorFunction', {
-		is: m.generatorFunction, fixtures: [
+		is: m.generatorFunction,
+		fixtures: [
 			function *() { yield 4; } // tslint:disable-line
 		]
 	}],
 	['asyncFunction', {
-		is: m.asyncFunction, fixtures: [
+		is: m.asyncFunction,
+		fixtures: [
 			async function() {}, // tslint:disable-line:no-empty only-arrow-functions no-function-expression
 			async () => {} // tslint:disable-line:no-empty
 		]
 	}],
 	['map', {
-		is: m.map, fixtures: [
+		is: m.map,
+		fixtures: [
 			new Map()
 		]
 	}],
 	['set', {
-		is: m.set, fixtures: [
+		is: m.set,
+		fixtures: [
 			new Set()
 		]
 	}],
 	['weakSet', {
-		is: m.weakSet, fixtures: [
+		is: m.weakSet,
+		fixtures: [
 			new WeakSet()
 		]
 	}],
 	['weakMap', {
-		is: m.weakMap, fixtures: [
+		is: m.weakMap,
+		fixtures: [
 			new WeakMap()
 		]
 	}],
 	['int8Array', {
-		is: m.int8Array, fixtures: [
+		is: m.int8Array,
+		fixtures: [
 			new Int8Array(0)
 		]
 	}],
 	['uint8Array', {
-		is: m.uint8Array, fixtures: [
+		is: m.uint8Array,
+		fixtures: [
 			new Uint8Array(0)
 		]
 	}],
 	['uint8ClampedArray', {
-		is: m.uint8ClampedArray, fixtures: [
+		is: m.uint8ClampedArray,
+		fixtures: [
 			new Uint8ClampedArray(0)
 		]
 	}],
 	['int16Array', {
-		is: m.int16Array, fixtures: [
+		is: m.int16Array,
+		fixtures: [
 			new Int16Array(0)
 		]
 	}],
 	['uint16Array', {
-		is: m.uint16Array, fixtures: [
+		is: m.uint16Array,
+		fixtures: [
 			new Uint16Array(0)
 		]
 	}],
 	['int32Array', {
-		is: m.int32Array, fixtures: [
+		is: m.int32Array,
+		fixtures: [
 			new Int32Array(0)
 		]
 	}],
 	['uint32Array', {
-		is: m.uint32Array, fixtures: [
+		is: m.uint32Array,
+		fixtures: [
 			new Uint32Array(0)
 		]
 	}],
 	['float32Array', {
-		is: m.float32Array, fixtures: [
+		is: m.float32Array,
+		fixtures: [
 			new Float32Array(0)
 		]
 	}],
 	['float64Array', {
-		is: m.float64Array, fixtures: [
+		is: m.float64Array,
+		fixtures: [
 			new Float64Array(0)
 		]
 	}],
 	['arrayBuffer', {
-		is: m.arrayBuffer, fixtures: [
+		is: m.arrayBuffer,
+		fixtures: [
 			new ArrayBuffer(10)
 		]
 	}],
 	['nan', {
-		is: m.nan, fixtures: [
+		is: m.nan,
+		fixtures: [
 			NaN,
 			Number.NaN
 		]
 	}],
 	['nullOrUndefined', {
-		is: m.nullOrUndefined, fixtures: [
+		is: m.nullOrUndefined,
+		fixtures: [
 			null,
 			undefined
 		]
 	}],
 	['plainObject', {
-		is: m.plainObject, fixtures: [
+		is: m.plainObject,
+		fixtures: [
 			{x: 1},
 			Object.create(null),
 			new Object()
 		]
 	}],
 	['integer', {
-		is: m.integer, fixtures: [
+		is: m.integer,
+		fixtures: [
 			6
 		]
 	}],
 	['safeInteger', {
-		is: m.safeInteger, fixtures: [
+		is: m.safeInteger,
+		fixtures: [
 			Math.pow(2, 53) - 1,
 			-Math.pow(2, 53) + 1
 		]
 	}],
 	['domElement', {
-		is: m.domElement, fixtures: [
+		is: m.domElement,
+		fixtures: [
 			'div',
 			'input',
 			'span',
@@ -236,7 +274,8 @@ const types = new Map<string, Test>([
 			'script'
 		].map(createDomElement) }
 	], ['non-domElements', {
-		is: value => !m.domElement(value), fixtures: [
+		is: value => !m.domElement(value),
+		fixtures: [
 			document.createTextNode('data'),
 			document.createProcessingInstruction('xml-stylesheet', 'href="mycss.css" type="text/css"'),
 			document.createComment('This is a comment'),
@@ -246,7 +285,8 @@ const types = new Map<string, Test>([
 		]
 	}],
 	['infinite', {
-		is:  m.infinite, fixtures: [
+		is:  m.infinite,
+		fixtures: [
 			Infinity,
 			-Infinity
 		]

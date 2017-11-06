@@ -21,8 +21,8 @@
     "test": "npm run lint && npm run build && ava dist/tests",
     "prepublish": "npm run build && del dist/tests"
   },
-  "main": "dist/index",
-  "types": "dist/index",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
   "files": [
     "dist"
   ],
