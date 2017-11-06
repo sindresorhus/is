@@ -5,7 +5,9 @@ import m from '..';
 
 const isNode8orHigher = Number(process.versions.node.split('.')[0]) >= 8;
 
-// Currently out of order, see https://github.com/Microsoft/TypeScript/issues/15202 class PromiseSubclassFixture<T> extends Promise<T> {}
+// Currently not working. See https://github.com/Microsoft/TypeScript/issues/15202
+// `class PromiseSubclassFixture<T> extends Promise<T> {}`
+
 class ErrorSubclassFixture extends Error {}
 
 const document = jsdom();

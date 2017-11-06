@@ -2,7 +2,7 @@ import * as util from 'util';
 
 const toString = Object.prototype.toString;
 const getObjectType = (value: any) => toString.call(value).slice(8, -1) as string;
-const isOfType = (type: string) => (value: any) => typeof value === type; // tslint:disable-line
+const isOfType = (type: string) => (value: any) => typeof value === type; // tslint:disable-line:strict-type-predicates
 const isObjectOfType = (type: string) => (value: any) => getObjectType(value) === type;
 
 function is(value: any) { // tslint:disable-line:only-arrow-functions
@@ -232,12 +232,18 @@ namespace is { // tslint:disable-line:no-namespace
 	// tslint:enable:only-arrow-functions no-function-expression
 }
 
-// Some few keywords are reserved, but we'll populate them for the node-folks
+// Some few keywords are reserved, but we'll populate them for Node.js users
 // See https://github.com/Microsoft/TypeScript/issues/2536
 Object.defineProperties(is, {
-	class: {value: is.class_},
-	function: {value: is.function_},
-	null: {value: is.null_}
+	class: {
+		value: is.class_
+	},
+	function: {
+		value: is.function_
+	},
+	null: {
+		value: is.null_
+	}
 });
 
 export default is; // tslint:disable-line:no-default-export

@@ -1,17 +1,20 @@
 {
-    "compileOnSave": true,
-    "compilerOptions": {
-        /* es2015 requires moduleResolution and module to be set,
-        see https://github.com/Microsoft/TypeScript/issues/8189 */
-        "target": "es2015",
-        "moduleResolution": "node",
-        "module": "none",
-        "strict": true,
-        "declaration": true,
-        "sourceMap": true,
-        "outDir": "dist",
-        "lib": [
-            "es2015", "dom", "scripthost"
-        ]
-    }
+	"compileOnSave": true,
+	"compilerOptions": {
+		/* es2015 requires moduleResolution and module to be set,
+		see https://github.com/Microsoft/TypeScript/issues/8189 */
+		"target": "es2015",
+		"moduleResolution": "node",
+		"module": "none",
+		"strict": true,
+		"declaration": true,
+		"sourceMap": true,
+		"outDir": "dist",
+		"removeComments": true,
+		"lib": [
+			"es2015",
+			"dom",
+			"scripthost"
+		]
+	}
 }

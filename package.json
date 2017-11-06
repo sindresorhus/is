@@ -1,60 +1,60 @@
 {
-  "name": "@sindresorhus/is",
-  "version": "0.4.0",
-  "description": "Type check values: `is.string('🦄') //=> true`",
-  "license": "MIT",
-  "repository": "sindresorhus/is",
-  "author": {
-    "name": "Sindre Sorhus",
-    "email": "sindresorhus@gmail.com",
-    "url": "sindresorhus.com"
-  },
-  "publishConfig": {
-    "access": "public"
-  },
-  "engines": {
-    "node": ">=4"
-  },
-  "scripts": {
-    "lint": "tslint --project .",
-    "build": "tsc",
-    "test": "npm run lint && npm run build && ava dist/tests",
-    "prepublish": "npm run build && del dist/tests"
-  },
-  "main": "dist/index.js",
-  "types": "dist/index.d.ts",
-  "files": [
-    "dist"
-  ],
-  "keywords": [
-    "type",
-    "types",
-    "is",
-    "check",
-    "checking",
-    "validate",
-    "validation",
-    "utility",
-    "util",
-    "typeof",
-    "instanceof",
-    "object",
-    "assert",
-    "assertion",
-    "test",
-    "kind",
-    "primitive",
-    "verify",
-    "compare"
-  ],
-  "devDependencies": {
-    "@types/jsdom": "^2.0.31",
-    "@types/node": "^8.0.47",
-    "ava": "*",
-    "del-cli": "^1.1.0",
-    "jsdom": "^9.12.0",
-    "tslint": "^5.8.0",
-    "tslint-xo": "^0.2.1",
-    "typescript": "^2.6.1"
-  }
+	"name": "@sindresorhus/is",
+	"version": "0.4.0",
+	"description": "Type check values: `is.string('🦄') //=> true`",
+	"license": "MIT",
+	"repository": "sindresorhus/is",
+	"author": {
+		"name": "Sindre Sorhus",
+		"email": "sindresorhus@gmail.com",
+		"url": "sindresorhus.com"
+	},
+	"publishConfig": {
+		"access": "public"
+	},
+	"main": "dist/index.js",
+	"engines": {
+		"node": ">=4"
+	},
+	"scripts": {
+		"lint": "tslint --project .",
+		"build": "tsc",
+		"test": "npm run lint && npm run build && ava dist/tests",
+		"prepublish": "npm run build && del dist/tests"
+	},
+	"files": [
+		"dist"
+	],
+	"keywords": [
+		"type",
+		"types",
+		"is",
+		"check",
+		"checking",
+		"validate",
+		"validation",
+		"utility",
+		"util",
+		"typeof",
+		"instanceof",
+		"object",
+		"assert",
+		"assertion",
+		"test",
+		"kind",
+		"primitive",
+		"verify",
+		"compare"
+	],
+	"devDependencies": {
+		"@types/jsdom": "^2.0.31",
+		"@types/node": "^8.0.47",
+		"ava": "*",
+		"del-cli": "^1.1.0",
+		"jsdom": "^9.12.0",
+		"tslint": "^5.8.0",
+		"tslint-xo": "^0.2.1",
+		"typescript": "^2.6.1"
+	},
+	"types": "dist/index.d.ts"
 }
