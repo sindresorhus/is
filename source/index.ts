@@ -247,3 +247,7 @@ Object.defineProperties(is, {
 });
 
 export default is; // tslint:disable-line:no-default-export
+
+// For CommonJS default export support
+module.exports = is;
+module.exports.default = is;
