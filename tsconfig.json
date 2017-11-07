@@ -1,20 +1,25 @@
 {
-	"compileOnSave": true,
 	"compilerOptions": {
-		/* es2015 requires moduleResolution and module to be set,
-		see https://github.com/Microsoft/TypeScript/issues/8189 */
-		"target": "es2015",
-		"moduleResolution": "node",
-		"module": "none",
-		"strict": true,
-		"declaration": true,
-		"sourceMap": true,
 		"outDir": "dist",
-		"removeComments": true,
-		"lib": [
-			"es2015",
-			"dom",
-			"scripthost"
-		]
-	}
+		"target": "es2015",
+		"module": "commonjs",
+		"moduleResolution": "node",
+		"declaration": true,
+		"pretty": true,
+		"newLine": "lf",
+		"stripInternal": true,
+		"noImplicitAny": true,
+		"noImplicitReturns": true,
+		"noImplicitThis": true,
+		"noUnusedLocals": true,
+		"noUnusedParameters": true,
+		"noFallthroughCasesInSwitch": true,
+		"strictNullChecks": true,
+		"strictFunctionTypes": true,
+		"alwaysStrict": true
+	},
+	"exclude": [
+		"node_modules",
+		"dist"
+	]
 }

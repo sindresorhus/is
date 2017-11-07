@@ -72,13 +72,13 @@ const types = new Map<string, Test>([
 	['function', {
 		is: m.function_,
 		fixtures: [
-			// tslint:disable:no-empty no-unused-variable only-arrow-functions no-function-expression
-			function foo() {}, // tslint:disable-line:no-unused
-			function() {},
+			// tslint:disable:no-unused no-empty no-unused-variable only-arrow-functions no-function-expression
+			function foo() {},
+			function () {},
 			() => {},
-			async function() {},
-			function *(): any {}
-			// tslint:enable:no-empty no-unused-variable only-arrow-functions no-function-expression
+			async function () {},
+			function * (): any {}
+			// tslint:enable:no-unused no-empty no-unused-variable only-arrow-functions no-function-expression
 		]
 	}],
 	['buffer', {
@@ -130,19 +130,23 @@ const types = new Map<string, Test>([
 	['generator', {
 		is: m.generator,
 		fixtures: [
-			(function *() { yield 4; })() // tslint:disable-line
+			(function * () {
+				yield 4;
+			})()
 		]
 	}],
 	['generatorFunction', {
 		is: m.generatorFunction,
 		fixtures: [
-			function *() { yield 4; } // tslint:disable-line
+			function * () {
+				yield 4;
+			}
 		]
 	}],
 	['asyncFunction', {
 		is: m.asyncFunction,
 		fixtures: [
-			async function() {}, // tslint:disable-line:no-empty only-arrow-functions no-function-expression
+			async function () {}, // tslint:disable-line:no-empty only-arrow-functions no-function-expression
 			async () => {} // tslint:disable-line:no-empty
 		]
 	}],
@@ -282,7 +286,7 @@ const types = new Map<string, Test>([
 			document.createProcessingInstruction('xml-stylesheet', 'href="mycss.css" type="text/css"'),
 			document.createComment('This is a comment'),
 			document,
-			document.implementation.createDocumentType('svg:svg', '-//W3C//DTD SVG 1.1//EN', 'http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd'), // tslint:disable-line
+			document.implementation.createDocumentType('svg:svg', '-//W3C//DTD SVG 1.1//EN', 'https://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd'),
 			document.createDocumentFragment()
 		]
 	}],
@@ -579,7 +583,7 @@ test('is.typedArray', t => {
 });
 
 test('is.arrayLike', t => {
-	(() => {
+	(function () { // tslint:disable-line:only-arrow-functions
 		t.true(m.arrayLike(arguments));
 	})();
 	t.true(m.arrayLike([]));
