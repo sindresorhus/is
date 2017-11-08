@@ -150,6 +150,13 @@ const types = new Map<string, Test>([
 			async () => {} // tslint:disable-line:no-empty
 		]
 	}],
+	['boundFunction', {
+		is: m.boundFunction,
+		fixtures: [
+			() => {}, // tslint:disable-line:no-empty
+			function () {}.bind(null), // tslint:disable-line:no-empty only-arrow-functions
+		]
+	}],
 	['map', {
 		is: m.map,
 		fixtures: [
@@ -362,7 +369,8 @@ test('is.array', t => {
 });
 
 test('is.function', t => {
-	testType(t, 'function', ['generatorFunction', 'asyncFunction']);
+	testType(t, 'function', ['generatorFunction', 'asyncFunction', 'boundFunction']);
+	t.false(m.boundFunction(function () {})); // tslint:disable-line:no-empty only-arrow-functions
 });
 
 test('is.buffer', t => {

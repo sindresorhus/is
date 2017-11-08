@@ -96,6 +96,21 @@ is.asyncFunction(() => {});
 // => false
 ```
 
+##### .boundFunction(value)
+
+Returns `true` for any `bound` function.
+
+```js
+is.boundFunction(() => {});
+// => true
+
+is.boundFunction(function () {}.bind(null));
+// => true
+
+is.boundFunction(function () {});
+// => false
+```
+
 ##### .map(value)
 ##### .set(value)
 ##### .weakMap(value)
