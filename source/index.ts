@@ -95,6 +95,7 @@ namespace is { // tslint:disable-line:no-namespace
 
 	export const generatorFunction = isFunctionOfType('GeneratorFunction');
 	export const asyncFunction = isFunctionOfType('AsyncFunction');
+	export const boundFunction = (value: any) => function_(value) && !value.hasOwnProperty('prototype');
 
 	export const regExp = isObjectOfType('RegExp');
 	export const date = isObjectOfType('Date');
