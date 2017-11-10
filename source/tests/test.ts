@@ -370,6 +370,9 @@ test('is.array', t => {
 
 test('is.function', t => {
 	testType(t, 'function', ['generatorFunction', 'asyncFunction', 'boundFunction']);
+});
+
+test('is.boundFunction', t => {
 	t.false(m.boundFunction(function () {})); // tslint:disable-line:no-empty only-arrow-functions
 });
 
