@@ -34,11 +34,6 @@ export enum TypeName {
 
 const toString = Object.prototype.toString;
 const isOfType = (type: string) => (value: any) => typeof value === type; // tslint:disable-line:strict-type-predicates
-const isObjectOfType = (typeName: string | TypeName) => (value: any) => {
-	const type = typeName === 'string' ? TypeName[typeName] : typeName;
-
-	return getObjectType(value) === type;
-};
 
 const getObjectType = (value: any): TypeName | null => {
 	const objectName = toString.call(value).slice(8, -1) as string;
@@ -85,6 +80,12 @@ const getObjectType = (value: any): TypeName | null => {
 		default:
 			return null;
 	}
+};
+
+const isObjectOfType = (typeName: string | TypeName) => (value: any) => {
+	const type = typeName === 'string' ? TypeName[typeName] : typeName;
+
+	return getObjectType(value) === type;
 };
 
 function is(value: any): TypeName { // tslint:disable-line:only-arrow-functions
