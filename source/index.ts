@@ -1,47 +1,129 @@
 import * as util from 'util';
 
-const toString = Object.prototype.toString;
-const getObjectType = (value: any) => toString.call(value).slice(8, -1) as string;
-const isOfType = (type: string) => (value: any) => typeof value === type; // tslint:disable-line:strict-type-predicates
-const isObjectOfType = (type: string) => (value: any) => getObjectType(value) === type;
+export enum TypeName {
+	null = 'null',
+	boolean = 'boolean',
+	undefined = 'undefined',
+	string = 'string',
+	number = 'number',
+	symbol = 'symbol',
+	Function = 'Function',
+	Array = 'Array',
+	Buffer = 'Buffer',
+	Object = 'Object',
+	RegExp = 'RegExp',
+	Date = 'Date',
+	Error = 'Error',
+	Map = 'Map',
+	Set = 'Set',
+	WeakMap = 'WeakMap',
+	WeakSet = 'WeakSet',
+	Int8Array = 'Int8Array',
+	Uint8Array = 'Uint8Array',
+	Uint8ClampedArray = 'Uint8ClampedArray',
+	Int16Array = 'Int16Array',
+	Uint16Array = 'Uint16Array',
+	Int32Array = 'Int32Array',
+	Uint32Array = 'Uint32Array',
+	Float32Array = 'Float32Array',
+	Float64Array = 'Float64Array',
+	ArrayBuffer = 'ArrayBuffer',
+	SharedArrayBuffer = 'SharedArrayBuffer',
+	Promise = 'Promise'
+}
 
-function is(value: any) { // tslint:disable-line:only-arrow-functions
+const toString = Object.prototype.toString;
+const isOfType = (type: string) => (value: any) => typeof value === type; // tslint:disable-line:strict-type-predicates
+const isObjectOfType = (typeName: string | TypeName) => (value: any) => {
+	const type = typeName === 'string' ? TypeName[typeName] : typeName;
+
+	return getObjectType(value) === type;
+};
+
+const getObjectType = (value: any): TypeName | null => {
+	const objectName = toString.call(value).slice(8, -1) as string;
+
+	switch (objectName) {
+		case 'ArrayBuffer':
+			return TypeName.ArrayBuffer;
+		case 'WeakSet':
+			return TypeName.WeakSet;
+		case 'WeakMap':
+			return TypeName.WeakMap;
+		case 'Set':
+			return TypeName.Set;
+		case 'Promise':
+			return TypeName.Promise;
+		case 'RegExp':
+			return TypeName.RegExp;
+		case 'Date':
+			return TypeName.Date;
+		case 'Error':
+			return TypeName.Error;
+		case 'Map':
+			return TypeName.Map;
+		case 'Int8Array':
+			return TypeName.Int8Array;
+		case 'Uint8Array':
+			return TypeName.Uint8Array;
+		case 'Uint8ClampedArray':
+			return TypeName.Uint8ClampedArray;
+		case 'Int16Array':
+			return TypeName.Int16Array;
+		case 'Uint16Array':
+			return TypeName.Uint16Array;
+		case 'Int32Array':
+			return TypeName.Int32Array;
+		case 'Uint32Array':
+			return TypeName.Uint32Array;
+		case 'Float32Array':
+			return TypeName.Float32Array;
+		case 'Float64Array':
+			return TypeName.Float64Array;
+		case 'Object':
+			return TypeName.Object;
+		default:
+			return null;
+	}
+};
+
+function is(value: any): TypeName { // tslint:disable-line:only-arrow-functions
 	if (value === null) {
-		return 'null';
+		return TypeName.null;
 	}
 
 	if (value === true || value === false) {
-		return 'boolean';
+		return TypeName.boolean;
 	}
 
 	const type = typeof value;
 
 	if (type === 'undefined') {
-		return 'undefined';
+		return TypeName.undefined;
 	}
 
 	if (type === 'string') {
-		return 'string';
+		return TypeName.string;
 	}
 
 	if (type === 'number') {
-		return 'number';
+		return TypeName.number;
 	}
 
 	if (type === 'symbol') {
-		return 'symbol';
+		return TypeName.symbol;
 	}
 
 	if (is.function_(value)) {
-		return 'Function';
+		return TypeName.Function;
 	}
 
 	if (Array.isArray(value)) {
-		return 'Array';
+		return TypeName.Array;
 	}
 
 	if (Buffer.isBuffer(value)) {
-		return 'Buffer';
+		return TypeName.Buffer;
 	}
 
 	const tagType = getObjectType(value);
@@ -53,7 +135,7 @@ function is(value: any) { // tslint:disable-line:only-arrow-functions
 		throw new TypeError('Please don\'t use object wrappers for primitive types');
 	}
 
-	return 'Object';
+	return TypeName.Object;
 }
 
 namespace is { // tslint:disable-line:no-namespace
@@ -139,23 +221,31 @@ namespace is { // tslint:disable-line:no-namespace
 		// From: https://github.com/sindresorhus/is-plain-obj/blob/master/index.js
 		let prototype;
 
-		return getObjectType(value) === 'Object' &&
+		return getObjectType(value) === TypeName.Object &&
 			(prototype = Object.getPrototypeOf(value), prototype === null || // tslint:disable-line:ban-comma-operator
 				prototype === Object.getPrototypeOf({}));
 	};
 
 	const typedArrayTypes = new Set([
-		'Int8Array',
-		'Uint8Array',
-		'Uint8ClampedArray',
-		'Int16Array',
-		'Uint16Array',
-		'Int32Array',
-		'Uint32Array',
-		'Float32Array',
-		'Float64Array'
+		TypeName.Int8Array,
+		TypeName.Uint8Array,
+		TypeName.Uint8ClampedArray,
+		TypeName.Int16Array,
+		TypeName.Uint16Array,
+		TypeName.Int32Array,
+		TypeName.Uint32Array,
+		TypeName.Float32Array,
+		TypeName.Float64Array
 	]);
-	export const typedArray = (value: any) => typedArrayTypes.has(getObjectType(value));
+	export const typedArray = (value: any) => {
+		const objectType = getObjectType(value);
+
+		if (objectType === null) {
+			return false;
+		}
+
+		return typedArrayTypes.has(objectType);
+	};
 
 	const isValidLength = (value: any) => safeInteger(value) && value > -1;
 	export const arrayLike = (value: any) => !nullOrUndefined(value) && !function_(value) && isValidLength(value.length);
