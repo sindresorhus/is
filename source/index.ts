@@ -38,48 +38,11 @@ const isOfType = (type: string) => (value: any) => typeof value === type; // tsl
 const getObjectType = (value: any): TypeName | null => {
 	const objectName = toString.call(value).slice(8, -1) as string;
 
-	switch (objectName) {
-		case 'ArrayBuffer':
-			return TypeName.ArrayBuffer;
-		case 'WeakSet':
-			return TypeName.WeakSet;
-		case 'WeakMap':
-			return TypeName.WeakMap;
-		case 'Set':
-			return TypeName.Set;
-		case 'Promise':
-			return TypeName.Promise;
-		case 'RegExp':
-			return TypeName.RegExp;
-		case 'Date':
-			return TypeName.Date;
-		case 'Error':
-			return TypeName.Error;
-		case 'Map':
-			return TypeName.Map;
-		case 'Int8Array':
-			return TypeName.Int8Array;
-		case 'Uint8Array':
-			return TypeName.Uint8Array;
-		case 'Uint8ClampedArray':
-			return TypeName.Uint8ClampedArray;
-		case 'Int16Array':
-			return TypeName.Int16Array;
-		case 'Uint16Array':
-			return TypeName.Uint16Array;
-		case 'Int32Array':
-			return TypeName.Int32Array;
-		case 'Uint32Array':
-			return TypeName.Uint32Array;
-		case 'Float32Array':
-			return TypeName.Float32Array;
-		case 'Float64Array':
-			return TypeName.Float64Array;
-		case 'Object':
-			return TypeName.Object;
-		default:
-			return null;
+	if (objectName) {
+		return objectName as TypeName;
 	}
+
+	return null;
 };
 
 const isObjectOfType = (typeName: string | TypeName) => (value: any) => {
