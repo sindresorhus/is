@@ -1,6 +1,6 @@
 import * as util from 'util';
 
-export enum TypeName {
+export const enum TypeName {
 	null = 'null',
 	boolean = 'boolean',
 	undefined = 'undefined',
@@ -45,10 +45,8 @@ const getObjectType = (value: any): TypeName | null => {
 	return null;
 };
 
-const isObjectOfType = (typeName: string | TypeName) => (value: any) => {
-	const type = typeName === 'string' ? TypeName[typeName] : typeName;
-
-	return getObjectType(value) === type;
+const isObjectOfType = (typeName: TypeName) => (value: any) => {
+	return getObjectType(value) === typeName;
 };
 
 function is(value: any): TypeName { // tslint:disable-line:only-arrow-functions
@@ -126,7 +124,7 @@ namespace is { // tslint:disable-line:no-namespace
 	export const iterable = (value: any) => !nullOrUndefined(value) && function_(value[Symbol.iterator]);
 	export const generator = (value: any) => iterable(value) && function_(value.next) && function_(value.throw);
 
-	export const nativePromise = isObjectOfType('Promise');
+	export const nativePromise = isObjectOfType(TypeName.Promise);
 
 	const hasPromiseAPI = (value: any) =>
 		!null_(value) &&
@@ -142,26 +140,26 @@ namespace is { // tslint:disable-line:no-namespace
 	export const generatorFunction = isFunctionOfType('GeneratorFunction');
 	export const asyncFunction = isFunctionOfType('AsyncFunction');
 
-	export const regExp = isObjectOfType('RegExp');
-	export const date = isObjectOfType('Date');
-	export const error = isObjectOfType('Error');
-	export const map = isObjectOfType('Map');
-	export const set = isObjectOfType('Set');
-	export const weakMap = isObjectOfType('WeakMap');
-	export const weakSet = isObjectOfType('WeakSet');
+	export const regExp = isObjectOfType(TypeName.RegExp);
+	export const date = isObjectOfType(TypeName.Date);
+	export const error = isObjectOfType(TypeName.Error);
+	export const map = isObjectOfType(TypeName.Map);
+	export const set = isObjectOfType(TypeName.Set);
+	export const weakMap = isObjectOfType(TypeName.WeakMap);
+	export const weakSet = isObjectOfType(TypeName.WeakSet);
 
-	export const int8Array = isObjectOfType('Int8Array');
-	export const uint8Array = isObjectOfType('Uint8Array');
-	export const uint8ClampedArray = isObjectOfType('Uint8ClampedArray');
-	export const int16Array = isObjectOfType('Int16Array');
-	export const uint16Array = isObjectOfType('Uint16Array');
-	export const int32Array = isObjectOfType('Int32Array');
-	export const uint32Array = isObjectOfType('Uint32Array');
-	export const float32Array = isObjectOfType('Float32Array');
-	export const float64Array = isObjectOfType('Float64Array');
+	export const int8Array = isObjectOfType(TypeName.Int8Array);
+	export const uint8Array = isObjectOfType(TypeName.Uint8Array);
+	export const uint8ClampedArray = isObjectOfType(TypeName.Uint8ClampedArray);
+	export const int16Array = isObjectOfType(TypeName.Int16Array);
+	export const uint16Array = isObjectOfType(TypeName.Uint16Array);
+	export const int32Array = isObjectOfType(TypeName.Int32Array);
+	export const uint32Array = isObjectOfType(TypeName.Uint32Array);
+	export const float32Array = isObjectOfType(TypeName.Float32Array);
+	export const float64Array = isObjectOfType(TypeName.Float64Array);
 
-	export const arrayBuffer = isObjectOfType('ArrayBuffer');
-	export const sharedArrayBuffer = isObjectOfType('SharedArrayBuffer');
+	export const arrayBuffer = isObjectOfType(TypeName.ArrayBuffer);
+	export const sharedArrayBuffer = isObjectOfType(TypeName.SharedArrayBuffer);
 
 	export const truthy = (value: any) => Boolean(value);
 	export const falsy = (value: any) => !value;
