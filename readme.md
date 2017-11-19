@@ -213,7 +213,7 @@ Returns `true` if `value` is a DOM Element.
 
 ##### .nodeStream(value)
 
-Returns `true` if `value` is a node [stream](https://nodejs.org/api/stream.html).
+Returns `true` if `value` is a Node.js [stream](https://nodejs.org/api/stream.html).
 
 ```js
 const fs = require('fs');
