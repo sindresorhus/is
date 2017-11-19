@@ -1,8 +1,8 @@
 import * as fs from 'fs';
 import * as net from 'net';
 import * as Stream from 'stream';
-import * as tempy from 'tempy';
 import * as util from 'util';
+import * as tempy from 'tempy';
 import test, {TestContext, Context} from 'ava';
 import {jsdom} from 'jsdom';
 import m from '..';
