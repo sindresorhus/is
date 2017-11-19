@@ -238,6 +238,8 @@ namespace is { // tslint:disable-line:no-namespace
 	export const domElement = (value: any) => object(value) && value.nodeType === NODE_TYPE_ELEMENT && string(value.nodeName) &&
 		!plainObject(value) && DOM_PROPERTIES_TO_CHECK.every(property => property in value);
 
+	export const nodeStream = (value: any) => !nullOrUndefined(value) && isObject(value) && function_(value.pipe);
+
 	export const infinite = (value: any) => value === Infinity || value === -Infinity;
 
 	const isAbsoluteMod2 = (value: number) => (rem: number) => integer(rem) && Math.abs(rem % 2) === value;
