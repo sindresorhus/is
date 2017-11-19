@@ -1,3 +1,7 @@
+import * as fs from 'fs';
+import * as net from 'net';
+import * as Stream from 'stream';
+import * as tempy from 'tempy';
 import * as util from 'util';
 import test, {TestContext, Context} from 'ava';
 import {jsdom} from 'jsdom';
@@ -286,7 +290,8 @@ const types = new Map<string, Test>([
 			'canvas',
 			'script'
 		].map(createDomElement) }
-	], ['non-domElements', {
+	],
+	['non-domElements', {
 		is: value => !m.domElement(value),
 		fixtures: [
 			document.createTextNode('data'),
@@ -295,6 +300,20 @@ const types = new Map<string, Test>([
 			document,
 			document.implementation.createDocumentType('svg:svg', '-//W3C//DTD SVG 1.1//EN', 'https://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd'),
 			document.createDocumentFragment()
+		]
+	}],
+	['nodeStream', {
+		is: m.nodeStream,
+		fixtures: [
+			fs.createReadStream('readme.md'),
+			fs.createWriteStream(tempy.file()),
+			new net.Socket(),
+			new Stream.Duplex(),
+			new Stream.PassThrough(),
+			new Stream.Readable(),
+			new Stream.Transform(),
+			new Stream.Stream(),
+			new Stream.Writable()
 		]
 	}],
 	['infinite', {
@@ -639,6 +658,10 @@ test('is.inRange', t => {
 test('is.domElement', t => {
 	testType(t, 'domElement');
 	t.false(m.domElement({nodeType: 1, nodeName: 'div'}));
+});
+
+test('is.nodeStream', t => {
+	testType(t, 'nodeStream');
 });
 
 test('is.infinite', t => {

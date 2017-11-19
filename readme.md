@@ -211,6 +211,16 @@ is.inRange(3, 10);
 
 Returns `true` if `value` is a DOM Element.
 
+##### .nodeStream(value)
+
+Returns `true` if `value` is a node [stream](https://nodejs.org/api/stream.html).
+
+```js
+const fs = require('fs');
+is.nodeStream(fs.createReadStream('unicorn.png'));
+//=> true
+```
+
 ##### .infinite(value)
 
 Check if `value` is `Infinity` or `-Infinity`.
