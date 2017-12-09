@@ -136,6 +136,20 @@ is.boundFunction(function () {});
 
 #### Miscellaneous
 
+##### .directInstanceOf(value, klass)
+
+Returns `true` if value is a direct instance of a class of type `klass`.
+
+```js
+class ErrorSubclass extends Error {};
+
+is.directInstanceOf(new Error(), Error);
+//=> true
+
+is.directInstanceOf(new ErrorSubclass(), Error);
+//=> false
+```
+
 ##### .truthy(value)
 
 Returns `true` for all values that evaluate to true in a boolean context:

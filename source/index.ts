@@ -162,6 +162,8 @@ namespace is { // tslint:disable-line:no-namespace
 	export const arrayBuffer = isObjectOfType(TypeName.ArrayBuffer);
 	export const sharedArrayBuffer = isObjectOfType(TypeName.SharedArrayBuffer);
 
+	export const directInstanceOf = (instance: any, klass: any) => object(instance) && object(klass) && Object.getPrototypeOf(instance) === klass.prototype;
+
 	export const truthy = (value: any) => Boolean(value);
 	export const falsy = (value: any) => !value;
 
