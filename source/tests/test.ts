@@ -507,6 +507,17 @@ test('is.dataView', t => {
 	testType(t, 'arrayBuffer');
 });
 
+test('is.directInstanceOf', t => {
+	const error = new Error();
+	const errorSubclass = new ErrorSubclassFixture();
+
+	t.true(m.directInstanceOf(error, Error));
+	t.true(m.directInstanceOf(errorSubclass, ErrorSubclassFixture));
+
+	t.false(m.directInstanceOf(error, ErrorSubclassFixture));
+	t.false(m.directInstanceOf(errorSubclass, Error));
+});
+
 test('is.truthy', t => {
 	t.true(m.truthy('unicorn'));
 	t.true(m.truthy('🦄'));

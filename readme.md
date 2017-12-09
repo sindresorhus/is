@@ -136,6 +136,20 @@ is.boundFunction(function () {});
 
 #### Miscellaneous
 
+##### .directInstanceOf(value, class)
+
+Returns `true` if `value` is a direct instance of `class`.
+
+```js
+is.directInstanceOf(new Error(), Error);
+//=> true
+
+class UnicornError extends Error {};
+
+is.directInstanceOf(new UnicornError(), Error);
+//=> false
+```
+
 ##### .truthy(value)
 
 Returns `true` for all values that evaluate to true in a boolean context:
