@@ -162,6 +162,8 @@ namespace is { // tslint:disable-line:no-namespace
 	export const arrayBuffer = isObjectOfType(TypeName.ArrayBuffer);
 	export const sharedArrayBuffer = isObjectOfType(TypeName.SharedArrayBuffer);
 
+	// TODO: Remove `object` checks when targeting ES2015 or higher
+	// See `Notes`: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/getPrototypeOf
 	export const directInstanceOf = (instance: any, klass: any) => object(instance) && object(klass) && Object.getPrototypeOf(instance) === klass.prototype;
 
 	export const truthy = (value: any) => Boolean(value);
