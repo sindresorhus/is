@@ -136,17 +136,17 @@ is.boundFunction(function () {});
 
 #### Miscellaneous
 
-##### .directInstanceOf(value, klass)
+##### .directInstanceOf(value, class)
 
-Returns `true` if value is a direct instance of a class of type `klass`.
+Returns `true` if `value` is a direct instance of `class`.
 
 ```js
-class ErrorSubclass extends Error {};
-
 is.directInstanceOf(new Error(), Error);
 //=> true
 
-is.directInstanceOf(new ErrorSubclass(), Error);
+class UnicornError extends Error {};
+
+is.directInstanceOf(new UnicornError(), Error);
 //=> false
 ```
 
