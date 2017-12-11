@@ -245,6 +245,12 @@ const types = new Map<string, Test>([
 			new ArrayBuffer(10)
 		]
 	}],
+	['dataView', {
+		is: m.dataView,
+		fixtures: [
+			new DataView(new ArrayBuffer(10))
+		]
+	}],
 	['nan', {
 		is: m.nan,
 		fixtures: [
@@ -504,7 +510,7 @@ test('is.arrayBuffer', t => {
 });
 
 test('is.dataView', t => {
-	testType(t, 'arrayBuffer');
+	testType(t, 'dataView');
 });
 
 test('is.directInstanceOf', t => {

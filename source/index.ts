@@ -29,6 +29,7 @@ export const enum TypeName {
 	Float64Array = 'Float64Array',
 	ArrayBuffer = 'ArrayBuffer',
 	SharedArrayBuffer = 'SharedArrayBuffer',
+	DataView = 'DataView',
 	Promise = 'Promise'
 }
 
@@ -161,6 +162,7 @@ namespace is { // tslint:disable-line:no-namespace
 
 	export const arrayBuffer = isObjectOfType(TypeName.ArrayBuffer);
 	export const sharedArrayBuffer = isObjectOfType(TypeName.SharedArrayBuffer);
+	export const dataView = isObjectOfType(TypeName.DataView);
 
 	// TODO: Remove `object` checks when targeting ES2015 or higher
 	// See `Notes`: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/getPrototypeOf
