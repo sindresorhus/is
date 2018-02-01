@@ -16,7 +16,9 @@
 		"noFallthroughCasesInSwitch": true,
 		"strictNullChecks": true,
 		"strictFunctionTypes": true,
-		"alwaysStrict": true
+		"strictPropertyInitialization": true,
+		"alwaysStrict": true,
+		"esModuleInterop": true
 	},
 	"exclude": [
 		"node_modules",
