@@ -4,17 +4,16 @@ import * as Stream from 'stream';
 import * as util from 'util';
 import * as tempy from 'tempy';
 import test, {TestContext, Context} from 'ava';
-import {jsdom} from 'jsdom';
+import {JSDOM} from 'jsdom';
 import m from '..';
 
 const isNode8orHigher = Number(process.versions.node.split('.')[0]) >= 8;
 
-// Currently not working. See https://github.com/Microsoft/TypeScript/issues/15202
-// `class PromiseSubclassFixture<T> extends Promise<T> {}`
-
+class PromiseSubclassFixture<T> extends Promise<T> {}
 class ErrorSubclassFixture extends Error {}
 
-const document = jsdom();
+const {window} = new JSDOM();
+const {document} = window;
 const createDomElement = (el: string) => document.createElement(el);
 
 interface Test {
@@ -122,7 +121,7 @@ const types = new Map<string, Test>([
 		is: m.nativePromise,
 		fixtures: [
 			Promise.resolve(),
-			// PromiseSubclassFixture.resolve()
+			PromiseSubclassFixture.resolve()
 		]
 	}],
 	['promise', {

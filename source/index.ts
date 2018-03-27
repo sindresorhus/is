@@ -8,6 +8,8 @@ export const enum TypeName {
 	number = 'number',
 	symbol = 'symbol',
 	Function = 'Function',
+	GeneratorFunction = 'GeneratorFunction',
+	AsyncFunction = 'AsyncFunction',
 	Array = 'Array',
 	Buffer = 'Buffer',
 	Object = 'Object',
@@ -46,9 +48,7 @@ const getObjectType = (value: any): TypeName | null => {
 	return null;
 };
 
-const isObjectOfType = (typeName: TypeName) => (value: any) => {
-	return getObjectType(value) === typeName;
-};
+const isObjectOfType = (type: TypeName) => (value: any) => getObjectType(value) === type;
 
 function is(value: any): TypeName { // tslint:disable-line:only-arrow-functions
 	if (value === null) {
@@ -110,12 +110,10 @@ namespace is { // tslint:disable-line:no-namespace
 	export const number = isOfType('number');
 	export const function_ = isOfType('function');
 	export const null_ = (value: any) => value === null;
-
 	export const class_ = (value: any) => function_(value) && value.toString().startsWith('class ');
 	export const boolean = (value: any) => value === true || value === false;
-	// tslint:enable:variable-name
-
 	export const symbol = isOfType('symbol');
+	// tslint:enable:variable-name
 
 	export const array = Array.isArray;
 	export const buffer = Buffer.isBuffer;
@@ -135,11 +133,9 @@ namespace is { // tslint:disable-line:no-namespace
 
 	export const promise = (value: any) => nativePromise(value) || hasPromiseAPI(value);
 
-	// TODO: Change to use `isObjectOfType` once Node.js 6 or higher is targeted
-	const isFunctionOfType = (type: string) => (value: any) => function_(value) && function_(value.constructor) && value.constructor.name === type;
-
-	export const generatorFunction = isFunctionOfType('GeneratorFunction');
-	export const asyncFunction = isFunctionOfType('AsyncFunction');
+	const isFunctionOfType = (type: TypeName) => (value: any) => isObjectOfType(type)(value);
+	export const generatorFunction = isFunctionOfType(TypeName.GeneratorFunction);
+	export const asyncFunction = isFunctionOfType(TypeName.AsyncFunction);
 	export const boundFunction = (value: any) => function_(value) && !value.hasOwnProperty('prototype');
 
 	export const regExp = isObjectOfType(TypeName.RegExp);
@@ -164,9 +160,7 @@ namespace is { // tslint:disable-line:no-namespace
 	export const sharedArrayBuffer = isObjectOfType(TypeName.SharedArrayBuffer);
 	export const dataView = isObjectOfType(TypeName.DataView);
 
-	// TODO: Remove `object` checks when targeting ES2015 or higher
-	// See `Notes`: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/getPrototypeOf
-	export const directInstanceOf = (instance: any, klass: any) => object(instance) && object(klass) && Object.getPrototypeOf(instance) === klass.prototype;
+	export const directInstanceOf = (instance: any, klass: any) => Object.getPrototypeOf(instance) === klass.prototype;
 
 	export const truthy = (value: any) => Boolean(value);
 	export const falsy = (value: any) => !value;
@@ -225,8 +219,7 @@ namespace is { // tslint:disable-line:no-namespace
 		}
 
 		if (array(range) && range.length === 2) {
-			// TODO: Use spread operator here when targeting Node.js 6 or higher
-			return value >= Math.min.apply(null, range) && value <= Math.max.apply(null, range);
+			return value >= Math.min(...range) && value <= Math.max(...range);
 		}
 
 		throw new TypeError(`Invalid range: ${util.inspect(range)}`);
@@ -260,13 +253,8 @@ namespace is { // tslint:disable-line:no-namespace
 	export const empty = (value: any) => falsy(value) || isEmptyStringOrArray(value) || isEmptyObject(value) || isEmptyMapOrSet(value);
 	export const emptyOrWhitespace = (value: any) => empty(value) || isWhiteSpaceString(value);
 
-	type ArrayMethod = (fn: (value: any, index: number, arr: any[]) => boolean, thisArg?: any) => boolean;
-	const predicateOnArray = (method: ArrayMethod, predicate: any, args: IArguments) => {
-		// `args` is the calling function's "arguments object".
-		// We have to do it this way to keep node v4 support.
-		// So here we convert it to an array and slice off the first item.
-		const values = Array.prototype.slice.call(args, 1);
-
+	type ArrayMethod = (fn: (value: any, index: number, array: any[]) => boolean, thisArg?: any) => boolean;
+	const predicateOnArray = (method: ArrayMethod, predicate: any, values: any[]) => {
 		if (function_(predicate) === false) {
 			throw new TypeError(`Invalid predicate: ${util.inspect(predicate)}`);
 		}
@@ -278,19 +266,10 @@ namespace is { // tslint:disable-line:no-namespace
 		return method.call(values, predicate);
 	};
 
-	// We can't use rest parameters in node v4 due to the lack of the spread operator.
-	// Therefore We have to use anonymous functions for the any() and all() methods
-	// tslint:disable:only-arrow-functions no-function-expression
-	export function any(...predicate: any[]): any; // tslint:disable-line:variable-name
-	export function any(predicate: any) {
-		return predicateOnArray(Array.prototype.some, predicate, arguments);
-	}
-
-	export function all(...predicate: any[]): any;
-	export function all(predicate: any) {
-		return predicateOnArray(Array.prototype.every, predicate, arguments);
-	}
-	// tslint:enable:only-arrow-functions no-function-expression
+	// tslint:disable variable-name
+	export const any = (predicate: any, ...values: any[]) => predicateOnArray(Array.prototype.some, predicate, values);
+	export const all = (predicate: any, ...values: any[]) => predicateOnArray(Array.prototype.every, predicate, values);
+	// tslint:enable variable-name
 }
 
 // Some few keywords are reserved, but we'll populate them for Node.js users
