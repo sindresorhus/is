@@ -133,7 +133,7 @@ namespace is { // tslint:disable-line:no-namespace
 
 	export const promise = (value: any) => nativePromise(value) || hasPromiseAPI(value);
 
-	const isFunctionOfType = (type: TypeName) => (value: any) => isObjectOfType(type)(value);
+	const isFunctionOfType = (type: TypeName) => isObjectOfType(type);
 	export const generatorFunction = isFunctionOfType(TypeName.GeneratorFunction);
 	export const asyncFunction = isFunctionOfType(TypeName.AsyncFunction);
 	export const boundFunction = (value: any) => function_(value) && !value.hasOwnProperty('prototype');
