@@ -46,7 +46,7 @@ Example:
 - `'Function'`
 - `'Object'`
 
-Note: It will throw if you try to feed it object-wrapped primitives, as that's a bad practice. For example `new String('foo')`.
+Note: It will throw an error if you try to feed it object-wrapped primitives, as that's a bad practice. For example `new String('foo')`.
 
 ### is.{method}
 
