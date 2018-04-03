@@ -27,6 +27,32 @@ is.number(6);
 //=> true
 ```
 
+When using `is` together with TypeScript, [type guards](http://www.typescriptlang.org/docs/handbook/advanced-types.html#type-guards-and-differentiating-types) are being used to infer the correct type inside if-else statements.
+
+```ts
+import is from '@sindresorhus/is';
+
+const padLeft = (value: string, padding: string | number) => {
+	if (is.number(padding)) {
+		// `padding` is typed as `number`
+		return Array(padding + 1).join(' ') + value;
+	}
+
+	if (is.string(padding)) {
+		// `padding` is typed as `string`
+		return padding + value;
+	}
+
+	throw new TypeError(`Expected 'padding' to be of type 'string' or 'number', got '${is(padding)}'.`);
+}
+
+padLeft('🦄', 3);
+//=> '   🦄'
+
+padLeft('🦄', '🌈');
+//=> '🌈🦄'
+```
+
 
 ## API
 
