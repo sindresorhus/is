@@ -7,6 +7,11 @@
 		"declaration": true,
 		"pretty": true,
 		"newLine": "lf",
+		"lib": [
+			"dom",
+			"es2015",
+			"es2017.sharedmemory"
+		],
 		"stripInternal": true,
 		"noImplicitAny": true,
 		"noImplicitReturns": true,
