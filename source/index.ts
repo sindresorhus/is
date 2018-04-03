@@ -127,18 +127,18 @@ namespace is { // tslint:disable-line:no-namespace
 
 	export const nullOrUndefined = (value: any): value is null | undefined => null_(value) || undefined(value);
 	export const object = (value: any) => !nullOrUndefined(value) && (function_(value) || isObject(value));
-	export const iterable = <T = any>(value: any): value is Iterator<T> => !nullOrUndefined(value) && function_(value[Symbol.iterator]);
+	export const iterable = (value: any): value is Iterator<any> => !nullOrUndefined(value) && function_(value[Symbol.iterator]);
 	export const generator = (value: any): value is Generator => iterable(value) && function_(value.next) && function_(value.throw);
 
 	export const nativePromise = isObjectOfType<Promise<any>>(TypeName.Promise);
 
-	const hasPromiseAPI = <T = any>(value: any): value is Promise<T> =>
+	const hasPromiseAPI = (value: any): value is Promise<any> =>
 		!null_(value) &&
 		isObject(value) &&
 		function_(value.then) &&
 		function_(value.catch);
 
-	export const promise = <T = any>(value: any): value is Promise<T> => nativePromise(value) || hasPromiseAPI<T>(value);
+	export const promise = (value: any): value is Promise<any> => nativePromise(value) || hasPromiseAPI(value);
 
 	const isFunctionOfType = <T>(type: TypeName) => isObjectOfType<T>(type);
 	export const generatorFunction = isFunctionOfType<GeneratorFunction>(TypeName.GeneratorFunction);
