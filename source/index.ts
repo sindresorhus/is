@@ -43,7 +43,7 @@ export const enum TypeName {
 }
 
 const toString = Object.prototype.toString;
-const isOfType = <T>(type: string) => (value: any): value is T => typeof value === type; // tslint:disable-line:strict-type-predicates
+const isOfType = <T>(type: string) => (value: any): value is T => typeof value === type;
 
 const getObjectType = (value: any): TypeName | null => {
 	const objectName = toString.call(value).slice(8, -1) as string;
