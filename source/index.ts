@@ -111,7 +111,7 @@ namespace is { // tslint:disable-line:no-namespace
 	export const string = isOfType<string>('string');
 	export const number = isOfType<number>('number');
 	export const function_ = isOfType<Function>('function');
-	export const null_ = (value: any): value is null => value === null;
+	export const null_ = (value: null | any): value is null => value === null;
 	export const class_ = (value: any) => function_(value) && value.toString().startsWith('class ');
 	export const boolean = (value: boolean): value is boolean => value === true || value === false;
 	export const symbol = isOfType<Symbol>('symbol');
@@ -120,10 +120,10 @@ namespace is { // tslint:disable-line:no-namespace
 	export const array = Array.isArray;
 	export const buffer = Buffer.isBuffer;
 
-	export const nullOrUndefined = (value: any): value is null | undefined => null_(value) || undefined(value);
+	export const nullOrUndefined = (value: null | undefined | any): value is null | undefined => null_(value) || undefined(value);
 	export const object = (value: object) => !nullOrUndefined(value) && (function_(value) || isObject(value));
-	export const iterable = (value: IterableIterator<any>): value is IterableIterator<any> => !nullOrUndefined(value) && function_(value[Symbol.iterator]);
-	export const generator = (value: any): value is Generator => iterable(value) && function_(value.next) && function_(value.throw);
+	export const iterable = <T = any>(value: IterableIterator<T>): value is IterableIterator<T> => !nullOrUndefined(value) && function_(value[Symbol.iterator]);
+	export const generator = (value: Generator): value is Generator => iterable(value as IterableIterator<any>) && function_(value.next) && function_(value.throw);
 
 	export const nativePromise = <T = any>(value: Promise<T>): value is Promise<T> =>
 		isObjectOfType<Promise<T>>(TypeName.Promise)(value);
@@ -236,10 +236,10 @@ namespace is { // tslint:disable-line:no-namespace
 		'nodeValue'
 	];
 
-	export const domElement = (value: any) => object(value) && value.nodeType === NODE_TYPE_ELEMENT && string(value.nodeName) &&
+	export const domElement = (value: object & { nodeType: 1; nodeName: string }) => object(value) && value.nodeType === NODE_TYPE_ELEMENT && string(value.nodeName) &&
 		!plainObject(value) && DOM_PROPERTIES_TO_CHECK.every(property => property in value);
 
-	export const nodeStream = (value: object) => !nullOrUndefined(value) && isObject(value) && function_(value.pipe);
+	export const nodeStream = (value: object & { pipe: Function }) => !nullOrUndefined(value) && isObject(value) && function_(value.pipe);
 
 	export const infinite = (value: number) => value === Infinity || value === -Infinity;
 
