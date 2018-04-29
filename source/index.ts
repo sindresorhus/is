@@ -182,7 +182,7 @@ namespace is { // tslint:disable-line:no-namespace
 	export const integer = (value: number): value is number => Number.isInteger(value);
 	export const safeInteger = (value: number): value is number => Number.isSafeInteger(value);
 
-	export const plainObject = (value: any) => {
+	export const plainObject = (value: object) => {
 		// From: https://github.com/sindresorhus/is-plain-obj/blob/master/index.js
 		let prototype;
 
@@ -239,7 +239,7 @@ namespace is { // tslint:disable-line:no-namespace
 	export const domElement = (value: any) => object(value) && value.nodeType === NODE_TYPE_ELEMENT && string(value.nodeName) &&
 		!plainObject(value) && DOM_PROPERTIES_TO_CHECK.every(property => property in value);
 
-	export const nodeStream = (value: any) => !nullOrUndefined(value) && isObject(value) && function_(value.pipe);
+	export const nodeStream = (value: object) => !nullOrUndefined(value) && isObject(value) && function_(value.pipe);
 
 	export const infinite = (value: number) => value === Infinity || value === -Infinity;
 
