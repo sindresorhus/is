@@ -322,7 +322,7 @@ const types = new Map<string, Test>([
 		]
 	}],
 	['infinite', {
-		is:  m.infinite,
+		is: m.infinite,
 		fixtures: [
 			Infinity,
 			-Infinity
@@ -582,15 +582,15 @@ test('is.plainObject', t => {
 });
 
 test('is.iterable', t => {
-	t.true(m.iterable(''));
-	t.true(m.iterable([]));
-	t.true(m.iterable(new Map()));
-	t.false(m.iterable(null));
-	t.false(m.iterable(undefined));
-	t.false(m.iterable(0));
-	t.false(m.iterable(NaN));
-	t.false(m.iterable(Infinity));
-	t.false(m.iterable({}));
+	t.true(m.iterable('' as any));
+	t.true(m.iterable([] as any));
+	t.true(m.iterable(new Map() as any));
+	t.false(m.iterable(null as any));
+	t.false(m.iterable(undefined as any));
+	t.false(m.iterable(0 as any));
+	t.false(m.iterable(NaN as any));
+	t.false(m.iterable(Infinity as any));
+	t.false(m.iterable({} as any));
 });
 
 test('is.class', t => {
@@ -623,9 +623,9 @@ test('is.typedArray', t => {
 		t.true(m.typedArray(el));
 	}
 
-	t.false(m.typedArray(new ArrayBuffer(1)));
-	t.false(m.typedArray([]));
-	t.false(m.typedArray({}));
+	t.false(m.typedArray(new ArrayBuffer(1) as any));
+	t.false(m.typedArray([] as any));
+	t.false(m.typedArray({} as any));
 });
 
 test('is.arrayLike', t => {
@@ -635,9 +635,9 @@ test('is.arrayLike', t => {
 	t.true(m.arrayLike([]));
 	t.true(m.arrayLike('unicorn'));
 
-	t.false(m.arrayLike({}));
+	t.false(m.arrayLike({} as any));
 	t.false(m.arrayLike(() => {})); // tslint:disable-line:no-empty
-	t.false(m.arrayLike(new Map()));
+	t.false(m.arrayLike(new Map() as any));
 });
 
 test('is.inRange', t => {
