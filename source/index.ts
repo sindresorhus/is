@@ -129,7 +129,7 @@ namespace is { // tslint:disable-line:no-namespace
 
 	export const nullOrUndefined = (value: any): value is null | undefined => null_(value) || undefined(value);
 	export const object = (value: any): value is object => !nullOrUndefined(value) && (function_(value) || isObject(value));
-	export const iterable = <T = any>(value: any): value is IterableIterator<T> => !nullOrUndefined(value) && function_(value[Symbol.iterator]);
+	export const iterable = (value: any): value is IterableIterator<any> => !nullOrUndefined(value) && function_(value[Symbol.iterator]);
 	export const generator = (value: any): value is Generator => iterable(value) && function_(value.next) && function_(value.throw);
 
 	export const nativePromise = (value: any): value is Promise<any> =>
@@ -150,10 +150,10 @@ namespace is { // tslint:disable-line:no-namespace
 	export const regExp = isObjectOfType<RegExp>(TypeName.RegExp);
 	export const date = isObjectOfType<Date>(TypeName.Date);
 	export const error = isObjectOfType<Error>(TypeName.Error);
-	export const map = (value: Map<any, any>): value is Map<any, any> => isObjectOfType<Map<any, any>>(TypeName.Map)(value);
-	export const set = (value: Set<any>): value is Set<any> => isObjectOfType<Set<any>>(TypeName.Set)(value);
-	export const weakMap = (value: WeakMap<any, any>): value is WeakMap<any, any> => isObjectOfType<WeakMap<any, any>>(TypeName.WeakMap)(value);
-	export const weakSet = (value: WeakSet<any>): value is WeakSet<any> => isObjectOfType<WeakSet<any>>(TypeName.WeakSet)(value);
+	export const map = (value: any): value is Map<any, any> => isObjectOfType<Map<any, any>>(TypeName.Map)(value);
+	export const set = (value: any): value is Set<any> => isObjectOfType<Set<any>>(TypeName.Set)(value);
+	export const weakMap = (value: any): value is WeakMap<any, any> => isObjectOfType<WeakMap<any, any>>(TypeName.WeakMap)(value);
+	export const weakSet = (value: any): value is WeakSet<any> => isObjectOfType<WeakSet<any>>(TypeName.WeakSet)(value);
 
 	export const int8Array = isObjectOfType<Int8Array>(TypeName.Int8Array);
 	export const uint8Array = isObjectOfType<Uint8Array>(TypeName.Uint8Array);
