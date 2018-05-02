@@ -7,6 +7,11 @@ export interface ArrayLike {
 	length: number;
 }
 
+type Class<T = any> = { new(...args: any[]): T; };
+
+type DomElement = object & { nodeType: 1; nodeName: string }
+type NodeStream = object & { pipe: Function }
+
 export const enum TypeName {
 	null = 'null',
 	boolean = 'boolean',
@@ -104,49 +109,49 @@ function is(value: any): TypeName { // tslint:disable-line:only-arrow-functions
 }
 
 namespace is { // tslint:disable-line:no-namespace
-	const isObject = (value: object) => typeof value === 'object'; // tslint:disable-line:strict-type-predicates
+	const isObject = (value: object) => typeof value === 'object';
 
 	// tslint:disable:variable-name
 	export const undefined = isOfType<undefined>('undefined');
 	export const string = isOfType<string>('string');
 	export const number = isOfType<number>('number');
 	export const function_ = isOfType<Function>('function');
-	export const null_ = (value: null | any): value is null => value === null;
-	export const class_ = (value: any) => function_(value) && value.toString().startsWith('class ');
-	export const boolean = (value: boolean): value is boolean => value === true || value === false;
+	export const null_ = (value: any): value is null => value === null;
+	export const class_ = (value: any): value is Class => function_(value) && value.toString().startsWith('class ');
+	export const boolean = (value: any): value is boolean => value === true || value === false;
 	export const symbol = isOfType<Symbol>('symbol');
 	// tslint:enable:variable-name
 
 	export const array = Array.isArray;
 	export const buffer = Buffer.isBuffer;
 
-	export const nullOrUndefined = (value: null | undefined | any): value is null | undefined => null_(value) || undefined(value);
-	export const object = (value: object) => !nullOrUndefined(value) && (function_(value) || isObject(value));
-	export const iterable = <T = any>(value: IterableIterator<T>): value is IterableIterator<T> => !nullOrUndefined(value) && function_(value[Symbol.iterator]);
-	export const generator = (value: Generator): value is Generator => iterable(value as IterableIterator<any>) && function_(value.next) && function_(value.throw);
+	export const nullOrUndefined = (value: any): value is null | undefined => null_(value) || undefined(value);
+	export const object = (value: any): value is object => !nullOrUndefined(value) && (function_(value) || isObject(value));
+	export const iterable = <T = any>(value: any): value is IterableIterator<T> => !nullOrUndefined(value) && function_(value[Symbol.iterator]);
+	export const generator = (value: any): value is Generator => iterable(value) && function_(value.next) && function_(value.throw);
 
-	export const nativePromise = <T = any>(value: Promise<T>): value is Promise<T> =>
-		isObjectOfType<Promise<T>>(TypeName.Promise)(value);
+	export const nativePromise = (value: any): value is Promise<any> =>
+		isObjectOfType<Promise<any>>(TypeName.Promise)(value);
 
-	const hasPromiseAPI = <T = any>(value: Promise<T>): value is Promise<T> =>
+	const hasPromiseAPI = (value: any): value is Promise<any> =>
 		!null_(value) &&
 		isObject(value) &&
 		function_(value.then) &&
 		function_(value.catch);
 
-	export const promise = <T = any>(value: Promise<T>): value is Promise<T> => nativePromise<T>(value) || hasPromiseAPI<T>(value);
+	export const promise = (value: any): value is Promise<any> => nativePromise(value) || hasPromiseAPI(value);
 
 	export const generatorFunction = isObjectOfType<GeneratorFunction>(TypeName.GeneratorFunction);
 	export const asyncFunction = isObjectOfType<Function>(TypeName.AsyncFunction);
-	export const boundFunction = (value: Function): value is Function => function_(value) && !value.hasOwnProperty('prototype');
+	export const boundFunction = (value: any): value is Function => function_(value) && !value.hasOwnProperty('prototype');
 
 	export const regExp = isObjectOfType<RegExp>(TypeName.RegExp);
 	export const date = isObjectOfType<Date>(TypeName.Date);
 	export const error = isObjectOfType<Error>(TypeName.Error);
-	export const map = <T1 = any, T2 = any>(value: Map<T1, T2>): value is Map<T1, T2> => isObjectOfType<Map<T1, T2>>(TypeName.Map)(value);
-	export const set = <T = any>(value: Set<T>): value is Set<T> => isObjectOfType<Set<T>>(TypeName.Set)(value);
-	export const weakMap = <T1 extends object = any, T2 = any>(value: WeakMap<T1, T2>): value is WeakMap<T1, T2> => isObjectOfType<WeakMap<T1, T2>>(TypeName.WeakMap)(value);
-	export const weakSet = <T extends object = any>(value: WeakSet<T>): value is WeakSet<T> => isObjectOfType<WeakSet<T>>(TypeName.WeakSet)(value);
+	export const map = (value: Map<any, any>): value is Map<any, any> => isObjectOfType<Map<any, any>>(TypeName.Map)(value);
+	export const set = (value: Set<any>): value is Set<any> => isObjectOfType<Set<any>>(TypeName.Set)(value);
+	export const weakMap = (value: WeakMap<any, any>): value is WeakMap<any, any> => isObjectOfType<WeakMap<any, any>>(TypeName.WeakMap)(value);
+	export const weakSet = (value: WeakSet<any>): value is WeakSet<any> => isObjectOfType<WeakSet<any>>(TypeName.WeakSet)(value);
 
 	export const int8Array = isObjectOfType<Int8Array>(TypeName.Int8Array);
 	export const uint8Array = isObjectOfType<Uint8Array>(TypeName.Uint8Array);
@@ -162,12 +167,12 @@ namespace is { // tslint:disable-line:no-namespace
 	export const sharedArrayBuffer = isObjectOfType<SharedArrayBuffer>(TypeName.SharedArrayBuffer);
 	export const dataView = isObjectOfType<DataView>(TypeName.DataView);
 
-	export const directInstanceOf = (instance: any, klass: any) => Object.getPrototypeOf(instance) === klass.prototype;
+	export const directInstanceOf = <T>(instance: any, klass: Class<T>): instance is T => Object.getPrototypeOf(instance) === klass.prototype;
 
 	export const truthy = (value: any) => Boolean(value);
 	export const falsy = (value: any) => !value;
 
-	export const nan = (value: number) => Number.isNaN(value);
+	export const nan = (value: any) => Number.isNaN(value);
 
 	const primitiveTypes = new Set([
 		'undefined',
@@ -177,12 +182,12 @@ namespace is { // tslint:disable-line:no-namespace
 		'symbol'
 	]);
 
-	export const primitive = (value: Primitive): value is Primitive => null_(value) || primitiveTypes.has(typeof value);
+	export const primitive = (value: any): value is Primitive => null_(value) || primitiveTypes.has(typeof value);
 
-	export const integer = (value: number): value is number => Number.isInteger(value);
-	export const safeInteger = (value: number): value is number => Number.isSafeInteger(value);
+	export const integer = (value: any): value is number => Number.isInteger(value);
+	export const safeInteger = (value: any): value is number => Number.isSafeInteger(value);
 
-	export const plainObject = (value: object) => {
+	export const plainObject = (value: any) => {
 		// From: https://github.com/sindresorhus/is-plain-obj/blob/master/index.js
 		let prototype;
 
@@ -202,7 +207,7 @@ namespace is { // tslint:disable-line:no-namespace
 		TypeName.Float32Array,
 		TypeName.Float64Array
 	]);
-	export const typedArray = (value: TypedArray): value is TypedArray => {
+	export const typedArray = (value: any): value is TypedArray => {
 		const objectType = getObjectType(value);
 
 		if (objectType === null) {
@@ -212,8 +217,8 @@ namespace is { // tslint:disable-line:no-namespace
 		return typedArrayTypes.has(objectType);
 	};
 
-	const isValidLength = (value: number) => safeInteger(value) && value > -1;
-	export const arrayLike = (value: ArrayLike): value is ArrayLike => !nullOrUndefined(value) && !function_(value) && isValidLength(value.length);
+	const isValidLength = (value: any) => safeInteger(value) && value > -1;
+	export const arrayLike = (value: any): value is ArrayLike => !nullOrUndefined(value) && !function_(value) && isValidLength(value.length);
 
 	export const inRange = (value: number, range: number | number[]) => {
 		if (number(range)) {
@@ -236,27 +241,27 @@ namespace is { // tslint:disable-line:no-namespace
 		'nodeValue'
 	];
 
-	export const domElement = (value: object & { nodeType: 1; nodeName: string }) => object(value) && value.nodeType === NODE_TYPE_ELEMENT && string(value.nodeName) &&
-		!plainObject(value) && DOM_PROPERTIES_TO_CHECK.every(property => property in value);
+	export const domElement = (value: any): value is DomElement => value.nodeType === NODE_TYPE_ELEMENT && string(value.nodeName) &&
+		!plainObject(value) && DOM_PROPERTIES_TO_CHECK.every(property => property in value) && object(value);
 
-	export const nodeStream = (value: object & { pipe: Function }) => !nullOrUndefined(value) && isObject(value) && function_(value.pipe);
+	export const nodeStream = (value: any): value is NodeStream => !nullOrUndefined(value) && isObject(value) && function_(value.pipe);
 
-	export const infinite = (value: number) => value === Infinity || value === -Infinity;
+	export const infinite = (value: any) => value === Infinity || value === -Infinity;
 
 	const isAbsoluteMod2 = (value: number) => (rem: number) => integer(rem) && Math.abs(rem % 2) === value;
 	export const even = isAbsoluteMod2(0);
 	export const odd = isAbsoluteMod2(1);
 
-	const isWhiteSpaceString = (value: string) => string(value) && /\S/.test(value) === false;
-	const isEmptyStringOrArray = (value: string | any[]) => (string(value) || array(value)) && value.length === 0;
+	const isWhiteSpaceString = (value: any) => string(value) && /\S/.test(value) === false;
+	const isEmptyStringOrArray = (value: any) => (string(value) || array(value)) && value.length === 0;
 	const isEmptyObject = (value: any) => !map(value) && !set(value) && object(value) && Object.keys(value).length === 0;
 	const isEmptyMapOrSet = (value: any) => (map(value) || set(value)) && value.size === 0;
 
 	export const empty = (value: any) => falsy(value) || isEmptyStringOrArray(value) || isEmptyObject(value) || isEmptyMapOrSet(value);
 	export const emptyOrWhitespace = (value: any) => empty(value) || isWhiteSpaceString(value);
 
-	type ArrayMethod = <T>(fn: (value: T, index: number, array: T[]) => boolean, thisArg?: any) => boolean;
-	const predicateOnArray = <T = any>(method: ArrayMethod, predicate: T, values: any[]) => {
+	type ArrayMethod = (fn: (value: any, index: number, array: any[]) => boolean, thisArg?: any) => boolean;
+	const predicateOnArray = (method: ArrayMethod, predicate: any, values: any[]) => {
 		if (function_(predicate) === false) {
 			throw new TypeError(`Invalid predicate: ${util.inspect(predicate)}`);
 		}
@@ -269,8 +274,8 @@ namespace is { // tslint:disable-line:no-namespace
 	};
 
 	// tslint:disable variable-name
-	export const any = <T>(predicate: T, ...values: any[]) => predicateOnArray(Array.prototype.some, predicate, values);
-	export const all = <T>(predicate: T, ...values: any[]) => predicateOnArray(Array.prototype.every, predicate, values);
+	export const any = (predicate: any, ...values: any[]) => predicateOnArray(Array.prototype.some, predicate, values);
+	export const all = (predicate: any, ...values: any[]) => predicateOnArray(Array.prototype.every, predicate, values);
 	// tslint:enable variable-name
 }
 
