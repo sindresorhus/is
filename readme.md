@@ -261,6 +261,16 @@ is.nodeStream(fs.createReadStream('unicorn.png'));
 //=> true
 ```
 
+##### .observable(value)
+
+Returns `true` if `value` is an `Observable`.
+
+```js
+const Observable = require('rxjs').Observable;
+is.observable(new Observable());
+//=> true
+```
+
 ##### .infinite(value)
 
 Check if `value` is `Infinity` or `-Infinity`.
