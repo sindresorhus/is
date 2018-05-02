@@ -7,10 +7,12 @@ export interface ArrayLike {
 	length: number;
 }
 
-type Class<T = any> = { new(...args: any[]): T; };
+export interface Class<T = any> {
+	new(...args: any[]): T;
+}
 
-type DomElement = object & { nodeType: 1; nodeName: string }
-type NodeStream = object & { pipe: Function }
+type DomElement = object & { nodeType: 1; nodeName: string };
+type NodeStream = object & { pipe: Function };
 
 export const enum TypeName {
 	null = 'null',
@@ -109,7 +111,7 @@ function is(value: any): TypeName { // tslint:disable-line:only-arrow-functions
 }
 
 namespace is { // tslint:disable-line:no-namespace
-	const isObject = (value: object) => typeof value === 'object';
+	const isObject = (value: object) => typeof value === 'object'; // tslint:disable-line:strict-type-predicates
 
 	// tslint:disable:variable-name
 	export const undefined = isOfType<undefined>('undefined');
@@ -241,8 +243,8 @@ namespace is { // tslint:disable-line:no-namespace
 		'nodeValue'
 	];
 
-	export const domElement = (value: any): value is DomElement => value.nodeType === NODE_TYPE_ELEMENT && string(value.nodeName) &&
-		!plainObject(value) && DOM_PROPERTIES_TO_CHECK.every(property => property in value) && object(value);
+	export const domElement = (value: any): value is DomElement => object(value) as any && value.nodeType === NODE_TYPE_ELEMENT && string(value.nodeName) &&
+		!plainObject(value) && DOM_PROPERTIES_TO_CHECK.every(property => property in value);
 
 	export const nodeStream = (value: any): value is NodeStream => !nullOrUndefined(value) && isObject(value) && function_(value.pipe);
 
