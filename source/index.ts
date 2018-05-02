@@ -111,7 +111,7 @@ function is(value: any): TypeName { // tslint:disable-line:only-arrow-functions
 }
 
 namespace is { // tslint:disable-line:no-namespace
-	const isObject = (value: object) => typeof value === 'object'; // tslint:disable-line:strict-type-predicates
+	const isObject = (value: any): value is object => typeof value === 'object';
 
 	// tslint:disable:variable-name
 	export const undefined = isOfType<undefined>('undefined');
@@ -137,7 +137,7 @@ namespace is { // tslint:disable-line:no-namespace
 
 	const hasPromiseAPI = (value: any): value is Promise<any> =>
 		!null_(value) &&
-		isObject(value) &&
+		isObject(value) as any &&
 		function_(value.then) &&
 		function_(value.catch);
 
@@ -246,7 +246,7 @@ namespace is { // tslint:disable-line:no-namespace
 	export const domElement = (value: any): value is DomElement => object(value) as any && value.nodeType === NODE_TYPE_ELEMENT && string(value.nodeName) &&
 		!plainObject(value) && DOM_PROPERTIES_TO_CHECK.every(property => property in value);
 
-	export const nodeStream = (value: any): value is NodeStream => !nullOrUndefined(value) && isObject(value) && function_(value.pipe);
+	export const nodeStream = (value: any): value is NodeStream => !nullOrUndefined(value) && isObject(value) as any && function_(value.pipe);
 
 	export const infinite = (value: any) => value === Infinity || value === -Infinity;
 
