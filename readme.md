@@ -261,6 +261,16 @@ is.nodeStream(fs.createReadStream('unicorn.png'));
 //=> true
 ```
 
+##### .observable(value)
+
+Returns `true` if `value` is an `Observable`.
+
+```js
+const {Observable} = require('rxjs');
+is.observable(new Observable());
+//=> true
+```
+
 ##### .infinite(value)
 
 Check if `value` is `Infinity` or `-Infinity`.
@@ -280,7 +290,6 @@ Returns `true` if `value` is falsy or an empty string, array, object, map, or se
 ##### .emptyOrWhitespace(value)
 
 Returns `true` if `is.empty(value)` or a string that is all whitespace.
-
 
 ##### .any(predicate, ...values)
 
@@ -305,6 +314,7 @@ is.all(is.object, {}, new Map(), new Set());
 is.all(is.string, '🦄', [], 'unicorns');
 //=> false
 ```
+
 
 ## FAQ
 

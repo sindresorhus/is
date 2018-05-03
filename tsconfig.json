@@ -5,6 +5,7 @@
 		"module": "commonjs",
 		"moduleResolution": "node",
 		"declaration": true,
+		"skipLibCheck": true,
 		"pretty": true,
 		"newLine": "lf",
 		"lib": [

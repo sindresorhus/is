@@ -1,4 +1,5 @@
 import * as util from 'util';
+import symbolObservable from 'symbol-observable';
 
 type TypedArray = Int8Array | Uint8Array | Uint8ClampedArray | Int16Array | Uint16Array | Int32Array | Uint32Array | Float32Array | Float64Array;
 type Primitive = null | undefined | string | number | boolean | Symbol;
@@ -17,6 +18,7 @@ export const enum TypeName {
 	Function = 'Function',
 	GeneratorFunction = 'GeneratorFunction',
 	AsyncFunction = 'AsyncFunction',
+	Observable = 'Observable',
 	Array = 'Array',
 	Buffer = 'Buffer',
 	Object = 'Object',
@@ -86,6 +88,10 @@ function is(value: any): TypeName { // tslint:disable-line:only-arrow-functions
 
 	if (is.function_(value)) {
 		return TypeName.Function;
+	}
+
+	if (is.observable(value)) {
+		return TypeName.Observable;
 	}
 
 	if (Array.isArray(value)) {
@@ -244,7 +250,8 @@ namespace is { // tslint:disable-line:no-namespace
 	export const domElement = (value: any) => object(value) && value.nodeType === NODE_TYPE_ELEMENT && string(value.nodeName) &&
 		!plainObject(value) && DOM_PROPERTIES_TO_CHECK.every(property => property in value);
 
-	export const nodeStream = (value: any) => !nullOrUndefined(value) && isObject(value) && function_(value.pipe);
+	export const observable = (value: any) => Boolean(value && value[symbolObservable] && value === value[symbolObservable]());
+	export const nodeStream = (value: any) => !nullOrUndefined(value) && isObject(value) && function_(value.pipe) && !observable(value);
 
 	export const infinite = (value: any) => value === Infinity || value === -Infinity;
 
