@@ -5,6 +5,8 @@ import * as util from 'util';
 import * as tempy from 'tempy';
 import test, {TestContext, Context} from 'ava';
 import {JSDOM} from 'jsdom';
+import {Subject, Observable} from 'rxjs';
+import ZenObservable from 'zen-observable';
 import m from '..';
 
 const isNode8orHigher = Number(process.versions.node.split('.')[0]) >= 8;
@@ -319,6 +321,14 @@ const types = new Map<string, Test>([
 			new Stream.Transform(),
 			new Stream.Stream(),
 			new Stream.Writable()
+		]
+	}],
+	['observable', {
+		is: m.observable,
+		fixtures: [
+			new Observable(),
+			new Subject(),
+			new ZenObservable(() => {})	// tslint:disable-line:no-empty
 		]
 	}],
 	['infinite', {
