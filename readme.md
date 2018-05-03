@@ -266,7 +266,7 @@ is.nodeStream(fs.createReadStream('unicorn.png'));
 Returns `true` if `value` is an `Observable`.
 
 ```js
-const Observable = require('rxjs').Observable;
+const {Observable} = require('rxjs');
 is.observable(new Observable());
 //=> true
 ```
@@ -291,7 +291,6 @@ Returns `true` if `value` is falsy or an empty string, array, object, map, or se
 
 Returns `true` if `is.empty(value)` or a string that is all whitespace.
 
-
 ##### .any(predicate, ...values)
 
 Returns `true` if **any** of the input `values` returns true in the `predicate`:
@@ -315,6 +314,7 @@ is.all(is.object, {}, new Map(), new Set());
 is.all(is.string, '🦄', [], 'unicorns');
 //=> false
 ```
+
 
 ## FAQ
 
