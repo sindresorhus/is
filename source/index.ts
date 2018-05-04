@@ -8,6 +8,13 @@ export interface ArrayLike {
 	length: number;
 }
 
+export interface Class<T = any> {
+	new(...args: any[]): T;
+}
+
+type DomElement = object & { nodeType: 1; nodeName: string };
+type NodeStream = object & { pipe: Function };
+
 export const enum TypeName {
 	null = 'null',
 	boolean = 'boolean',
@@ -60,30 +67,25 @@ const getObjectType = (value: any): TypeName | null => {
 const isObjectOfType = <T>(type: TypeName) => (value: any): value is T => getObjectType(value) === type;
 
 function is(value: any): TypeName { // tslint:disable-line:only-arrow-functions
-	if (value === null) {
-		return TypeName.null;
+	switch (value) {
+		case null:
+			return TypeName.null;
+		case true:
+		case false:
+			return TypeName.boolean;
+		default:
 	}
 
-	if (value === true || value === false) {
-		return TypeName.boolean;
-	}
-
-	const type = typeof value;
-
-	if (type === 'undefined') {
-		return TypeName.undefined;
-	}
-
-	if (type === 'string') {
-		return TypeName.string;
-	}
-
-	if (type === 'number') {
-		return TypeName.number;
-	}
-
-	if (type === 'symbol') {
-		return TypeName.symbol;
+	switch (typeof value) {
+		case 'undefined':
+			return TypeName.undefined;
+		case 'string':
+			return TypeName.string;
+		case 'number':
+			return TypeName.number;
+		case 'symbol':
+			return TypeName.symbol;
+		default:
 	}
 
 	if (is.function_(value)) {
@@ -115,7 +117,7 @@ function is(value: any): TypeName { // tslint:disable-line:only-arrow-functions
 }
 
 namespace is { // tslint:disable-line:no-namespace
-	const isObject = (value: any) => typeof value === 'object';
+	const isObject = (value: any): value is object => typeof value === 'object';
 
 	// tslint:disable:variable-name
 	export const undefined = isOfType<undefined>('undefined');
@@ -123,7 +125,7 @@ namespace is { // tslint:disable-line:no-namespace
 	export const number = isOfType<number>('number');
 	export const function_ = isOfType<Function>('function');
 	export const null_ = (value: any): value is null => value === null;
-	export const class_ = (value: any) => function_(value) && value.toString().startsWith('class ');
+	export const class_ = (value: any): value is Class => function_(value) && value.toString().startsWith('class ');
 	export const boolean = (value: any): value is boolean => value === true || value === false;
 	export const symbol = isOfType<Symbol>('symbol');
 	// tslint:enable:variable-name
@@ -132,32 +134,32 @@ namespace is { // tslint:disable-line:no-namespace
 	export const buffer = Buffer.isBuffer;
 
 	export const nullOrUndefined = (value: any): value is null | undefined => null_(value) || undefined(value);
-	export const object = (value: any) => !nullOrUndefined(value) && (function_(value) || isObject(value));
-	export const iterable = (value: any): value is Iterator<any> => !nullOrUndefined(value) && function_(value[Symbol.iterator]);
+	export const object = (value: any): value is object => !nullOrUndefined(value) && (function_(value) || isObject(value));
+	export const iterable = (value: any): value is IterableIterator<any> => !nullOrUndefined(value) && function_(value[Symbol.iterator]);
 	export const generator = (value: any): value is Generator => iterable(value) && function_(value.next) && function_(value.throw);
 
-	export const nativePromise = isObjectOfType<Promise<any>>(TypeName.Promise);
+	export const nativePromise = (value: any): value is Promise<any> =>
+		isObjectOfType<Promise<any>>(TypeName.Promise)(value);
 
 	const hasPromiseAPI = (value: any): value is Promise<any> =>
 		!null_(value) &&
-		isObject(value) &&
+		isObject(value) as any &&
 		function_(value.then) &&
 		function_(value.catch);
 
 	export const promise = (value: any): value is Promise<any> => nativePromise(value) || hasPromiseAPI(value);
 
-	const isFunctionOfType = <T>(type: TypeName) => isObjectOfType<T>(type);
-	export const generatorFunction = isFunctionOfType<GeneratorFunction>(TypeName.GeneratorFunction);
-	export const asyncFunction = isFunctionOfType<Function>(TypeName.AsyncFunction);
+	export const generatorFunction = isObjectOfType<GeneratorFunction>(TypeName.GeneratorFunction);
+	export const asyncFunction = isObjectOfType<Function>(TypeName.AsyncFunction);
 	export const boundFunction = (value: any): value is Function => function_(value) && !value.hasOwnProperty('prototype');
 
 	export const regExp = isObjectOfType<RegExp>(TypeName.RegExp);
 	export const date = isObjectOfType<Date>(TypeName.Date);
 	export const error = isObjectOfType<Error>(TypeName.Error);
-	export const map = isObjectOfType<Map<any, any>>(TypeName.Map);
-	export const set = isObjectOfType<Set<any>>(TypeName.Set);
-	export const weakMap = isObjectOfType<WeakMap<any, any>>(TypeName.WeakMap);
-	export const weakSet = isObjectOfType<WeakSet<any>>(TypeName.WeakSet);
+	export const map = (value: any): value is Map<any, any> => isObjectOfType<Map<any, any>>(TypeName.Map)(value);
+	export const set = (value: any): value is Set<any> => isObjectOfType<Set<any>>(TypeName.Set)(value);
+	export const weakMap = (value: any): value is WeakMap<any, any> => isObjectOfType<WeakMap<any, any>>(TypeName.WeakMap)(value);
+	export const weakSet = (value: any): value is WeakSet<any> => isObjectOfType<WeakSet<any>>(TypeName.WeakSet)(value);
 
 	export const int8Array = isObjectOfType<Int8Array>(TypeName.Int8Array);
 	export const uint8Array = isObjectOfType<Uint8Array>(TypeName.Uint8Array);
@@ -173,7 +175,7 @@ namespace is { // tslint:disable-line:no-namespace
 	export const sharedArrayBuffer = isObjectOfType<SharedArrayBuffer>(TypeName.SharedArrayBuffer);
 	export const dataView = isObjectOfType<DataView>(TypeName.DataView);
 
-	export const directInstanceOf = (instance: any, klass: any) => Object.getPrototypeOf(instance) === klass.prototype;
+	export const directInstanceOf = <T>(instance: any, klass: Class<T>): instance is T => Object.getPrototypeOf(instance) === klass.prototype;
 
 	export const truthy = (value: any) => Boolean(value);
 	export const falsy = (value: any) => !value;
@@ -247,11 +249,11 @@ namespace is { // tslint:disable-line:no-namespace
 		'nodeValue'
 	];
 
-	export const domElement = (value: any) => object(value) && value.nodeType === NODE_TYPE_ELEMENT && string(value.nodeName) &&
+	export const domElement = (value: any): value is DomElement => object(value) as any && value.nodeType === NODE_TYPE_ELEMENT && string(value.nodeName) &&
 		!plainObject(value) && DOM_PROPERTIES_TO_CHECK.every(property => property in value);
 
 	export const observable = (value: any) => Boolean(value && value[symbolObservable] && value === value[symbolObservable]());
-	export const nodeStream = (value: any) => !nullOrUndefined(value) && isObject(value) && function_(value.pipe) && !observable(value);
+	export const nodeStream = (value: any): value is NodeStream => !nullOrUndefined(value) && isObject(value) as any && function_(value.pipe) && !observable(value);
 
 	export const infinite = (value: any) => value === Infinity || value === -Infinity;
 

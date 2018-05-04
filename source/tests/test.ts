@@ -332,7 +332,7 @@ const types = new Map<string, Test>([
 		]
 	}],
 	['infinite', {
-		is:  m.infinite,
+		is: m.infinite,
 		fixtures: [
 			Infinity,
 			-Infinity
