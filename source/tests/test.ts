@@ -1,8 +1,8 @@
-import * as fs from 'fs';
-import * as net from 'net';
-import * as Stream from 'stream';
-import * as util from 'util';
-import * as tempy from 'tempy';
+import fs from 'fs';
+import net from 'net';
+import Stream from 'stream';
+import util from 'util';
+import tempy from 'tempy';
 import test, {TestContext, Context} from 'ava';
 import {JSDOM} from 'jsdom';
 import {Subject, Observable} from 'rxjs';
