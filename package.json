@@ -17,7 +17,7 @@
 		"lint": "tslint --format stylish --project .",
 		"build": "del dist && tsc",
 		"test": "npm run lint && npm run build && ava dist/tests",
-		"prepublish": "npm run build"
+		"prepublish": "npm run build && del dist/tests"
 	},
 	"files": [
 		"dist"
