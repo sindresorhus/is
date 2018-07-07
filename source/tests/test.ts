@@ -10,6 +10,7 @@ import ZenObservable from 'zen-observable';
 import m from '..';
 
 const isNode8orHigher = Number(process.versions.node.split('.')[0]) >= 8;
+const isNode10orHigher = Number(process.versions.node.split('.')[0]) >= 10;
 
 class PromiseSubclassFixture<T> extends Promise<T> {}
 class ErrorSubclassFixture extends Error {}
@@ -337,6 +338,14 @@ const types = new Map<string, Test>([
 			Infinity,
 			-Infinity
 		]
+	}],
+	['asyncIterable', {
+		is: m.asyncIterable,
+		fixtures: [
+			Object.create({
+				[Symbol.asyncIterator]: () => {} // tslint:disable-line:no-empty
+			})
+		]
 	}]
 ]);
 
@@ -452,6 +461,14 @@ if (isNode8orHigher) {
 	/*test('is.asyncFunction', t => {
 		testType(t, 'asyncFunction', ['function']);
 	});*/
+}
+
+if (isNode10orHigher) {
+	test('is.asyncIterable', t => {
+		t.true(m.asyncIterable(Object.create({
+			[Symbol.asyncIterator]: () => {} // tslint:disable-line:no-empty
+		})));
+	});
 }
 
 test('is.generator', t => {

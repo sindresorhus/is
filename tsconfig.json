@@ -6,7 +6,8 @@
 			"dom",
 			"es2015",
 			"es2016",
-			"es2017.sharedmemory"
+			"es2017.sharedmemory",
+			"esnext.asynciterable"
 		],
 		"module": "commonjs",
 		"moduleResolution": "node",
