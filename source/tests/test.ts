@@ -338,14 +338,6 @@ const types = new Map<string, Test>([
 			Infinity,
 			-Infinity
 		]
-	}],
-	['asyncIterable', {
-		is: m.asyncIterable,
-		fixtures: [
-			Object.create({
-				[Symbol.asyncIterator]: () => {} // tslint:disable-line:no-empty
-			})
-		]
 	}]
 ]);
 
