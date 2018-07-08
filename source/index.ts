@@ -1,5 +1,6 @@
 import util from 'util';
 import symbolObservable from 'symbol-observable';
+import {URL} from 'url';
 
 type TypedArray = Int8Array | Uint8Array | Uint8ClampedArray | Int16Array | Uint16Array | Int32Array | Uint32Array | Float32Array | Float64Array;
 type Primitive = null | undefined | string | number | boolean | Symbol;
@@ -177,6 +178,7 @@ namespace is { // tslint:disable-line:no-namespace
 	export const dataView = isObjectOfType<DataView>(TypeName.DataView);
 
 	export const directInstanceOf = <T>(instance: any, klass: Class<T>): instance is T => Object.getPrototypeOf(instance) === klass.prototype;
+	export const urlInstance = (value: any): value is URL => !nullOrUndefined(value) && directInstanceOf<URL>(value, URL);
 
 	export const truthy = (value: any) => Boolean(value);
 	export const falsy = (value: any) => !value;
