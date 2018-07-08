@@ -455,14 +455,6 @@ if (isNode8orHigher) {
 	});*/
 }
 
-if (isNode10orHigher) {
-	test('is.asyncIterable', t => {
-		t.true(m.asyncIterable(Object.create({
-			[Symbol.asyncIterator]: () => {} // tslint:disable-line:no-empty
-		})));
-	});
-}
-
 test('is.generator', t => {
 	testType(t, 'generator');
 });
@@ -611,6 +603,21 @@ test('is.iterable', t => {
 	t.false(m.iterable(Infinity));
 	t.false(m.iterable({}));
 });
+
+if (isNode10orHigher) {
+	test('is.asyncIterable', t => {
+		t.true(m.asyncIterable({
+			[Symbol.asyncIterator]: () => {} // tslint:disable-line:no-empty
+		}));
+
+		t.false(m.asyncIterable(null));
+		t.false(m.asyncIterable(undefined));
+		t.false(m.asyncIterable(0));
+		t.false(m.asyncIterable(NaN));
+		t.false(m.asyncIterable(Infinity));
+		t.false(m.asyncIterable({}));
+	});
+}
 
 test('is.class', t => {
 	class Foo {} // tslint:disable-line
