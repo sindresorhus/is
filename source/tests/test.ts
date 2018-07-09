@@ -3,7 +3,6 @@ import net from 'net';
 import Stream from 'stream';
 import util from 'util';
 import tempy from 'tempy';
-import {URL} from 'url';
 import test, {TestContext, Context} from 'ava';
 import {JSDOM} from 'jsdom';
 import {Subject, Observable} from 'rxjs';
@@ -533,16 +532,6 @@ test('is.directInstanceOf', t => {
 
 	t.false(m.directInstanceOf(error, ErrorSubclassFixture));
 	t.false(m.directInstanceOf(errorSubclass, Error));
-});
-
-test('is.urlInstance', t => {
-	const url = new URL('https://google.com');
-
-	t.true(m.urlInstance(url));
-
-	t.false(m.urlInstance({}));
-	t.false(m.urlInstance(undefined));
-	t.false(m.urlInstance(null));
 });
 
 test('is.truthy', t => {
