@@ -176,6 +176,17 @@ is.directInstanceOf(new UnicornError(), Error);
 //=> false
 ```
 
+##### .urlInstance(value)
+
+Returns `true` if `value` is an instance of `URL` class.
+
+```js
+const url = new URL('https://google.com');
+
+is.urlInstance(url);
+//=> true
+```
+
 ##### .truthy(value)
 
 Returns `true` for all values that evaluate to true in a boolean context:
