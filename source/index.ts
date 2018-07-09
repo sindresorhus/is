@@ -48,8 +48,8 @@ export const enum TypeName {
 	ArrayBuffer = 'ArrayBuffer',
 	SharedArrayBuffer = 'SharedArrayBuffer',
 	DataView = 'DataView',
-    Promise = 'Promise',
-    URL = 'URL'
+	Promise = 'Promise',
+	URL = 'URL'
 }
 
 const toString = Object.prototype.toString;
