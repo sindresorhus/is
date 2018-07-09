@@ -209,6 +209,7 @@ Returns `true` if `value` is a [safe integer](https://developer.mozilla.org/en-U
 An object is plain if it's created by either `{}`, `new Object()`, or `Object.create(null)`.
 
 ##### .iterable(value)
+##### .asyncIterable(value)
 ##### .class(value)
 
 Returns `true` for instances created by a ES2015 class.
