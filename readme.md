@@ -181,7 +181,7 @@ is.directInstanceOf(new UnicornError(), Error);
 Returns `true` if `value` is an instance of `URL` class.
 
 ```js
-const url = new URL('https://google.com');
+const url = new URL('https://www.example.com');
 
 is.urlInstance(url);
 //=> true
