@@ -178,10 +178,10 @@ is.directInstanceOf(new UnicornError(), Error);
 
 ##### .urlInstance(value)
 
-Returns `true` if `value` is an instance of `URL` class.
+Returns `true` if `value` is an instance of the [`URL` class](https://developer.mozilla.org/en-US/docs/Web/API/URL).
 
 ```js
-const url = new URL('https://www.example.com');
+const url = new URL('https://example.com');
 
 is.urlInstance(url);
 //=> true
