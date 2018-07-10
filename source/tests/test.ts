@@ -536,9 +536,7 @@ test('is.directInstanceOf', t => {
 
 test('is.urlInstance', t => {
 	const url = new URL('https://www.example.com');
-
 	t.true(m.urlInstance(url));
-
 	t.false(m.urlInstance({}));
 	t.false(m.urlInstance(undefined));
 	t.false(m.urlInstance(null));
