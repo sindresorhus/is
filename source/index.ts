@@ -265,12 +265,22 @@ namespace is { // tslint:disable-line:no-namespace
 	export const odd = isAbsoluteMod2(1);
 
 	const isWhiteSpaceString = (value: any) => string(value) && /\S/.test(value) === false;
-	const isEmptyStringOrArray = (value: any) => (string(value) || array(value)) && value.length === 0;
-	const isEmptyObject = (value: any) => !map(value) && !set(value) && object(value) && Object.keys(value).length === 0;
-	const isEmptyMapOrSet = (value: any) => (map(value) || set(value)) && value.size === 0;
 
-	export const empty = (value: any) => falsy(value) || isEmptyStringOrArray(value) || isEmptyObject(value) || isEmptyMapOrSet(value);
-	export const emptyOrWhitespace = (value: any) => empty(value) || isWhiteSpaceString(value);
+	export const emptyArray = (value: any) => array(value) && value.length === 0;
+	export const nonEmptyArray = (value: any) => array(value) && value.length > 0;
+
+	export const emptyString = (value: any) => string(value) && value.length === 0;
+	export const nonEmptyString = (value: any) => string(value) && value.length > 0;
+	export const emptyStringOrWhitespace = (value: any) => emptyString(value) || isWhiteSpaceString(value);
+
+	export const emptyObject = (value: any) => object(value) && !map(value) && !set(value) && Object.keys(value).length === 0;
+	export const nonEmptyObject = (value: any) => object(value) && !map(value) && !set(value) && Object.keys(value).length > 0;
+
+	export const emptySet = (value: any) => set(value) && value.size === 0;
+	export const nonEmptySet = (value: any) => set(value) && value.size > 0;
+
+	export const emptyMap = (value: any) => map(value) && value.size === 0;
+	export const nonEmptyMap = (value: any) => map(value) && value.size > 0;
 
 	type ArrayMethod = (fn: (value: any, index: number, array: any[]) => boolean, thisArg?: any) => boolean;
 	const predicateOnArray = (method: ArrayMethod, predicate: any, values: any[]) => {

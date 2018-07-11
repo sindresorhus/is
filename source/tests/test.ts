@@ -46,6 +46,13 @@ const types = new Map<string, Test>([
 			''
 		]
 	}],
+	['emptyString', {
+		is: m.emptyString,
+		fixtures: [
+			'',
+			String()
+		]
+	}],
 	['number', {
 		is: m.number,
 		fixtures: [
@@ -74,6 +81,13 @@ const types = new Map<string, Test>([
 		fixtures: [
 			[1, 2],
 			new Array(2) // tslint:disable-line:prefer-array-literal
+		]
+	}],
+	['emptyArray', {
+		is: m.emptyArray,
+		fixtures: [
+			[],
+			new Array()
 		]
 	}],
 	['function', {
@@ -167,13 +181,25 @@ const types = new Map<string, Test>([
 	['map', {
 		is: m.map,
 		fixtures: [
-			new Map()
+			new Map([['one', '1']]),
+		]
+	}],
+	['emptyMap', {
+		is: m.emptyMap,
+		fixtures: [
+			new Map(),
 		]
 	}],
 	['set', {
 		is: m.set,
 		fixtures: [
-			new Set()
+			new Set(['one'])
+		]
+	}],
+	['emptySet', {
+		is: m.emptySet,
+		fixtures: [
+			new Set(),
 		]
 	}],
 	['weakSet', {
@@ -385,7 +411,7 @@ test('is.null', t => {
 });
 
 test('is.string', t => {
-	testType(t, 'string');
+	testType(t, 'string', ['emptyString']);
 });
 
 test('is.number', t => {
@@ -401,7 +427,7 @@ test('is.symbol', t => {
 });
 
 test('is.array', t => {
-	testType(t, 'array');
+	testType(t, 'array', ['emptyArray']);
 });
 
 test('is.function', t => {
@@ -465,11 +491,11 @@ test('is.generatorFunction', t => {
 });
 
 test('is.map', t => {
-	testType(t, 'map');
+	testType(t, 'map', ['emptyMap']);
 });
 
 test('is.set', t => {
-	testType(t, 'set');
+	testType(t, 'set', ['emptySet']);
 });
 
 test('is.weakMap', t => {
@@ -739,40 +765,68 @@ test('is.odd', t => {
 	}
 });
 
-test('is.empty', t => {
-	t.true(m.empty(null));
-	t.true(m.empty(undefined));
-
-	t.true(m.empty(false));
-	t.false(m.empty(true));
-
-	t.true(m.empty(''));
-	t.false(m.empty('🦄'));
-
-	t.true(m.empty([]));
-	t.false(m.empty(['🦄']));
-
-	t.true(m.empty({}));
-	t.false(m.empty({unicorn: '🦄'}));
-
-	const tempMap = new Map();
-	t.true(m.empty(tempMap));
-
-	tempMap.set('unicorn', '🦄');
-	t.false(m.empty(tempMap));
-
-	const tempSet = new Set();
-	t.true(m.empty(tempSet));
-
-	tempSet.add(1);
-	t.false(m.empty(tempSet));
+test('is.emptyArray', t => {
+	testType(t, 'emptyArray');
 });
 
-test('is.emptyOrWhitespace', t => {
-	t.true(m.emptyOrWhitespace(''));
-	t.true(m.emptyOrWhitespace('  '));
-	t.false(m.emptyOrWhitespace('🦄'));
-	t.false(m.emptyOrWhitespace('unicorn'));
+test('is.nonEmptyArray', t => {
+	t.true(m.nonEmptyArray([1, 2, 3]));
+	t.false(m.nonEmptyArray([]));
+	t.false(m.nonEmptyArray(new Array()));
+});
+
+test('is.emptyString', t => {
+	testType(t, 'emptyString', ['string']);
+	t.false(m.emptyString('🦄'));
+});
+
+test('is.nonEmptyString', t => {
+	t.false(m.nonEmptyString(''));
+	t.false(m.nonEmptyString(String()));
+	t.true(m.nonEmptyString('🦄'));
+});
+
+test('is.emptyStringOrWhitespace', t => {
+	testType(t, 'emptyString', ['string']);
+	t.true(m.emptyStringOrWhitespace('  '));
+	t.false(m.emptyStringOrWhitespace('🦄'));
+	t.false(m.emptyStringOrWhitespace('unicorn'));
+});
+
+test('is.emptyObject', t => {
+	t.true(m.emptyObject({}));
+	t.true(m.emptyObject(new Object()));
+	t.false(m.emptyObject({unicorn: '🦄'}));
+});
+
+test('is.nonEmptyObject', t => {
+	t.false(m.nonEmptyObject({}));
+	t.false(m.nonEmptyObject(new Object()));
+	t.true(m.nonEmptyObject({unicorn: '🦄'}));
+});
+
+test('is.emptySet', t => {
+	testType(t, 'emptySet');
+});
+
+test('is.nonEmptySet', t => {
+	const tempSet = new Set();
+	t.false(m.nonEmptySet(tempSet));
+
+	tempSet.add(1);
+	t.true(m.nonEmptySet(tempSet));
+});
+
+test('is.emptyMap', t => {
+	testType(t, 'emptyMap');
+});
+
+test('is.nonEmptyMap', t => {
+	const tempMap = new Map();
+	t.false(m.nonEmptyMap(tempMap));
+
+	tempMap.set('unicorn', '🦄');
+	t.true(m.nonEmptyMap(tempMap));
 });
 
 test('is.any', t => {
