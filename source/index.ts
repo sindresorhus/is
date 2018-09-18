@@ -260,7 +260,7 @@ namespace is { // tslint:disable-line:no-namespace
 
 	export const infinite = (value: any) => value === Infinity || value === -Infinity;
 
-	const isAbsoluteMod2 = (value: number) => (rem: number) => integer(rem) && Math.abs(rem % 2) === value;
+	const isAbsoluteMod2 = (rem: number) => (value: number) => integer(value) && Math.abs(value % 2) === rem;
 	export const even = isAbsoluteMod2(0);
 	export const odd = isAbsoluteMod2(1);
 
