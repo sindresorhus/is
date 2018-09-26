@@ -54,6 +54,7 @@ export const enum TypeName {
 
 const toString = Object.prototype.toString;
 const isOfType = <T>(type: string) => (value: any): value is T => typeof value === type;
+const isBuffer = (input: any): input is Buffer => !is.nullOrUndefined(input) && !is.nullOrUndefined(input.constructor) && is.function_(input.constructor.isBuffer) && input.constructor.isBuffer(input);
 
 const getObjectType = (value: any): TypeName | null => {
 	const objectName = toString.call(value).slice(8, -1) as string;
@@ -101,7 +102,7 @@ function is(value: any): TypeName { // tslint:disable-line:only-arrow-functions
 		return TypeName.Array;
 	}
 
-	if (Buffer.isBuffer(value)) {
+	if (isBuffer(value)) {
 		return TypeName.Buffer;
 	}
 
@@ -132,7 +133,7 @@ namespace is { // tslint:disable-line:no-namespace
 	// tslint:enable:variable-name
 
 	export const array = Array.isArray;
-	export const buffer = Buffer.isBuffer;
+	export const buffer = isBuffer;
 
 	export const nullOrUndefined = (value: any): value is null | undefined => null_(value) || undefined(value);
 	export const object = (value: any): value is object => !nullOrUndefined(value) && (function_(value) || isObject(value));
