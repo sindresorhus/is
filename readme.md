@@ -164,29 +164,29 @@ is.boundFunction(function () {});
 
 ##### .emptyString(value)
 
-Returns `true` if the value is an empty string. `false` otherwise.
+Returns `true` if the value is a `string` and the `.length` is 0.
 
 ##### .nonEmptyString(value)
 
-Returns `true` if the value is string, and the length > 0. `false` when the string is empty.
+Returns `true` if the value is a `string` and the `.length` is more than 0.
 
 ##### .emptyStringOrWhitespace(value)
 
-Returns `true` if `is.emptyString(value)` or a string that is all whitespace.
+Returns `true` if `is.emptyString(value)` or if it's a `string` that is all whitespace.
 
 ##### .emptyArray(value)
 
-Returns `true` if the value is an array and the `length` is 0.
+Returns `true` if the value is an `Array` and the `.length` is 0.
 
 ##### .nonEmptyArray(value)
 
-Returns `true` if the value is an array and the `length` is > 0.
+Returns `true` if the value is an `Array` and the `.length` is more than 0.
 
 ##### .emptyObject(value)
 
-Returns `true` if the value is an object and `Object.keys(value)` length is 0. 
+Returns `true` if the value is an `Object` and `Object.keys(value).length` is 0. 
 
-Please note that `Object.keys` returns only enumerable properties. Hence something like this can happen - 
+Please note that `Object.keys` returns only own enumerable properties. Hence something like this can happen:
 
 ```js
 const object1 = {};
@@ -201,25 +201,26 @@ Object.defineProperty(object1, 'property1', {
 is.emptyObject(object1);
 // => true
 ```
+
 ##### .nonEmptyObject(value) 
 
-Returns `true` if the value is an object and length of `Object.keys(value)`  is > 0. `false` if it is 0.
+Returns `true` if the value is an `Object` and `Object.keys(value).length` is more than 0.
 
 ##### .emptySet(value)
 
-Returns `true` if the value is an empty Set (`size` is 0). `false` if it is not zero.
+Returns `true` if the value is a `Set` and the `.size` is 0.
 
 ##### .nonEmptySet(Value)
 
-Returns `true` of the value is a Set and it's `size` is > 0. `false` if it is `size` is 0.
+Returns `true` if the value is a `Set` and the `.size` is more than 0.
 
 ##### .emptyMap(value)
 
-Returns `true` if the value is an empty Map (`size` is 0). `false` if it is not zero.
+Returns `true` if the value is a `Map` and the `.size` is 0.
 
 ##### .nonEmptyMap(value)
 
-Returns `true` if the value is a Map and its `size` is > 0. `false` if is 0.
+Returns `true` if the value is a `Map` and the `.size` is more than 0.
 
 #### Miscellaneous
 
