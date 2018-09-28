@@ -1,3 +1,7 @@
+/// <reference lib="es2016"/>
+/// <reference lib="es2017.sharedmemory"/>
+/// <reference lib="esnext.asynciterable"/>
+/// <reference lib="dom"/>
 import util from 'util';
 import symbolObservable from 'symbol-observable';
 
