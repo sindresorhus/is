@@ -2,7 +2,6 @@
 /// <reference lib="es2017.sharedmemory"/>
 /// <reference lib="esnext.asynciterable"/>
 /// <reference lib="dom"/>
-import util from 'util';
 import symbolObservable from 'symbol-observable';
 
 type TypedArray = Int8Array | Uint8Array | Uint8ClampedArray | Int16Array | Uint16Array | Int32Array | Uint32Array | Float32Array | Float64Array;
@@ -245,7 +244,7 @@ namespace is { // tslint:disable-line:no-namespace
 			return value >= Math.min(...range) && value <= Math.max(...range);
 		}
 
-		throw new TypeError(`Invalid range: ${util.inspect(range)}`);
+		throw new TypeError(`Invalid range: ${JSON.stringify(range)}`);
 	};
 
 	const NODE_TYPE_ELEMENT = 1;
@@ -290,7 +289,7 @@ namespace is { // tslint:disable-line:no-namespace
 	type ArrayMethod = (fn: (value: any, index: number, array: any[]) => boolean, thisArg?: any) => boolean;
 	const predicateOnArray = (method: ArrayMethod, predicate: any, values: any[]) => {
 		if (function_(predicate) === false) {
-			throw new TypeError(`Invalid predicate: ${util.inspect(predicate)}`);
+			throw new TypeError(`Invalid predicate: ${JSON.stringify(predicate)}`);
 		}
 
 		if (values.length === 0) {

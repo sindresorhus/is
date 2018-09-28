@@ -184,7 +184,7 @@ Returns `true` if the value is an `Array` and the `.length` is more than 0.
 
 ##### .emptyObject(value)
 
-Returns `true` if the value is an `Object` and `Object.keys(value).length` is 0. 
+Returns `true` if the value is an `Object` and `Object.keys(value).length` is 0.
 
 Please note that `Object.keys` returns only own enumerable properties. Hence something like this can happen:
 
@@ -202,7 +202,7 @@ is.emptyObject(object1);
 // => true
 ```
 
-##### .nonEmptyObject(value) 
+##### .nonEmptyObject(value)
 
 Returns `true` if the value is an `Object` and `Object.keys(value).length` is more than 0.
 
