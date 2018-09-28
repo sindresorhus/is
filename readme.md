@@ -160,6 +160,68 @@ is.boundFunction(function () {});
 ##### .sharedArrayBuffer(value)
 ##### .dataView(value)
 
+#### Emptiness
+
+##### .emptyString(value)
+
+Returns `true` if the value is a `string` and the `.length` is 0.
+
+##### .nonEmptyString(value)
+
+Returns `true` if the value is a `string` and the `.length` is more than 0.
+
+##### .emptyStringOrWhitespace(value)
+
+Returns `true` if `is.emptyString(value)` or if it's a `string` that is all whitespace.
+
+##### .emptyArray(value)
+
+Returns `true` if the value is an `Array` and the `.length` is 0.
+
+##### .nonEmptyArray(value)
+
+Returns `true` if the value is an `Array` and the `.length` is more than 0.
+
+##### .emptyObject(value)
+
+Returns `true` if the value is an `Object` and `Object.keys(value).length` is 0. 
+
+Please note that `Object.keys` returns only own enumerable properties. Hence something like this can happen:
+
+```js
+const object1 = {};
+
+Object.defineProperty(object1, 'property1', {
+	value: 42,
+	writable: true,
+	enumerable: false,
+	configurable: true
+});
+
+is.emptyObject(object1);
+// => true
+```
+
+##### .nonEmptyObject(value) 
+
+Returns `true` if the value is an `Object` and `Object.keys(value).length` is more than 0.
+
+##### .emptySet(value)
+
+Returns `true` if the value is a `Set` and the `.size` is 0.
+
+##### .nonEmptySet(Value)
+
+Returns `true` if the value is a `Set` and the `.size` is more than 0.
+
+##### .emptyMap(value)
+
+Returns `true` if the value is a `Map` and the `.size` is 0.
+
+##### .nonEmptyMap(value)
+
+Returns `true` if the value is a `Map` and the `.size` is more than 0.
+
 #### Miscellaneous
 
 ##### .directInstanceOf(value, class)
@@ -294,14 +356,6 @@ Returns `true` if `value` is an even integer.
 ##### .odd(value)
 
 Returns `true` if `value` is an odd integer.
-
-##### .empty(value)
-
-Returns `true` if `value` is falsy or an empty string, array, object, map, or set.
-
-##### .emptyOrWhitespace(value)
-
-Returns `true` if `is.empty(value)` or a string that is all whitespace.
 
 ##### .any(predicate, ...values)
 
