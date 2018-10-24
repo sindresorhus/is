@@ -136,8 +136,8 @@ namespace is { // tslint:disable-line:no-namespace
 	// tslint:enable:variable-name
 
 	export const nullOrUndefined = (value: any): value is null | undefined => null_(value) || undefined(value);
-	export const numericString = (value: any): value is String =>
-		!Number.isNaN(Number(value)) && !nullOrUndefined(value);
+	export const numericString = (value: string): bool =>
+		!Number.isNaN(Number(value));
 
 	export const array = Array.isArray;
 	export const buffer = isBuffer;

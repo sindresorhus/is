@@ -430,8 +430,6 @@ test('is.numericString', t => {
 	t.true(m.numericString('5'));
 	t.true(m.numericString('-3.2'));
 	t.true(m.numericString('Infinity'));
-	t.false(m.numericString(undefined));
-	t.false(m.numericString(null));
 });
 
 test('is.array', t => {
