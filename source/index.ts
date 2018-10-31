@@ -11,7 +11,7 @@ export interface ArrayLike {
 	length: number;
 }
 
-export interface Class<T = any> {
+export interface Class<T = unknown> {
 	new(...args: any[]): T;
 }
 
@@ -57,7 +57,7 @@ export const enum TypeName {
 
 const toString = Object.prototype.toString;
 const isOfType = <T>(type: string) => (value: unknown): value is T => typeof value === type;
-const isBuffer = (input: any): input is Buffer => !is.nullOrUndefined(input) && !is.nullOrUndefined(input.constructor) && is.function_(input.constructor.isBuffer) && input.constructor.isBuffer(input);
+const isBuffer = (input: unknown): input is Buffer => !is.nullOrUndefined(input) && !is.nullOrUndefined((input as Buffer).constructor) && is.function_((input as Buffer).constructor.isBuffer) && (input as Buffer).constructor.isBuffer(input);
 
 const getObjectType = (value: unknown): TypeName | null => {
 	const objectName = toString.call(value).slice(8, -1) as string;
@@ -145,18 +145,18 @@ namespace is { // tslint:disable-line:no-namespace
 
 	export const nullOrUndefined = (value: unknown): value is null | undefined => null_(value) || undefined(value);
 	export const object = (value: unknown): value is object => !nullOrUndefined(value) && (function_(value) || isObject(value));
-	export const iterable = (value: any): value is IterableIterator<unknown> => !nullOrUndefined(value) && function_(value[Symbol.iterator]);
-	export const asyncIterable = (value: any): value is AsyncIterableIterator<unknown> => !nullOrUndefined(value) && function_(value[Symbol.asyncIterator]);
+	export const iterable = (value: unknown): value is IterableIterator<unknown> => !nullOrUndefined(value) && function_((value as IterableIterator<unknown>)[Symbol.iterator]);
+	export const asyncIterable = (value: unknown): value is AsyncIterableIterator<unknown> => !nullOrUndefined(value) && function_((value as AsyncIterableIterator<unknown>)[Symbol.asyncIterator]);
 	export const generator = (value: unknown): value is Generator => iterable(value) && function_(value.next) && function_(value.throw);
 
 	export const nativePromise = (value: unknown): value is Promise<unknown> =>
 		isObjectOfType<Promise<unknown>>(TypeName.Promise)(value);
 
-	const hasPromiseAPI = (value: any): value is Promise<unknown> =>
+	const hasPromiseAPI = (value: unknown): value is Promise<unknown> =>
 		!null_(value) &&
 		isObject(value) as unknown &&
-		function_(value.then) &&
-		function_(value.catch);
+		function_((value as Promise<unknown>).then) &&
+		function_((value as Promise<unknown>).catch);
 
 	export const promise = (value: unknown): value is Promise<unknown> => nativePromise(value) || hasPromiseAPI(value);
 
@@ -192,7 +192,7 @@ namespace is { // tslint:disable-line:no-namespace
 	export const truthy = (value: unknown) => Boolean(value);
 	export const falsy = (value: unknown) => !value;
 
-	export const nan = (value: any) => Number.isNaN(value);
+	export const nan = (value: unknown) => Number.isNaN(value as number);
 
 	const primitiveTypes = new Set([
 		'undefined',
@@ -204,8 +204,8 @@ namespace is { // tslint:disable-line:no-namespace
 
 	export const primitive = (value: unknown): value is Primitive => null_(value) || primitiveTypes.has(typeof value);
 
-	export const integer = (value: any): value is number => Number.isInteger(value);
-	export const safeInteger = (value: any): value is number => Number.isSafeInteger(value);
+	export const integer = (value: unknown): value is number => Number.isInteger(value as number);
+	export const safeInteger = (value: unknown): value is number => Number.isSafeInteger(value as number);
 
 	export const plainObject = (value: unknown) => {
 		// From: https://github.com/sindresorhus/is-plain-obj/blob/master/index.js
@@ -238,7 +238,7 @@ namespace is { // tslint:disable-line:no-namespace
 	};
 
 	const isValidLength = (value: unknown) => safeInteger(value) && value > -1;
-	export const arrayLike = (value: any): value is ArrayLike => !nullOrUndefined(value) && !function_(value) && isValidLength(value.length);
+	export const arrayLike = (value: unknown): value is ArrayLike => !nullOrUndefined(value) && !function_(value) && isValidLength((value as ArrayLike).length);
 
 	export const inRange = (value: number, range: number | number[]) => {
 		if (number(range)) {
@@ -261,11 +261,11 @@ namespace is { // tslint:disable-line:no-namespace
 		'nodeValue'
 	];
 
-	export const domElement = (value: any): value is DomElement => object(value) as unknown && value.nodeType === NODE_TYPE_ELEMENT && string(value.nodeName) &&
-		!plainObject(value) && DOM_PROPERTIES_TO_CHECK.every(property => property in value);
+	export const domElement = (value: unknown): value is DomElement => object(value) && (value as DomElement).nodeType === NODE_TYPE_ELEMENT && string((value as DomElement).nodeName) &&
+		!plainObject(value) && DOM_PROPERTIES_TO_CHECK.every(property => property in (value as DomElement));
 
-	export const observable = (value: any) => Boolean(value && value[symbolObservable] && value === value[symbolObservable]());
-	export const nodeStream = (value: any): value is NodeStream => !nullOrUndefined(value) && isObject(value) as unknown && function_(value.pipe) && !observable(value);
+	export const observable = (value: unknown) => Boolean(value && (value as any)[symbolObservable] && value === (value as any)[symbolObservable]());
+	export const nodeStream = (value: unknown): value is NodeStream => !nullOrUndefined(value) && isObject(value) as unknown && function_((value as NodeStream).pipe) && !observable(value);
 
 	export const infinite = (value: unknown) => value === Infinity || value === -Infinity;
 

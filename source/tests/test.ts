@@ -21,8 +21,8 @@ const {document} = window;
 const createDomElement = (element: string) => document.createElement(element);
 
 interface Test {
-	is(value: any): boolean;
-	fixtures: any[];
+	is(value: unknown): boolean;
+	fixtures: unknown[];
 }
 
 const types = new Map<string, Test>([
@@ -106,7 +106,7 @@ const types = new Map<string, Test>([
 			function () {},
 			() => {},
 			async function () {},
-			function * (): any {}
+			function * (): unknown {}
 			// tslint:enable:no-unused no-empty no-unused-variable only-arrow-functions no-function-expression
 		]
 	}],
@@ -377,7 +377,7 @@ const types = new Map<string, Test>([
 ]);
 
 // This ensures a certain method matches only the types it's supposed to and none of the other methods' types
-const testType = (t: TestContext & Context<any>, type: string, exclude?: string[]) => {
+const testType = (t: TestContext & Context<unknown>, type: string, exclude?: string[]) => {
 	const testData = types.get(type);
 
 	if (testData === undefined) {
