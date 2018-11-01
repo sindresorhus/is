@@ -137,7 +137,7 @@ namespace is { // tslint:disable-line:no-namespace
 	export const symbol = isOfType<Symbol>('symbol');
 	// tslint:enable:variable-name
 
-	export const numericString = (value: any): boolean =>
+	export const numericString = (value: unknown): boolean =>
 		string(value) && value.length > 0 && !Number.isNaN(Number(value));
 
 	export const array = Array.isArray;
@@ -169,8 +169,8 @@ namespace is { // tslint:disable-line:no-namespace
 	export const error = isObjectOfType<Error>(TypeName.Error);
 	export const map = (value: unknown): value is Map<unknown, unknown> => isObjectOfType<Map<unknown, unknown>>(TypeName.Map)(value);
 	export const set = (value: unknown): value is Set<unknown> => isObjectOfType<Set<unknown>>(TypeName.Set)(value);
-	export const weakMap = (value: unknown): value is WeakMap<any, unknown> => isObjectOfType<WeakMap<any, unknown>>(TypeName.WeakMap)(value);
-	export const weakSet = (value: unknown): value is WeakSet<any> => isObjectOfType<WeakSet<any>>(TypeName.WeakSet)(value);
+	export const weakMap = (value: unknown): value is WeakMap<object, unknown> => isObjectOfType<WeakMap<object, unknown>>(TypeName.WeakMap)(value);
+	export const weakSet = (value: unknown): value is WeakSet<object> => isObjectOfType<WeakSet<object>>(TypeName.WeakSet)(value);
 
 	export const int8Array = isObjectOfType<Int8Array>(TypeName.Int8Array);
 	export const uint8Array = isObjectOfType<Uint8Array>(TypeName.Uint8Array);
