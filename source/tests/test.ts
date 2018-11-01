@@ -76,6 +76,14 @@ const types = new Map<string, Test>([
 			Symbol('🦄')
 		]
 	}],
+	['numericString', {
+		is: m.numericString,
+		fixtures: [
+			'5',
+			'-3.2',
+			'Infinity'
+		]
+	}],
 	['array', {
 		is: is.array,
 		fixtures: [
@@ -411,7 +419,7 @@ test('is.null', t => {
 });
 
 test('is.string', t => {
-	testType(t, 'string', ['emptyString']);
+	testType(t, 'string', ['emptyString', 'numericString']);
 });
 
 test('is.number', t => {
@@ -424,6 +432,12 @@ test('is.boolean', t => {
 
 test('is.symbol', t => {
 	testType(t, 'symbol');
+});
+
+test('is.numericString', t => {
+	testType(t, 'numericString');
+	t.false(m.numericString(''));
+	t.false(m.numericString(1));
 });
 
 test('is.array', t => {

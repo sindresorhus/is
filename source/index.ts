@@ -135,10 +135,13 @@ namespace is { // tslint:disable-line:no-namespace
 	export const symbol = isOfType<Symbol>('symbol');
 	// tslint:enable:variable-name
 
+	export const nullOrUndefined = (value: any): value is null | undefined => null_(value) || undefined(value);
+	export const numericString = (value: any): boolean =>
+		string(value) && value.length > 0 && !Number.isNaN(Number(value));
+
 	export const array = Array.isArray;
 	export const buffer = isBuffer;
 
-	export const nullOrUndefined = (value: any): value is null | undefined => null_(value) || undefined(value);
 	export const object = (value: any): value is object => !nullOrUndefined(value) && (function_(value) || isObject(value));
 	export const iterable = (value: any): value is IterableIterator<any> => !nullOrUndefined(value) && function_(value[Symbol.iterator]);
 	export const asyncIterable = (value: any): value is AsyncIterableIterator<any> => !nullOrUndefined(value) && function_(value[Symbol.asyncIterator]);
