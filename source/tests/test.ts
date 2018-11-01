@@ -77,7 +77,7 @@ const types = new Map<string, Test>([
 		]
 	}],
 	['numericString', {
-		is: m.numericString,
+		is: is.numericString,
 		fixtures: [
 			'5',
 			'-3.2',
@@ -436,8 +436,8 @@ test('is.symbol', t => {
 
 test('is.numericString', t => {
 	testType(t, 'numericString');
-	t.false(m.numericString(''));
-	t.false(m.numericString(1));
+	t.false(is.numericString(''));
+	t.false(is.numericString(1));
 });
 
 test('is.array', t => {
