@@ -97,6 +97,9 @@ All the below methods accept a value and returns a boolean for whether the value
 Keep in mind that [functions are objects too](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Functions).
 
 ##### .numericString(value)
+
+Returns `true` for a string that contains a number.
+
 ##### .regExp(value)
 ##### .date(value)
 ##### .error(value)
