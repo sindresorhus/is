@@ -98,7 +98,7 @@ Keep in mind that [functions are objects too](https://developer.mozilla.org/en-U
 
 ##### .numericString(value)
 
-Returns `true` for a string that contains a number.
+Returns `true` for a string that represents a number (e.g. `'42'` or `'-8'`).
 
 ##### .regExp(value)
 ##### .date(value)
