@@ -100,6 +100,8 @@ Keep in mind that [functions are objects too](https://developer.mozilla.org/en-U
 
 Returns `true` for a string that represents a number. For example, `'42'` and `'-8'`.
 
+Note: `'NaN'` return `false`, but `'Infinity'` and `'-Infinity'` return `true`.
+
 ##### .regExp(value)
 ##### .date(value)
 ##### .error(value)
@@ -236,7 +238,7 @@ Returns `true` if `value` is a direct instance of `class`.
 is.directInstanceOf(new Error(), Error);
 //=> true
 
-class UnicornError extends Error {};
+class UnicornError extends Error {}
 
 is.directInstanceOf(new UnicornError(), Error);
 //=> false
@@ -289,7 +291,7 @@ An object is plain if it's created by either `{}`, `new Object()`, or `Object.cr
 ##### .asyncIterable(value)
 ##### .class(value)
 
-Returns `true` for instances created by a ES2015 class.
+Returns `true` for instances created by a class.
 
 ##### .typedArray(value)
 
@@ -301,10 +303,11 @@ A `value` is array-like if it is not a function and has a `value.length` that is
 is.arrayLike(document.forms);
 //=> true
 
-function () {
-    is.arrayLike(arguments);
-    //=> true
+function foo() {
+	is.arrayLike(arguments);
+	//=> true
 }
+foo();
 ```
 
 ##### .inRange(value, range)
@@ -335,6 +338,7 @@ Returns `true` if `value` is a Node.js [stream](https://nodejs.org/api/stream.ht
 
 ```js
 const fs = require('fs');
+
 is.nodeStream(fs.createReadStream('unicorn.png'));
 //=> true
 ```
@@ -345,6 +349,7 @@ Returns `true` if `value` is an `Observable`.
 
 ```js
 const {Observable} = require('rxjs');
+
 is.observable(new Observable());
 //=> true
 ```
