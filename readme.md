@@ -100,7 +100,7 @@ Keep in mind that [functions are objects too](https://developer.mozilla.org/en-U
 
 Returns `true` for a string that represents a number. For example, `'42'` and `'-8'`.
 
-Note: `'NaN'` return `false`, but `'Infinity'` and `'-Infinity'` return `true`.
+Note: `'NaN'` returns `false`, but `'Infinity'` and `'-Infinity'` return `true`.
 
 ##### .regExp(value)
 ##### .date(value)
