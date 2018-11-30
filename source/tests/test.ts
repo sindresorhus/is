@@ -21,8 +21,8 @@ const {document} = window;
 const createDomElement = (element: string) => document.createElement(element);
 
 interface Test {
-	is(value: unknown): boolean;
 	fixtures: unknown[];
+	is(value: unknown): boolean;
 }
 
 const types = new Map<string, Test>([

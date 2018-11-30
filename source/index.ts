@@ -60,7 +60,7 @@ const isOfType = <T>(type: string) => (value: unknown): value is T => typeof val
 const isBuffer = (input: unknown): input is Buffer => !is.nullOrUndefined(input) && !is.nullOrUndefined((input as Buffer).constructor) && is.function_((input as Buffer).constructor.isBuffer) && (input as Buffer).constructor.isBuffer(input);
 
 const getObjectType = (value: unknown): TypeName | null => {
-	const objectName = toString.call(value).slice(8, -1) as string;
+	const objectName = toString.call(value).slice(8, -1);
 
 	if (objectName) {
 		return objectName as TypeName;
@@ -301,7 +301,7 @@ namespace is { // tslint:disable-line:no-namespace
 			throw new TypeError('Invalid number of values');
 		}
 
-		return method.call(values, predicate);
+		return method.call(values, predicate as any);
 	};
 
 	// tslint:disable variable-name
