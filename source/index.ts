@@ -3,6 +3,7 @@
 /// <reference lib="esnext.asynciterable"/>
 /// <reference lib="dom"/>
 import symbolObservable from 'symbol-observable';
+import {URL} from 'url';
 
 type TypedArray = Int8Array | Uint8Array | Uint8ClampedArray | Int16Array | Uint16Array | Int32Array | Uint32Array | Float32Array | Float64Array;
 type Primitive = null | undefined | string | number | boolean | Symbol;
