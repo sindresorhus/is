@@ -583,6 +583,15 @@ test('is.urlInstance', t => {
 	t.false(is.urlInstance(null));
 });
 
+test('is.url', t => {
+	const url = 'https://www.example.com';
+	t.true(is.url(url));
+	t.false(is.url(new URL(url)));
+	t.false(is.url({}));
+	t.false(is.url(undefined));
+	t.false(is.url(null));
+});
+
 test('is.truthy', t => {
 	t.true(is.truthy('unicorn'));
 	t.true(is.truthy('🦄'));

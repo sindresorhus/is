@@ -189,6 +189,19 @@ namespace is { // tslint:disable-line:no-namespace
 	export const directInstanceOf = <T>(instance: unknown, klass: Class<T>): instance is T => Object.getPrototypeOf(instance) === klass.prototype;
 	export const urlInstance = (value: unknown): value is URL => isObjectOfType<URL>(TypeName.URL)(value);
 
+	export const url = (value: unknown) => {
+		if (!string(value)) {
+			return false;
+		}
+
+		try {
+			new URL(value); // tslint:disable-line no-unused-expression
+			return true;
+		} catch (_) { // tslint:disable-line no-unused
+			return false;
+		}
+	};
+
 	export const truthy = (value: unknown) => Boolean(value);
 	export const falsy = (value: unknown) => !value;
 
