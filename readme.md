@@ -257,7 +257,7 @@ is.urlInstance(url);
 
 ### .url(value)
 
-Returns `true` if `value` is a URL.
+Returns `true` if `value` is a URL string.
 
 Note: this only does basic checking using the [`URL` class](https://developer.mozilla.org/en-US/docs/Web/API/URL) constructor.
 
