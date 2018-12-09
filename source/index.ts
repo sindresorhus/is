@@ -198,7 +198,7 @@ namespace is { // tslint:disable-line:no-namespace
 		try {
 			new URL(value); // tslint:disable-line no-unused-expression
 			return true;
-		} catch (_) { // tslint:disable-line no-unused
+		} catch {
 			return false;
 		}
 	};
