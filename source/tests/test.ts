@@ -681,8 +681,9 @@ test('is.class', t => {
 });
 
 test('is.typedArray', t => {
-	// Typescript currently does not support empty constructors for these
+	// TypeScript currently does not support empty constructors for these
 	// See https://github.com/Microsoft/TypeScript/issues/19680
+	// TODO: Remove the `0` when targeting `es2017` (Node.js 8), in other places of this file too.
 	const typedArrays = [
 		new Int8Array(0),
 		new Uint8Array(0),
