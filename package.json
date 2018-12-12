@@ -43,9 +43,6 @@
 		"verify",
 		"compare"
 	],
-	"dependencies": {
-		"symbol-observable": "^1.2.0"
-	},
 	"devDependencies": {
 		"@sindresorhus/tsconfig": "^0.1.0",
 		"@types/jsdom": "^11.12.0",

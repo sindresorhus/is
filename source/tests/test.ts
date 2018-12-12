@@ -345,6 +345,14 @@ const types = new Map<string, Test>([
 			document.createDocumentFragment()
 		]
 	}],
+	['observable', {
+		is: is.observable,
+		fixtures: [
+			new Observable(),
+			new Subject(),
+			new ZenObservable(() => {}) // tslint:disable-line:no-empty
+		]
+	}],
 	['nodeStream', {
 		is: is.nodeStream,
 		fixtures: [
@@ -357,14 +365,6 @@ const types = new Map<string, Test>([
 			new Stream.Transform(),
 			new Stream.Stream(),
 			new Stream.Writable()
-		]
-	}],
-	['observable', {
-		is: is.observable,
-		fixtures: [
-			new Observable(),
-			new Subject(),
-			new ZenObservable(() => {})	// tslint:disable-line:no-empty
 		]
 	}],
 	['infinite', {
@@ -749,6 +749,10 @@ test('is.inRange', t => {
 test('is.domElement', t => {
 	testType(t, 'domElement');
 	t.false(is.domElement({nodeType: 1, nodeName: 'div'}));
+});
+
+test('is.observable', t => {
+	testType(t, 'observable');
 });
 
 test('is.nodeStream', t => {
