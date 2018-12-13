@@ -255,7 +255,7 @@ is.urlInstance(url);
 //=> true
 ```
 
-### .url(value)
+### .urlString(value)
 
 Returns `true` if `value` is a URL string.
 
@@ -264,10 +264,10 @@ Note: this only does basic checking using the [`URL` class](https://developer.mo
 ```js
 const url = 'https://example.com';
 
-is.url(url);
+is.urlString(url);
 //=> true
 
-is.url(new URL(url));
+is.urlString(new URL(url));
 //=> false
 ```
 
