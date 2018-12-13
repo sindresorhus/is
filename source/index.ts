@@ -2,7 +2,10 @@
 /// <reference lib="es2017.sharedmemory"/>
 /// <reference lib="esnext.asynciterable"/>
 /// <reference lib="dom"/>
-import {URL} from 'url';
+
+// TODO: Use the `URL` global when targeting Node.js 10
+// tslint:disable-next-line
+const URLGlobal = typeof URL === 'undefined' ? require('url').URL : URL;
 
 type TypedArray = Int8Array | Uint8Array | Uint8ClampedArray | Int16Array | Uint16Array | Int32Array | Uint32Array | Float32Array | Float64Array;
 type Primitive = null | undefined | string | number | boolean | Symbol;
@@ -195,7 +198,7 @@ namespace is { // tslint:disable-line:no-namespace
 		}
 
 		try {
-			new URL(value); // tslint:disable-line no-unused-expression
+			new URLGlobal(value); // tslint:disable-line no-unused-expression
 			return true;
 		} catch {
 			return false;
