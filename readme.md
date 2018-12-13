@@ -255,6 +255,22 @@ is.urlInstance(url);
 //=> true
 ```
 
+### .url(value)
+
+Returns `true` if `value` is a URL string.
+
+Note: this only does basic checking using the [`URL` class](https://developer.mozilla.org/en-US/docs/Web/API/URL) constructor.
+
+```js
+const url = 'https://example.com';
+
+is.url(url);
+//=> true
+
+is.url(new URL(url));
+//=> false
+```
+
 ##### .truthy(value)
 
 Returns `true` for all values that evaluate to true in a boolean context:

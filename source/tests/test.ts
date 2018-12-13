@@ -576,11 +576,20 @@ test('is.directInstanceOf', t => {
 });
 
 test('is.urlInstance', t => {
-	const url = new URL('https://www.example.com');
+	const url = new URL('https://example.com');
 	t.true(is.urlInstance(url));
 	t.false(is.urlInstance({}));
 	t.false(is.urlInstance(undefined));
 	t.false(is.urlInstance(null));
+});
+
+test('is.urlString', t => {
+	const url = 'https://example.com';
+	t.true(is.urlString(url));
+	t.false(is.urlString(new URL(url)));
+	t.false(is.urlString({}));
+	t.false(is.urlString(undefined));
+	t.false(is.urlString(null));
 });
 
 test('is.truthy', t => {
@@ -681,8 +690,9 @@ test('is.class', t => {
 });
 
 test('is.typedArray', t => {
-	// Typescript currently does not support empty constructors for these
+	// TypeScript currently does not support empty constructors for these
 	// See https://github.com/Microsoft/TypeScript/issues/19680
+	// TODO: Remove the `0` when targeting `es2017` (Node.js 8), in other places of this file too.
 	const typedArrays = [
 		new Int8Array(0),
 		new Uint8Array(0),

@@ -2,6 +2,7 @@
 /// <reference lib="es2017.sharedmemory"/>
 /// <reference lib="esnext.asynciterable"/>
 /// <reference lib="dom"/>
+import {URL} from 'url';
 
 type TypedArray = Int8Array | Uint8Array | Uint8ClampedArray | Int16Array | Uint16Array | Int32Array | Uint32Array | Float32Array | Float64Array;
 type Primitive = null | undefined | string | number | boolean | Symbol;
@@ -187,6 +188,19 @@ namespace is { // tslint:disable-line:no-namespace
 
 	export const directInstanceOf = <T>(instance: unknown, klass: Class<T>): instance is T => Object.getPrototypeOf(instance) === klass.prototype;
 	export const urlInstance = (value: unknown): value is URL => isObjectOfType<URL>(TypeName.URL)(value);
+
+	export const urlString = (value: unknown) => {
+		if (!string(value)) {
+			return false;
+		}
+
+		try {
+			new URL(value); // tslint:disable-line no-unused-expression
+			return true;
+		} catch {
+			return false;
+		}
+	};
 
 	export const truthy = (value: unknown) => Boolean(value);
 	export const falsy = (value: unknown) => !value;
