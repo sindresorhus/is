@@ -2,7 +2,6 @@
 /// <reference lib="es2017.sharedmemory"/>
 /// <reference lib="esnext.asynciterable"/>
 /// <reference lib="dom"/>
-import symbolObservable from 'symbol-observable';
 import {URL} from 'url';
 
 type TypedArray = Int8Array | Uint8Array | Uint8ClampedArray | Int16Array | Uint16Array | Int32Array | Uint32Array | Float32Array | Float64Array;
@@ -278,7 +277,22 @@ namespace is { // tslint:disable-line:no-namespace
 	export const domElement = (value: unknown): value is DomElement => object(value) && (value as DomElement).nodeType === NODE_TYPE_ELEMENT && string((value as DomElement).nodeName) &&
 		!plainObject(value) && DOM_PROPERTIES_TO_CHECK.every(property => property in (value as DomElement));
 
-	export const observable = (value: unknown) => Boolean(value && (value as any)[symbolObservable] && value === (value as any)[symbolObservable]());
+	export const observable = (value: unknown) => {
+		if (!value) {
+			return false;
+		}
+
+		if ((value as any)[Symbol.observable] && value === (value as any)[Symbol.observable]()) {
+			return true;
+		}
+
+		if ((value as any)['@@observable'] && value === (value as any)['@@observable']()) {
+			return true;
+		}
+
+		return false;
+	};
+
 	export const nodeStream = (value: unknown): value is NodeStream => !nullOrUndefined(value) && isObject(value) as unknown && function_((value as NodeStream).pipe) && !observable(value);
 
 	export const infinite = (value: unknown) => value === Infinity || value === -Infinity;
