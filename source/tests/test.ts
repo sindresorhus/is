@@ -576,11 +576,20 @@ test('is.directInstanceOf', t => {
 });
 
 test('is.urlInstance', t => {
-	const url = new URL('https://www.example.com');
+	const url = new URL('https://example.com');
 	t.true(is.urlInstance(url));
 	t.false(is.urlInstance({}));
 	t.false(is.urlInstance(undefined));
 	t.false(is.urlInstance(null));
+});
+
+test('is.urlString', t => {
+	const url = 'https://example.com';
+	t.true(is.urlString(url));
+	t.false(is.urlString(new URL(url)));
+	t.false(is.urlString({}));
+	t.false(is.urlString(undefined));
+	t.false(is.urlString(null));
 });
 
 test('is.truthy', t => {
