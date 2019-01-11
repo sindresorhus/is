@@ -255,7 +255,7 @@ is.urlInstance(url);
 //=> true
 ```
 
-### .urlString(value)
+##### .urlString(value)
 
 Returns `true` if `value` is a URL string.
 
