@@ -14,9 +14,7 @@ export interface ArrayLike {
 	length: number;
 }
 
-export interface Class<T = unknown> {
-	new(...args: any[]): T;
-}
+export type Class<T = unknown> = new(...args: any[]) => T;
 
 type DomElement = object & { nodeType: 1; nodeName: string };
 type NodeStream = object & { pipe: Function };
