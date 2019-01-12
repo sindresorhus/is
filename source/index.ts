@@ -299,8 +299,8 @@ namespace is { // tslint:disable-line:no-namespace
 	export const infinite = (value: unknown) => value === Infinity || value === -Infinity;
 
 	const isAbsoluteMod2 = (rem: number) => (value: number) => integer(value) && Math.abs(value % 2) === rem;
-	export const even = isAbsoluteMod2(0);
-	export const odd = isAbsoluteMod2(1);
+	export const evenInteger = isAbsoluteMod2(0);
+	export const oddInteger = isAbsoluteMod2(1);
 
 	const isWhiteSpaceString = (value: unknown) => string(value) && /\S/.test(value) === false;
 
