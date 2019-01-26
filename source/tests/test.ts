@@ -33,7 +33,7 @@ const types = new Map<string, Test>([
 		]
 	}],
 	['null', {
-		is: is.null_,
+		is: is.null,
 		fixtures: [
 			null
 		]
@@ -99,7 +99,7 @@ const types = new Map<string, Test>([
 		]
 	}],
 	['function', {
-		is: is.function_,
+		is: is.function,
 		fixtures: [
 			// tslint:disable:no-unused no-empty no-unused-variable only-arrow-functions no-function-expression
 			function foo() {},
@@ -685,7 +685,7 @@ test('is.class', t => {
 	];
 
 	for (const x of classDeclarations) {
-		t.true(is.class_(x));
+		t.true(is.class(x));
 	}
 });
 
