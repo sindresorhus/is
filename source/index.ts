@@ -58,7 +58,7 @@ export const enum TypeName {
 
 const toString = Object.prototype.toString;
 const isOfType = <T>(type: string) => (value: unknown): value is T => typeof value === type;
-const isBuffer = (input: unknown): input is Buffer => !is.nullOrUndefined(input) && !is.nullOrUndefined((input as Buffer).constructor) && is.function((input as Buffer).constructor.isBuffer) && (input as Buffer).constructor.isBuffer(input);
+const isBuffer = (input: unknown): input is Buffer => !is.nullOrUndefined(input) && !is.nullOrUndefined((input as Buffer).constructor) && is.function_((input as Buffer).constructor.isBuffer) && (input as Buffer).constructor.isBuffer(input);
 
 const getObjectType = (value: unknown): TypeName | null => {
 	const objectName = toString.call(value).slice(8, -1);
@@ -94,7 +94,7 @@ function is(value: unknown): TypeName { // tslint:disable-line:only-arrow-functi
 		default:
 	}
 
-	if (is.function(value)) {
+	if (is.function_(value)) {
 		return TypeName.Function;
 	}
 
@@ -128,10 +128,10 @@ const isObject = (value: unknown): value is object => typeof value === 'object';
 is.undefined = isOfType<undefined>('undefined');
 is.string = isOfType<string>('string');
 is.number = isOfType<number>('number');
-is.function = isOfType<Function>('function');
+is.function_ = isOfType<Function>('function');
 // tslint:disable-next-line:strict-type-predicates
-is.null = (value: unknown): value is null => value === null;
-is.class = (value: unknown): value is Class => is.function(value) && value.toString().startsWith('class ');
+is.null_ = (value: unknown): value is null => value === null;
+is.class_ = (value: unknown): value is Class => is.function_(value) && value.toString().startsWith('class ');
 is.boolean = (value: unknown): value is boolean => value === true || value === false;
 is.symbol = isOfType<Symbol>('symbol');
 // tslint:enable:variable-name
@@ -142,26 +142,26 @@ is.numericString = (value: unknown): boolean =>
 is.array = Array.isArray;
 is.buffer = isBuffer;
 
-is.nullOrUndefined = (value: unknown): value is null | undefined => is.null(value) || is.undefined(value);
-is.object = (value: unknown): value is object => !is.nullOrUndefined(value) && (is.function(value) || isObject(value));
-is.iterable = (value: unknown): value is IterableIterator<unknown> => !is.nullOrUndefined(value) && is.function((value as IterableIterator<unknown>)[Symbol.iterator]);
-is.asyncIterable = (value: unknown): value is AsyncIterableIterator<unknown> => !is.nullOrUndefined(value) && is.function((value as AsyncIterableIterator<unknown>)[Symbol.asyncIterator]);
-is.generator = (value: unknown): value is Generator => is.iterable(value) && is.function(value.next) && is.function(value.throw);
+is.nullOrUndefined = (value: unknown): value is null | undefined => is.null_(value) || is.undefined(value);
+is.object = (value: unknown): value is object => !is.nullOrUndefined(value) && (is.function_(value) || isObject(value));
+is.iterable = (value: unknown): value is IterableIterator<unknown> => !is.nullOrUndefined(value) && is.function_((value as IterableIterator<unknown>)[Symbol.iterator]);
+is.asyncIterable = (value: unknown): value is AsyncIterableIterator<unknown> => !is.nullOrUndefined(value) && is.function_((value as AsyncIterableIterator<unknown>)[Symbol.asyncIterator]);
+is.generator = (value: unknown): value is Generator => is.iterable(value) && is.function_(value.next) && is.function_(value.throw);
 
 is.nativePromise = (value: unknown): value is Promise<unknown> =>
 	isObjectOfType<Promise<unknown>>(TypeName.Promise)(value);
 
 const hasPromiseAPI = (value: unknown): value is Promise<unknown> =>
-	!is.null(value) &&
+	!is.null_(value) &&
 	isObject(value) as unknown &&
-	is.function((value as Promise<unknown>).then) &&
-	is.function((value as Promise<unknown>).catch);
+	is.function_((value as Promise<unknown>).then) &&
+	is.function_((value as Promise<unknown>).catch);
 
 is.promise = (value: unknown): value is Promise<unknown> => is.nativePromise(value) || hasPromiseAPI(value);
 
 is.generatorFunction = isObjectOfType<GeneratorFunction>(TypeName.GeneratorFunction);
 is.asyncFunction = isObjectOfType<Function>(TypeName.AsyncFunction);
-is.boundFunction = (value: unknown): value is Function => is.function(value) && !value.hasOwnProperty('prototype');
+is.boundFunction = (value: unknown): value is Function => is.function_(value) && !value.hasOwnProperty('prototype');
 
 is.regExp = isObjectOfType<RegExp>(TypeName.RegExp);
 is.date = isObjectOfType<Date>(TypeName.Date);
@@ -214,7 +214,7 @@ const primitiveTypes = new Set([
 	'symbol'
 ]);
 
-is.primitive = (value: unknown): value is Primitive => is.null(value) || primitiveTypes.has(typeof value);
+is.primitive = (value: unknown): value is Primitive => is.null_(value) || primitiveTypes.has(typeof value);
 
 is.integer = (value: unknown): value is number => Number.isInteger(value as number);
 is.safeInteger = (value: unknown): value is number => Number.isSafeInteger(value as number);
@@ -250,7 +250,7 @@ is.typedArray = (value: unknown): value is TypedArray => {
 };
 
 const isValidLength = (value: unknown) => is.safeInteger(value) && value > -1;
-is.arrayLike = (value: unknown): value is ArrayLike => !is.nullOrUndefined(value) && !is.function(value) && isValidLength((value as ArrayLike).length);
+is.arrayLike = (value: unknown): value is ArrayLike => !is.nullOrUndefined(value) && !is.function_(value) && isValidLength((value as ArrayLike).length);
 
 is.inRange = (value: number, range: number | number[]) => {
 	if (is.number(range)) {
@@ -292,7 +292,7 @@ is.observable = (value: unknown) => {
 	return false;
 };
 
-is.nodeStream = (value: unknown): value is NodeStream => !is.nullOrUndefined(value) && isObject(value) as unknown && is.function((value as NodeStream).pipe) && !is.observable(value);
+is.nodeStream = (value: unknown): value is NodeStream => !is.nullOrUndefined(value) && isObject(value) as unknown && is.function_((value as NodeStream).pipe) && !is.observable(value);
 
 is.infinite = (value: unknown) => value === Infinity || value === -Infinity;
 
@@ -320,7 +320,7 @@ is.nonEmptyMap = (value: unknown) => is.map(value) && value.size > 0;
 
 type ArrayMethod = (fn: (value: unknown, index: number, array: unknown[]) => boolean, thisArg?: unknown) => boolean;
 const predicateOnArray = (method: ArrayMethod, predicate: unknown, values: unknown[]) => {
-	if (is.function(predicate) === false) {
+	if (is.function_(predicate) === false) {
 		throw new TypeError(`Invalid predicate: ${JSON.stringify(predicate)}`);
 	}
 
@@ -335,6 +335,20 @@ const predicateOnArray = (method: ArrayMethod, predicate: unknown, values: unkno
 is.any = (predicate: unknown, ...values: unknown[]) => predicateOnArray(Array.prototype.some, predicate, values);
 is.all = (predicate: unknown, ...values: unknown[]) => predicateOnArray(Array.prototype.every, predicate, values);
 // tslint:enable variable-name
+
+// Some few keywords are reserved, but we'll populate them for Node.js users
+// See https://github.com/Microsoft/TypeScript/issues/2536
+Object.defineProperties(is, {
+	class: {
+		value: is.class_
+	},
+	function: {
+		value: is.function_
+	},
+	null: {
+		value: is.null_
+	}
+});
 
 export default is;
 
