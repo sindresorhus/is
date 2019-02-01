@@ -867,7 +867,7 @@ test('is.any', t => {
 	t.false(is.any(is.integer, true, 'lol', {}));
 
 	t.throws(() => {
-		is.any(null, true);
+		is.any(null as any, true);
 	});
 
 	t.throws(() => {
@@ -882,7 +882,7 @@ test('is.all', t => {
 	t.false(is.all(is.set, new Map(), {}));
 
 	t.throws(() => {
-		is.all(null, true);
+		is.all(null as any, true);
 	});
 
 	t.throws(() => {
