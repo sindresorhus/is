@@ -122,222 +122,220 @@ function is(value: unknown): TypeName { // tslint:disable-line:only-arrow-functi
 	return TypeName.Object;
 }
 
-namespace is { // tslint:disable-line:no-namespace
-	// tslint:disable-next-line:strict-type-predicates
-	const isObject = (value: unknown): value is object => typeof value === 'object';
+// tslint:disable-next-line:strict-type-predicates
+const isObject = (value: unknown): value is object => typeof value === 'object';
 
-	// tslint:disable:variable-name
-	export const undefined = isOfType<undefined>('undefined');
-	export const string = isOfType<string>('string');
-	export const number = isOfType<number>('number');
-	export const function_ = isOfType<Function>('function');
-	// tslint:disable-next-line:strict-type-predicates
-	export const null_ = (value: unknown): value is null => value === null;
-	export const class_ = (value: unknown): value is Class => function_(value) && value.toString().startsWith('class ');
-	export const boolean = (value: unknown): value is boolean => value === true || value === false;
-	export const symbol = isOfType<Symbol>('symbol');
-	// tslint:enable:variable-name
+is.undefined = isOfType<undefined>('undefined');
+is.string = isOfType<string>('string');
+is.number = isOfType<number>('number');
+is.function_ = isOfType<Function>('function');
+// tslint:disable-next-line:strict-type-predicates
+is.null_ = (value: unknown): value is null => value === null;
+is.class_ = (value: unknown): value is Class => is.function_(value) && value.toString().startsWith('class ');
+is.boolean = (value: unknown): value is boolean => value === true || value === false;
+is.symbol = isOfType<Symbol>('symbol');
+// tslint:enable:variable-name
 
-	export const numericString = (value: unknown): boolean =>
-		string(value) && value.length > 0 && !Number.isNaN(Number(value));
+is.numericString = (value: unknown): boolean =>
+	is.string(value) && value.length > 0 && !Number.isNaN(Number(value));
 
-	export const array = Array.isArray;
-	export const buffer = isBuffer;
+is.array = Array.isArray;
+is.buffer = isBuffer;
 
-	export const nullOrUndefined = (value: unknown): value is null | undefined => null_(value) || undefined(value);
-	export const object = (value: unknown): value is object => !nullOrUndefined(value) && (function_(value) || isObject(value));
-	export const iterable = (value: unknown): value is IterableIterator<unknown> => !nullOrUndefined(value) && function_((value as IterableIterator<unknown>)[Symbol.iterator]);
-	export const asyncIterable = (value: unknown): value is AsyncIterableIterator<unknown> => !nullOrUndefined(value) && function_((value as AsyncIterableIterator<unknown>)[Symbol.asyncIterator]);
-	export const generator = (value: unknown): value is Generator => iterable(value) && function_(value.next) && function_(value.throw);
+is.nullOrUndefined = (value: unknown): value is null | undefined => is.null_(value) || is.undefined(value);
+is.object = (value: unknown): value is object => !is.nullOrUndefined(value) && (is.function_(value) || isObject(value));
+is.iterable = (value: unknown): value is IterableIterator<unknown> => !is.nullOrUndefined(value) && is.function_((value as IterableIterator<unknown>)[Symbol.iterator]);
+is.asyncIterable = (value: unknown): value is AsyncIterableIterator<unknown> => !is.nullOrUndefined(value) && is.function_((value as AsyncIterableIterator<unknown>)[Symbol.asyncIterator]);
+is.generator = (value: unknown): value is Generator => is.iterable(value) && is.function_(value.next) && is.function_(value.throw);
 
-	export const nativePromise = (value: unknown): value is Promise<unknown> =>
-		isObjectOfType<Promise<unknown>>(TypeName.Promise)(value);
+is.nativePromise = (value: unknown): value is Promise<unknown> =>
+	isObjectOfType<Promise<unknown>>(TypeName.Promise)(value);
 
-	const hasPromiseAPI = (value: unknown): value is Promise<unknown> =>
-		!null_(value) &&
-		isObject(value) as unknown &&
-		function_((value as Promise<unknown>).then) &&
-		function_((value as Promise<unknown>).catch);
+const hasPromiseAPI = (value: unknown): value is Promise<unknown> =>
+	!is.null_(value) &&
+	isObject(value) as unknown &&
+	is.function_((value as Promise<unknown>).then) &&
+	is.function_((value as Promise<unknown>).catch);
 
-	export const promise = (value: unknown): value is Promise<unknown> => nativePromise(value) || hasPromiseAPI(value);
+is.promise = (value: unknown): value is Promise<unknown> => is.nativePromise(value) || hasPromiseAPI(value);
 
-	export const generatorFunction = isObjectOfType<GeneratorFunction>(TypeName.GeneratorFunction);
-	export const asyncFunction = isObjectOfType<Function>(TypeName.AsyncFunction);
-	export const boundFunction = (value: unknown): value is Function => function_(value) && !value.hasOwnProperty('prototype');
+is.generatorFunction = isObjectOfType<GeneratorFunction>(TypeName.GeneratorFunction);
+is.asyncFunction = isObjectOfType<Function>(TypeName.AsyncFunction);
+is.boundFunction = (value: unknown): value is Function => is.function_(value) && !value.hasOwnProperty('prototype');
 
-	export const regExp = isObjectOfType<RegExp>(TypeName.RegExp);
-	export const date = isObjectOfType<Date>(TypeName.Date);
-	export const error = isObjectOfType<Error>(TypeName.Error);
-	export const map = (value: unknown): value is Map<unknown, unknown> => isObjectOfType<Map<unknown, unknown>>(TypeName.Map)(value);
-	export const set = (value: unknown): value is Set<unknown> => isObjectOfType<Set<unknown>>(TypeName.Set)(value);
-	export const weakMap = (value: unknown): value is WeakMap<object, unknown> => isObjectOfType<WeakMap<object, unknown>>(TypeName.WeakMap)(value);
-	export const weakSet = (value: unknown): value is WeakSet<object> => isObjectOfType<WeakSet<object>>(TypeName.WeakSet)(value);
+is.regExp = isObjectOfType<RegExp>(TypeName.RegExp);
+is.date = isObjectOfType<Date>(TypeName.Date);
+is.error = isObjectOfType<Error>(TypeName.Error);
+is.map = (value: unknown): value is Map<unknown, unknown> => isObjectOfType<Map<unknown, unknown>>(TypeName.Map)(value);
+is.set = (value: unknown): value is Set<unknown> => isObjectOfType<Set<unknown>>(TypeName.Set)(value);
+is.weakMap = (value: unknown): value is WeakMap<object, unknown> => isObjectOfType<WeakMap<object, unknown>>(TypeName.WeakMap)(value);
+is.weakSet = (value: unknown): value is WeakSet<object> => isObjectOfType<WeakSet<object>>(TypeName.WeakSet)(value);
 
-	export const int8Array = isObjectOfType<Int8Array>(TypeName.Int8Array);
-	export const uint8Array = isObjectOfType<Uint8Array>(TypeName.Uint8Array);
-	export const uint8ClampedArray = isObjectOfType<Uint8ClampedArray>(TypeName.Uint8ClampedArray);
-	export const int16Array = isObjectOfType<Int16Array>(TypeName.Int16Array);
-	export const uint16Array = isObjectOfType<Uint16Array>(TypeName.Uint16Array);
-	export const int32Array = isObjectOfType<Int32Array>(TypeName.Int32Array);
-	export const uint32Array = isObjectOfType<Uint32Array>(TypeName.Uint32Array);
-	export const float32Array = isObjectOfType<Float32Array>(TypeName.Float32Array);
-	export const float64Array = isObjectOfType<Float64Array>(TypeName.Float64Array);
+is.int8Array = isObjectOfType<Int8Array>(TypeName.Int8Array);
+is.uint8Array = isObjectOfType<Uint8Array>(TypeName.Uint8Array);
+is.uint8ClampedArray = isObjectOfType<Uint8ClampedArray>(TypeName.Uint8ClampedArray);
+is.int16Array = isObjectOfType<Int16Array>(TypeName.Int16Array);
+is.uint16Array = isObjectOfType<Uint16Array>(TypeName.Uint16Array);
+is.int32Array = isObjectOfType<Int32Array>(TypeName.Int32Array);
+is.uint32Array = isObjectOfType<Uint32Array>(TypeName.Uint32Array);
+is.float32Array = isObjectOfType<Float32Array>(TypeName.Float32Array);
+is.float64Array = isObjectOfType<Float64Array>(TypeName.Float64Array);
 
-	export const arrayBuffer = isObjectOfType<ArrayBuffer>(TypeName.ArrayBuffer);
-	export const sharedArrayBuffer = isObjectOfType<SharedArrayBuffer>(TypeName.SharedArrayBuffer);
-	export const dataView = isObjectOfType<DataView>(TypeName.DataView);
+is.arrayBuffer = isObjectOfType<ArrayBuffer>(TypeName.ArrayBuffer);
+is.sharedArrayBuffer = isObjectOfType<SharedArrayBuffer>(TypeName.SharedArrayBuffer);
+is.dataView = isObjectOfType<DataView>(TypeName.DataView);
 
-	export const directInstanceOf = <T>(instance: unknown, klass: Class<T>): instance is T => Object.getPrototypeOf(instance) === klass.prototype;
-	export const urlInstance = (value: unknown): value is URL => isObjectOfType<URL>(TypeName.URL)(value);
+is.directInstanceOf = <T>(instance: unknown, klass: Class<T>): instance is T => Object.getPrototypeOf(instance) === klass.prototype;
+is.urlInstance = (value: unknown): value is URL => isObjectOfType<URL>(TypeName.URL)(value);
 
-	export const urlString = (value: unknown) => {
-		if (!string(value)) {
-			return false;
-		}
-
-		try {
-			new URLGlobal(value); // tslint:disable-line no-unused-expression
-			return true;
-		} catch {
-			return false;
-		}
-	};
-
-	export const truthy = (value: unknown) => Boolean(value);
-	export const falsy = (value: unknown) => !value;
-
-	export const nan = (value: unknown) => Number.isNaN(value as number);
-
-	const primitiveTypes = new Set([
-		'undefined',
-		'string',
-		'number',
-		'boolean',
-		'symbol'
-	]);
-
-	export const primitive = (value: unknown): value is Primitive => null_(value) || primitiveTypes.has(typeof value);
-
-	export const integer = (value: unknown): value is number => Number.isInteger(value as number);
-	export const safeInteger = (value: unknown): value is number => Number.isSafeInteger(value as number);
-
-	export const plainObject = (value: unknown) => {
-		// From: https://github.com/sindresorhus/is-plain-obj/blob/master/index.js
-		let prototype;
-
-		return getObjectType(value) === TypeName.Object &&
-			(prototype = Object.getPrototypeOf(value), prototype === null || // tslint:disable-line:ban-comma-operator
-				prototype === Object.getPrototypeOf({}));
-	};
-
-	const typedArrayTypes = new Set([
-		TypeName.Int8Array,
-		TypeName.Uint8Array,
-		TypeName.Uint8ClampedArray,
-		TypeName.Int16Array,
-		TypeName.Uint16Array,
-		TypeName.Int32Array,
-		TypeName.Uint32Array,
-		TypeName.Float32Array,
-		TypeName.Float64Array
-	]);
-	export const typedArray = (value: unknown): value is TypedArray => {
-		const objectType = getObjectType(value);
-
-		if (objectType === null) {
-			return false;
-		}
-
-		return typedArrayTypes.has(objectType);
-	};
-
-	const isValidLength = (value: unknown) => safeInteger(value) && value > -1;
-	export const arrayLike = (value: unknown): value is ArrayLike => !nullOrUndefined(value) && !function_(value) && isValidLength((value as ArrayLike).length);
-
-	export const inRange = (value: number, range: number | number[]) => {
-		if (number(range)) {
-			return value >= Math.min(0, range) && value <= Math.max(range, 0);
-		}
-
-		if (array(range) && range.length === 2) {
-			return value >= Math.min(...range) && value <= Math.max(...range);
-		}
-
-		throw new TypeError(`Invalid range: ${JSON.stringify(range)}`);
-	};
-
-	const NODE_TYPE_ELEMENT = 1;
-	const DOM_PROPERTIES_TO_CHECK = [
-		'innerHTML',
-		'ownerDocument',
-		'style',
-		'attributes',
-		'nodeValue'
-	];
-
-	export const domElement = (value: unknown): value is DomElement => object(value) && (value as DomElement).nodeType === NODE_TYPE_ELEMENT && string((value as DomElement).nodeName) &&
-		!plainObject(value) && DOM_PROPERTIES_TO_CHECK.every(property => property in (value as DomElement));
-
-	export const observable = (value: unknown) => {
-		if (!value) {
-			return false;
-		}
-
-		if ((value as any)[Symbol.observable] && value === (value as any)[Symbol.observable]()) {
-			return true;
-		}
-
-		if ((value as any)['@@observable'] && value === (value as any)['@@observable']()) {
-			return true;
-		}
-
+is.urlString = (value: unknown) => {
+	if (!is.string(value)) {
 		return false;
-	};
+	}
 
-	export const nodeStream = (value: unknown): value is NodeStream => !nullOrUndefined(value) && isObject(value) as unknown && function_((value as NodeStream).pipe) && !observable(value);
+	try {
+		new URLGlobal(value); // tslint:disable-line no-unused-expression
+		return true;
+	} catch {
+		return false;
+	}
+};
 
-	export const infinite = (value: unknown) => value === Infinity || value === -Infinity;
+is.truthy = (value: unknown) => Boolean(value);
+is.falsy = (value: unknown) => !value;
 
-	const isAbsoluteMod2 = (rem: number) => (value: number) => integer(value) && Math.abs(value % 2) === rem;
-	export const evenInteger = isAbsoluteMod2(0);
-	export const oddInteger = isAbsoluteMod2(1);
+is.nan = (value: unknown) => Number.isNaN(value as number);
 
-	const isWhiteSpaceString = (value: unknown) => string(value) && /\S/.test(value) === false;
+const primitiveTypes = new Set([
+	'undefined',
+	'string',
+	'number',
+	'boolean',
+	'symbol'
+]);
 
-	export const emptyArray = (value: unknown) => array(value) && value.length === 0;
-	export const nonEmptyArray = (value: unknown) => array(value) && value.length > 0;
+is.primitive = (value: unknown): value is Primitive => is.null_(value) || primitiveTypes.has(typeof value);
 
-	export const emptyString = (value: unknown) => string(value) && value.length === 0;
-	export const nonEmptyString = (value: unknown) => string(value) && value.length > 0;
-	export const emptyStringOrWhitespace = (value: unknown) => emptyString(value) || isWhiteSpaceString(value);
+is.integer = (value: unknown): value is number => Number.isInteger(value as number);
+is.safeInteger = (value: unknown): value is number => Number.isSafeInteger(value as number);
 
-	export const emptyObject = (value: unknown) => object(value) && !map(value) && !set(value) && Object.keys(value).length === 0;
-	export const nonEmptyObject = (value: unknown) => object(value) && !map(value) && !set(value) && Object.keys(value).length > 0;
+is.plainObject = (value: unknown) => {
+	// From: https://github.com/sindresorhus/is-plain-obj/blob/master/index.js
+	let prototype;
 
-	export const emptySet = (value: unknown) => set(value) && value.size === 0;
-	export const nonEmptySet = (value: unknown) => set(value) && value.size > 0;
+	return getObjectType(value) === TypeName.Object &&
+		(prototype = Object.getPrototypeOf(value), prototype === null || // tslint:disable-line:ban-comma-operator
+			prototype === Object.getPrototypeOf({}));
+};
 
-	export const emptyMap = (value: unknown) => map(value) && value.size === 0;
-	export const nonEmptyMap = (value: unknown) => map(value) && value.size > 0;
+const typedArrayTypes = new Set([
+	TypeName.Int8Array,
+	TypeName.Uint8Array,
+	TypeName.Uint8ClampedArray,
+	TypeName.Int16Array,
+	TypeName.Uint16Array,
+	TypeName.Int32Array,
+	TypeName.Uint32Array,
+	TypeName.Float32Array,
+	TypeName.Float64Array
+]);
 
-	type ArrayMethod = (fn: (value: unknown, index: number, array: unknown[]) => boolean, thisArg?: unknown) => boolean;
-	const predicateOnArray = (method: ArrayMethod, predicate: unknown, values: unknown[]) => {
-		if (function_(predicate) === false) {
-			throw new TypeError(`Invalid predicate: ${JSON.stringify(predicate)}`);
-		}
+is.typedArray = (value: unknown): value is TypedArray => {
+	const objectType = getObjectType(value);
 
-		if (values.length === 0) {
-			throw new TypeError('Invalid number of values');
-		}
+	if (objectType === null) {
+		return false;
+	}
 
-		return method.call(values, predicate as any);
-	};
+	return typedArrayTypes.has(objectType);
+};
 
-	// tslint:disable variable-name
-	export const any = (predicate: unknown, ...values: unknown[]) => predicateOnArray(Array.prototype.some, predicate, values);
-	export const all = (predicate: unknown, ...values: unknown[]) => predicateOnArray(Array.prototype.every, predicate, values);
-	// tslint:enable variable-name
-}
+const isValidLength = (value: unknown) => is.safeInteger(value) && value > -1;
+is.arrayLike = (value: unknown): value is ArrayLike => !is.nullOrUndefined(value) && !is.function_(value) && isValidLength((value as ArrayLike).length);
+
+is.inRange = (value: number, range: number | number[]) => {
+	if (is.number(range)) {
+		return value >= Math.min(0, range) && value <= Math.max(range, 0);
+	}
+
+	if (is.array(range) && range.length === 2) {
+		return value >= Math.min(...range) && value <= Math.max(...range);
+	}
+
+	throw new TypeError(`Invalid range: ${JSON.stringify(range)}`);
+};
+
+const NODE_TYPE_ELEMENT = 1;
+const DOM_PROPERTIES_TO_CHECK = [
+	'innerHTML',
+	'ownerDocument',
+	'style',
+	'attributes',
+	'nodeValue'
+];
+
+is.domElement = (value: unknown): value is DomElement => is.object(value) && (value as DomElement).nodeType === NODE_TYPE_ELEMENT && is.string((value as DomElement).nodeName) &&
+	!is.plainObject(value) && DOM_PROPERTIES_TO_CHECK.every(property => property in (value as DomElement));
+
+is.observable = (value: unknown) => {
+	if (!value) {
+		return false;
+	}
+
+	if ((value as any)[Symbol.observable] && value === (value as any)[Symbol.observable]()) {
+		return true;
+	}
+
+	if ((value as any)['@@observable'] && value === (value as any)['@@observable']()) {
+		return true;
+	}
+
+	return false;
+};
+
+is.nodeStream = (value: unknown): value is NodeStream => !is.nullOrUndefined(value) && isObject(value) as unknown && is.function_((value as NodeStream).pipe) && !is.observable(value);
+
+is.infinite = (value: unknown) => value === Infinity || value === -Infinity;
+
+const isAbsoluteMod2 = (rem: number) => (value: number) => is.integer(value) && Math.abs(value % 2) === rem;
+is.evenInteger = isAbsoluteMod2(0);
+is.oddInteger = isAbsoluteMod2(1);
+
+const isWhiteSpaceString = (value: unknown) => is.string(value) && /\S/.test(value) === false;
+
+is.emptyArray = (value: unknown) => is.array(value) && value.length === 0;
+is.nonEmptyArray = (value: unknown) => is.array(value) && value.length > 0;
+
+is.emptyString = (value: unknown) => is.string(value) && value.length === 0;
+is.nonEmptyString = (value: unknown) => is.string(value) && value.length > 0;
+is.emptyStringOrWhitespace = (value: unknown) => is.emptyString(value) || isWhiteSpaceString(value);
+
+is.emptyObject = (value: unknown) => is.object(value) && !is.map(value) && !is.set(value) && Object.keys(value).length === 0;
+is.nonEmptyObject = (value: unknown) => is.object(value) && !is.map(value) && !is.set(value) && Object.keys(value).length > 0;
+
+is.emptySet = (value: unknown) => is.set(value) && value.size === 0;
+is.nonEmptySet = (value: unknown) => is.set(value) && value.size > 0;
+
+is.emptyMap = (value: unknown) => is.map(value) && value.size === 0;
+is.nonEmptyMap = (value: unknown) => is.map(value) && value.size > 0;
+
+type ArrayMethod = (fn: (value: unknown, index: number, array: unknown[]) => boolean, thisArg?: unknown) => boolean;
+const predicateOnArray = (method: ArrayMethod, predicate: unknown, values: unknown[]) => {
+	if (is.function_(predicate) === false) {
+		throw new TypeError(`Invalid predicate: ${JSON.stringify(predicate)}`);
+	}
+
+	if (values.length === 0) {
+		throw new TypeError('Invalid number of values');
+	}
+
+	return method.call(values, predicate as any);
+};
+
+// tslint:disable variable-name
+is.any = (predicate: unknown, ...values: unknown[]) => predicateOnArray(Array.prototype.some, predicate, values);
+is.all = (predicate: unknown, ...values: unknown[]) => predicateOnArray(Array.prototype.every, predicate, values);
+// tslint:enable variable-name
 
 // Some few keywords are reserved, but we'll populate them for Node.js users
 // See https://github.com/Microsoft/TypeScript/issues/2536
