@@ -7,19 +7,7 @@
 // tslint:disable-next-line
 const URLGlobal = typeof URL === 'undefined' ? require('url').URL : URL;
 
-type TypedArray = Int8Array | Uint8Array | Uint8ClampedArray | Int16Array | Uint16Array | Int32Array | Uint32Array | Float32Array | Float64Array;
-
-// TODO: This should be able to be `not object` when the `not` operator is out
-type Primitive = null | undefined | string | number | boolean | symbol;
-
-export interface ArrayLike {
-	length: number;
-}
-
 export type Class<T = unknown> = new(...args: any[]) => T;
-
-type DomElement = object & {nodeType: 1; nodeName: string};
-type NodeStream = object & {pipe: Function};
 
 export const enum TypeName {
 	null = 'null',
@@ -202,9 +190,9 @@ is.urlString = (value: unknown): value is string => {
 };
 
 // TODO: Use the `not` operator with a type guard here when it's available.
-// Example: `is.truthy = (value: unknown): value is not (false | undefined | null) => Boolean(value);`
+// Example: `is.truthy = (value: unknown): value is (not false | not 0 | not '' | not undefined | not null) => Boolean(value);`
 is.truthy = (value: unknown) => Boolean(value);
-// Example: `is.falsy = (value: unknown): value is not (true | …) => Boolean(value);`
+// Example: `is.falsy = (value: unknown): value is (not true | 0 | '' | undefined | null) => Boolean(value);`
 is.falsy = (value: unknown) => !value;
 
 is.nan = (value: unknown) => Number.isNaN(value as number);
@@ -216,6 +204,9 @@ const primitiveTypeOfTypes = new Set([
 	'boolean',
 	'symbol'
 ]);
+
+// TODO: This should be able to be `not object` when the `not` operator is out
+export type Primitive = null | undefined | string | number | boolean | symbol;
 
 is.primitive = (value: unknown): value is Primitive => is.null_(value) || primitiveTypeOfTypes.has(typeof value);
 
@@ -243,6 +234,8 @@ const typedArrayTypes = new Set([
 	TypeName.Float64Array
 ]);
 
+export type TypedArray = Int8Array | Uint8Array | Uint8ClampedArray | Int16Array | Uint16Array | Int32Array | Uint32Array | Float32Array | Float64Array;
+
 is.typedArray = (value: unknown): value is TypedArray => {
 	const objectType = getObjectType(value);
 	if (objectType === null) {
@@ -252,8 +245,13 @@ is.typedArray = (value: unknown): value is TypedArray => {
 	return typedArrayTypes.has(objectType);
 };
 
+export interface ArrayLike<T> {
+	readonly length: number;
+	readonly [index: number]: T;
+}
+
 const isValidLength = (value: unknown) => is.safeInteger(value) && value >= 0;
-is.arrayLike = (value: unknown): value is ArrayLike => !is.nullOrUndefined(value) && !is.function_(value) && isValidLength((value as ArrayLike).length);
+is.arrayLike = (value: unknown): value is ArrayLike<unknown> => !is.nullOrUndefined(value) && !is.function_(value) && isValidLength((value as ArrayLike<unknown>).length);
 
 is.inRange = (value: number, range: number | number[]): value is number => {
 	if (is.number(range)) {
@@ -276,8 +274,8 @@ const DOM_PROPERTIES_TO_CHECK = [
 	'nodeValue'
 ];
 
-is.domElement = (value: unknown): value is DomElement => is.object(value) && (value as DomElement).nodeType === NODE_TYPE_ELEMENT && is.string((value as DomElement).nodeName) &&
-	!is.plainObject(value) && DOM_PROPERTIES_TO_CHECK.every(property => property in (value as DomElement));
+is.domElement = (value: unknown): value is Element => is.object(value) && (value as Element).nodeType === NODE_TYPE_ELEMENT && is.string((value as Element).nodeName) &&
+	!is.plainObject(value) && DOM_PROPERTIES_TO_CHECK.every(property => property in (value as Element));
 
 export interface ObservableLike {
 	subscribe(observer: (value: unknown) => void): void;
@@ -300,9 +298,11 @@ is.observable = (value: unknown): value is ObservableLike => {
 	return false;
 };
 
+export type NodeStream = object & {readonly pipe: Function};
+
 is.nodeStream = (value: unknown): value is NodeStream => !is.nullOrUndefined(value) && isObject(value) as unknown && is.function_((value as NodeStream).pipe) && !is.observable(value);
 
-is.infinite = (value: unknown) => value === Infinity || value === -Infinity;
+is.infinite = (value: unknown): value is number => value === Infinity || value === -Infinity;
 
 const isAbsoluteMod2 = (rem: number) => (value: number): value is number => is.integer(value) && Math.abs(value % 2) === rem;
 is.evenInteger = isAbsoluteMod2(0);
@@ -311,7 +311,9 @@ is.oddInteger = isAbsoluteMod2(1);
 is.emptyArray = (value: unknown): value is never[] => is.array(value) && value.length === 0;
 is.nonEmptyArray = (value: unknown): value is unknown[] => is.array(value) && value.length > 0;
 
-is.emptyString = (value: unknown): value is string => is.string(value) && value.length === 0;
+is.emptyString = (value: unknown): value is '' => is.string(value) && value.length === 0;
+
+// TODO: Use `not ''` when the `not` operator is available.
 is.nonEmptyString = (value: unknown): value is string => is.string(value) && value.length > 0;
 
 const isWhiteSpaceString = (value: unknown) => is.string(value) && /\S/.test(value) === false;
@@ -330,7 +332,9 @@ is.emptyMap = (value: unknown): value is Map<never, never> => is.map(value) && v
 is.nonEmptyMap = (value: unknown): value is Map<unknown, unknown> => is.map(value) && value.size > 0;
 
 export type Predicate = (value: unknown) => boolean;
+
 type ArrayMethod = (fn: (value: unknown, index: number, array: unknown[]) => boolean, thisArg?: unknown) => boolean;
+
 const predicateOnArray = (method: ArrayMethod, predicate: Predicate, values: unknown[]) => {
 	if (is.function_(predicate) === false) {
 		throw new TypeError(`Invalid predicate: ${JSON.stringify(predicate)}`);
