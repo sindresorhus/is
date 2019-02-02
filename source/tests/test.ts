@@ -773,23 +773,23 @@ test('is.infinite', t => {
 	testType(t, 'infinite', ['number']);
 });
 
-test('is.even', t => {
+test('is.evenInteger', t => {
 	for (const el of [-6, 2, 4]) {
-		t.true(is.even(el));
+		t.true(is.evenInteger(el));
 	}
 
 	for (const el of [-3, 1, 5]) {
-		t.false(is.even(el));
+		t.false(is.evenInteger(el));
 	}
 });
 
-test('is.odd', t => {
+test('is.oddInteger', t => {
 	for (const el of [-5, 7, 13]) {
-		t.true(is.odd(el));
+		t.true(is.oddInteger(el));
 	}
 
 	for (const el of [-8, 8, 10]) {
-		t.false(is.odd(el));
+		t.false(is.oddInteger(el));
 	}
 });
 

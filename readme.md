@@ -374,11 +374,11 @@ is.observable(new Observable());
 
 Check if `value` is `Infinity` or `-Infinity`.
 
-##### .even(value)
+##### .evenInteger(value)
 
 Returns `true` if `value` is an even integer.
 
-##### .odd(value)
+##### .oddInteger(value)
 
 Returns `true` if `value` is an odd integer.
 
