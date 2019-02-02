@@ -239,6 +239,7 @@ const typedArrayTypes = new Set([
 	TypeName.Float32Array,
 	TypeName.Float64Array
 ]);
+
 is.typedArray = (value: unknown): value is TypedArray => {
 	const objectType = getObjectType(value);
 
@@ -297,8 +298,8 @@ is.nodeStream = (value: unknown): value is NodeStream => !is.nullOrUndefined(val
 is.infinite = (value: unknown) => value === Infinity || value === -Infinity;
 
 const isAbsoluteMod2 = (rem: number) => (value: number) => is.integer(value) && Math.abs(value % 2) === rem;
-is.even = isAbsoluteMod2(0);
-is.odd = isAbsoluteMod2(1);
+is.evenInteger = isAbsoluteMod2(0);
+is.oddInteger = isAbsoluteMod2(1);
 
 const isWhiteSpaceString = (value: unknown) => is.string(value) && /\S/.test(value) === false;
 
