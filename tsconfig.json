@@ -9,5 +9,8 @@
 			"esnext.asynciterable",
 			"dom"
 		]
-	}
+	},
+	"include": [
+		"source"
+	]
 }

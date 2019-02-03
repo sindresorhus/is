@@ -4,7 +4,7 @@ import Stream from 'stream';
 import util from 'util';
 import tempy from 'tempy';
 import {URL} from 'url';
-import test, {TestContext, Context} from 'ava';
+import test, {ExecutionContext} from 'ava';
 import {JSDOM} from 'jsdom';
 import {Subject, Observable} from 'rxjs';
 import ZenObservable from 'zen-observable';
@@ -377,7 +377,7 @@ const types = new Map<string, Test>([
 ]);
 
 // This ensures a certain method matches only the types it's supposed to and none of the other methods' types
-const testType = (t: TestContext & Context<unknown>, type: string, exclude?: string[]) => {
+const testType = (t: ExecutionContext, type: string, exclude?: string[]) => {
 	const testData = types.get(type);
 
 	if (testData === undefined) {

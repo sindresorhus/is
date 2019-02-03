@@ -9,15 +9,15 @@
 		"email": "sindresorhus@gmail.com",
 		"url": "sindresorhus.com"
 	},
-	"main": "dist/index.js",
+	"main": "dist",
 	"engines": {
 		"node": ">=6"
 	},
 	"scripts": {
 		"lint": "tslint --format stylish --project .",
 		"build": "del dist && tsc",
-		"test": "npm run lint && npm run build && ava dist/tests",
-		"prepublish": "npm run build && del dist/tests"
+		"test": "npm run lint && ava",
+		"prepublishOnly": "npm run build"
 	},
 	"files": [
 		"dist"
@@ -46,18 +46,29 @@
 	"devDependencies": {
 		"@sindresorhus/tsconfig": "^0.1.0",
 		"@types/jsdom": "^11.12.0",
-		"@types/node": "^10.12.10",
+		"@types/node": "^10.12.21",
 		"@types/tempy": "^0.2.0",
 		"@types/zen-observable": "^0.8.0",
-		"ava": "^0.25.0",
+		"ava": "^1.2.0",
 		"del-cli": "^1.1.0",
 		"jsdom": "^11.6.2",
-		"rxjs": "^6.3.3",
+		"rxjs": "^6.4.0",
 		"tempy": "^0.2.1",
+		"ts-node": "^8.0.2",
 		"tslint": "^5.9.1",
 		"tslint-xo": "^0.10.0",
-		"typescript": "^3.2.1",
+		"typescript": "^3.3.1",
 		"zen-observable": "^0.8.8"
 	},
-	"types": "dist/index.d.ts"
+	"types": "dist",
+	"ava": {
+		"babel": false,
+		"compileEnhancements": false,
+		"extensions": [
+			"ts"
+		],
+		"require": [
+			"ts-node/register"
+		]
+	}
 }
