@@ -8,7 +8,7 @@ import test, {ExecutionContext} from 'ava';
 import {JSDOM} from 'jsdom';
 import {Subject, Observable} from 'rxjs';
 import ZenObservable from 'zen-observable';
-import is from '..';
+import is from '../source';
 
 const isNode8orHigher = Number(process.versions.node.split('.')[0]) >= 8;
 const isNode10orHigher = Number(process.versions.node.split('.')[0]) >= 10;
