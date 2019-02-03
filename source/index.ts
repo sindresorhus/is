@@ -49,13 +49,13 @@ export const enum TypeName {
 const toString = Object.prototype.toString;
 const isOfType = <T>(type: string) => (value: unknown): value is T => typeof value === type;
 
-const getObjectType = (value: unknown): TypeName | null => {
+const getObjectType = (value: unknown): TypeName | undefined => {
 	const objectName = toString.call(value).slice(8, -1);
 	if (objectName) {
 		return objectName as TypeName;
 	}
 
-	return null;
+	return;
 };
 
 const isObjectOfType = <T>(type: TypeName) => (value: unknown): value is T => getObjectType(value) === type;
@@ -238,7 +238,7 @@ export type TypedArray = Int8Array | Uint8Array | Uint8ClampedArray | Int16Array
 
 is.typedArray = (value: unknown): value is TypedArray => {
 	const objectType = getObjectType(value);
-	if (objectType === null) {
+	if (objectType === undefined) {
 		return false;
 	}
 
