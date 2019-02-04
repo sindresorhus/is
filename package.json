@@ -44,7 +44,7 @@
 		"compare"
 	],
 	"devDependencies": {
-		"@sindresorhus/tsconfig": "^0.1.0",
+		"@sindresorhus/tsconfig": "^0.2.0",
 		"@types/jsdom": "^11.12.0",
 		"@types/node": "^10.12.21",
 		"@types/tempy": "^0.2.0",
@@ -61,6 +61,7 @@
 		"zen-observable": "^0.8.8"
 	},
 	"types": "dist",
+	"sideEffects": false,
 	"ava": {
 		"babel": false,
 		"compileEnhancements": false,
