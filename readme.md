@@ -1,8 +1,18 @@
 # is [![Build Status](https://travis-ci.org/sindresorhus/is.svg?branch=master)](https://travis-ci.org/sindresorhus/is)
 
-> Type check values: `is.string('🦄') //=> true`
+> Type check values
+
+For example, `is.string('🦄') //=> true`
 
 <img src="header.gif" width="182" align="right">
+
+
+## Highlights
+
+- Written in TypeScript
+- [Extensive use of type guards](#type-guards)
+- Actively maintained
+- 2 million weekly downloads
 
 
 ## Install
@@ -25,32 +35,6 @@ is(new Map());
 
 is.number(6);
 //=> true
-```
-
-When using `is` together with TypeScript, [type guards](http://www.typescriptlang.org/docs/handbook/advanced-types.html#type-guards-and-differentiating-types) are being used to infer the correct type inside if-else statements.
-
-```ts
-import is from '@sindresorhus/is';
-
-const padLeft = (value: string, padding: string | number) => {
-	if (is.number(padding)) {
-		// `padding` is typed as `number`
-		return Array(padding + 1).join(' ') + value;
-	}
-
-	if (is.string(padding)) {
-		// `padding` is typed as `string`
-		return padding + value;
-	}
-
-	throw new TypeError(`Expected 'padding' to be of type 'string' or 'number', got '${is(padding)}'.`);
-}
-
-padLeft('🦄', 3);
-//=> '   🦄'
-
-padLeft('🦄', '🌈');
-//=> '🌈🦄'
 ```
 
 
@@ -404,6 +388,35 @@ is.all(is.object, {}, new Map(), new Set());
 
 is.all(is.string, '🦄', [], 'unicorns');
 //=> false
+```
+
+
+## Type guards
+
+When using `is` together with TypeScript, [type guards](http://www.typescriptlang.org/docs/handbook/advanced-types.html#type-guards-and-differentiating-types) are being used extensively to infer the correct type inside if-else statements.
+
+```ts
+import is from '@sindresorhus/is';
+
+const padLeft = (value: string, padding: string | number) => {
+	if (is.number(padding)) {
+		// `padding` is typed as `number`
+		return Array(padding + 1).join(' ') + value;
+	}
+
+	if (is.string(padding)) {
+		// `padding` is typed as `string`
+		return padding + value;
+	}
+
+	throw new TypeError(`Expected 'padding' to be of type 'string' or 'number', got '${is(padding)}'.`);
+}
+
+padLeft('🦄', 3);
+//=> '   🦄'
+
+padLeft('🦄', '🌈');
+//=> '🌈🦄'
 ```
 
 

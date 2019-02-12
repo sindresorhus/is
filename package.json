@@ -1,7 +1,7 @@
 {
 	"name": "@sindresorhus/is",
 	"version": "0.15.0",
-	"description": "Type check values: `is.string('🦄') //=> true`",
+	"description": "Type check values",
 	"license": "MIT",
 	"repository": "sindresorhus/is",
 	"author": {
@@ -41,7 +41,10 @@
 		"kind",
 		"primitive",
 		"verify",
-		"compare"
+		"compare",
+		"typescript",
+		"typeguards",
+		"types"
 	],
 	"devDependencies": {
 		"@sindresorhus/tsconfig": "^0.2.0",
