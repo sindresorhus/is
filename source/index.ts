@@ -366,6 +366,5 @@ Object.defineProperties(is, {
 	}
 });
 
-
 module.exports = is; // For CommonJS default export support
 export default is;
