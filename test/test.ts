@@ -2,8 +2,8 @@ import fs from 'fs';
 import net from 'net';
 import Stream from 'stream';
 import util from 'util';
-import tempy from 'tempy';
 import {URL} from 'url';
+import tempy from 'tempy';
 import test, {ExecutionContext} from 'ava';
 import {JSDOM} from 'jsdom';
 import {Subject, Observable} from 'rxjs';
@@ -88,26 +88,24 @@ const types = new Map<string, Test>([
 		is: is.array,
 		fixtures: [
 			[1, 2],
-			new Array(2) // tslint:disable-line:prefer-array-literal
+			new Array(2)
 		]
 	}],
 	['emptyArray', {
 		is: is.emptyArray,
 		fixtures: [
 			[],
-			new Array()
+			new Array() // eslint-disable-line @typescript-eslint/no-array-constructor
 		]
 	}],
 	['function', {
 		is: is.function_,
 		fixtures: [
-			// tslint:disable:no-unused no-empty no-unused-variable only-arrow-functions no-function-expression
-			function foo() {},
+			function foo() {}, // eslint-disable-line func-names
 			function () {},
 			() => {},
 			async function () {},
 			function * (): unknown {}
-			// tslint:enable:no-unused no-empty no-unused-variable only-arrow-functions no-function-expression
 		]
 	}],
 	['buffer', {
@@ -153,7 +151,7 @@ const types = new Map<string, Test>([
 	['promise', {
 		is: is.promise,
 		fixtures: [
-			{then() {}, catch() {}} // tslint:disable-line:no-empty
+			{then() {}, catch() {}}
 		]
 	}],
 	['generator', {
@@ -175,27 +173,27 @@ const types = new Map<string, Test>([
 	['asyncFunction', {
 		is: is.asyncFunction,
 		fixtures: [
-			async function () {}, // tslint:disable-line:no-empty only-arrow-functions no-function-expression
-			async () => {} // tslint:disable-line:no-empty
+			async function () {},
+			async () => {}
 		]
 	}],
 	['boundFunction', {
 		is: is.boundFunction,
 		fixtures: [
-			() => {}, // tslint:disable-line:no-empty
-			function () {}.bind(null), // tslint:disable-line:no-empty only-arrow-functions
+			() => {},
+			function () {}.bind(null) // eslint-disable-line no-extra-bind
 		]
 	}],
 	['map', {
 		is: is.map,
 		fixtures: [
-			new Map([['one', '1']]),
+			new Map([['one', '1']])
 		]
 	}],
 	['emptyMap', {
 		is: is.emptyMap,
 		fixtures: [
-			new Map(),
+			new Map()
 		]
 	}],
 	['set', {
@@ -207,7 +205,7 @@ const types = new Map<string, Test>([
 	['emptySet', {
 		is: is.emptySet,
 		fixtures: [
-			new Set(),
+			new Set()
 		]
 	}],
 	['weakSet', {
@@ -307,7 +305,7 @@ const types = new Map<string, Test>([
 		fixtures: [
 			{x: 1},
 			Object.create(null),
-			new Object()
+			new Object() // eslint-disable-line no-new-object
 		]
 	}],
 	['integer', {
@@ -319,8 +317,8 @@ const types = new Map<string, Test>([
 	['safeInteger', {
 		is: is.safeInteger,
 		fixtures: [
-			Math.pow(2, 53) - 1,
-			-Math.pow(2, 53) + 1
+			(2 ** 53) - 1,
+			-(2 ** 53) + 1
 		]
 	}],
 	['domElement', {
@@ -332,8 +330,8 @@ const types = new Map<string, Test>([
 			'img',
 			'canvas',
 			'script'
-		].map(createDomElement) }
-	],
+		].map(createDomElement)
+	}],
 	['non-domElements', {
 		is: value => !is.domElement(value),
 		fixtures: [
@@ -350,7 +348,7 @@ const types = new Map<string, Test>([
 		fixtures: [
 			new Observable(),
 			new Subject(),
-			new ZenObservable(() => {}) // tslint:disable-line:no-empty
+			new ZenObservable(() => {})
 		]
 	}],
 	['nodeStream', {
@@ -449,7 +447,7 @@ test('is.function', t => {
 });
 
 test('is.boundFunction', t => {
-	t.false(is.boundFunction(function () {})); // tslint:disable-line:no-empty only-arrow-functions
+	t.false(is.boundFunction(function () {})); // eslint-disable-line prefer-arrow-callback
 });
 
 test('is.buffer', t => {
@@ -491,9 +489,11 @@ if (isNode8orHigher) {
 		testType(t, 'promise', ['nativePromise']);
 	});
 
-	/*test('is.asyncFunction', t => {
+	/*-
+	test('is.asyncFunction', t => {
 		testType(t, 'asyncFunction', ['function']);
-	});*/
+	});
+	*/
 }
 
 test('is.generator', t => {
@@ -642,8 +642,8 @@ test('is.integer', t => {
 
 test('is.safeInteger', t => {
 	testType(t, 'safeInteger', ['number', 'integer']);
-	t.false(is.safeInteger(Math.pow(2, 53)));
-	t.false(is.safeInteger(-Math.pow(2, 53)));
+	t.false(is.safeInteger(2 ** 53));
+	t.false(is.safeInteger(-(2 ** 53)));
 });
 
 test('is.plainObject', t => {
@@ -665,7 +665,7 @@ test('is.iterable', t => {
 if (isNode10orHigher) {
 	test('is.asyncIterable', t => {
 		t.true(is.asyncIterable({
-			[Symbol.asyncIterator]: () => {} // tslint:disable-line:no-empty
+			[Symbol.asyncIterator]: () => {}
 		}));
 
 		t.false(is.asyncIterable(null));
@@ -678,14 +678,15 @@ if (isNode10orHigher) {
 }
 
 test('is.class', t => {
-	class Foo {} // tslint:disable-line
+	class Foo {} // eslint-disable-line @typescript-eslint/no-extraneous-class
+
 	const classDeclarations = [
 		Foo,
-		class Bar extends Foo {} // tslint:disable-line
+		class Bar extends Foo {}
 	];
 
-	for (const x of classDeclarations) {
-		t.true(is.class_(x));
+	for (const classDeclaration of classDeclarations) {
+		t.true(is.class_(classDeclaration));
 	}
 });
 
@@ -714,14 +715,15 @@ test('is.typedArray', t => {
 });
 
 test('is.arrayLike', t => {
-	(function () { // tslint:disable-line:only-arrow-functions
-		t.true(is.arrayLike(arguments));
+	(function () {
+		t.true(is.arrayLike(arguments)); // eslint-disable-line prefer-rest-params
 	})();
+
 	t.true(is.arrayLike([]));
 	t.true(is.arrayLike('unicorn'));
 
 	t.false(is.arrayLike({}));
-	t.false(is.arrayLike(() => {})); // tslint:disable-line:no-empty
+	t.false(is.arrayLike(() => {}));
 	t.false(is.arrayLike(new Map()));
 });
 
@@ -800,7 +802,7 @@ test('is.emptyArray', t => {
 test('is.nonEmptyArray', t => {
 	t.true(is.nonEmptyArray([1, 2, 3]));
 	t.false(is.nonEmptyArray([]));
-	t.false(is.nonEmptyArray(new Array()));
+	t.false(is.nonEmptyArray(new Array())); // eslint-disable-line @typescript-eslint/no-array-constructor
 });
 
 test('is.emptyString', t => {
@@ -823,7 +825,7 @@ test('is.emptyStringOrWhitespace', t => {
 
 test('is.emptyObject', t => {
 	t.true(is.emptyObject({}));
-	t.true(is.emptyObject(new Object()));
+	t.true(is.emptyObject(new Object())); // eslint-disable-line no-new-object
 	t.false(is.emptyObject({unicorn: '🦄'}));
 });
 
@@ -832,7 +834,7 @@ test('is.nonEmptyObject', t => {
 	is.nonEmptyObject(foo);
 
 	t.false(is.nonEmptyObject({}));
-	t.false(is.nonEmptyObject(new Object()));
+	t.false(is.nonEmptyObject(new Object())); // eslint-disable-line no-new-object
 	t.true(is.nonEmptyObject({unicorn: '🦄'}));
 });
 

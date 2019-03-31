@@ -14,9 +14,8 @@
 		"node": ">=6"
 	},
 	"scripts": {
-		"lint": "tslint --format stylish --project .",
 		"build": "del dist && tsc",
-		"test": "npm run lint && ava",
+		"test": "xo && ava",
 		"prepublishOnly": "npm run build"
 	},
 	"files": [
@@ -47,20 +46,19 @@
 		"types"
 	],
 	"devDependencies": {
-		"@sindresorhus/tsconfig": "^0.2.0",
-		"@types/jsdom": "^11.12.0",
-		"@types/node": "^10.12.21",
+		"@sindresorhus/tsconfig": "^0.3.0",
+		"@types/jsdom": "^12.2.3",
+		"@types/node": "^11.12.2",
 		"@types/tempy": "^0.2.0",
 		"@types/zen-observable": "^0.8.0",
-		"ava": "^1.2.0",
+		"@typescript-eslint/eslint-plugin": "^1.5.0",
+		"ava": "^1.4.1",
 		"del-cli": "^1.1.0",
 		"jsdom": "^11.6.2",
 		"rxjs": "^6.4.0",
 		"tempy": "^0.2.1",
-		"ts-node": "^8.0.2",
-		"tslint": "^5.9.1",
-		"tslint-xo": "^0.10.0",
-		"typescript": "^3.3.1",
+		"ts-node": "^8.0.3",
+		"typescript": "^3.4.1",
 		"zen-observable": "^0.8.8"
 	},
 	"types": "dist",
@@ -74,5 +72,14 @@
 		"require": [
 			"ts-node/register"
 		]
+	},
+	"xo": {
+		"extends": "xo-typescript",
+		"extensions": [
+			"ts"
+		],
+		"rules": {
+			"@typescript-eslint/explicit-function-return-type": "off"
+		}
 	}
 }

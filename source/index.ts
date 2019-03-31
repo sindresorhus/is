@@ -4,10 +4,10 @@
 /// <reference lib="dom"/>
 
 // TODO: Use the `URL` global when targeting Node.js 10
-// tslint:disable-next-line
+// eslint-disable-next-line @typescript-eslint/no-require-imports
 const URLGlobal = typeof URL === 'undefined' ? require('url').URL : URL;
 
-export type Class<T = unknown> = new(...args: any[]) => T;
+export type Class<T = unknown> = new (...args: any[]) => T;
 
 export const enum TypeName {
 	null = 'null',
@@ -46,7 +46,7 @@ export const enum TypeName {
 	URL = 'URL'
 }
 
-const toString = Object.prototype.toString;
+const {toString} = Object.prototype;
 const isOfType = <T>(type: string) => (value: unknown): value is T => typeof value === type;
 
 const getObjectType = (value: unknown): TypeName | undefined => {
@@ -55,12 +55,11 @@ const getObjectType = (value: unknown): TypeName | undefined => {
 		return objectName as TypeName;
 	}
 
-	return;
+	return undefined;
 };
 
 const isObjectOfType = <T>(type: TypeName) => (value: unknown): value is T => getObjectType(value) === type;
 
-// tslint:disable-next-line: no-use-before-declare
 function is(value: unknown): TypeName {
 	switch (value) {
 		case null:
@@ -111,14 +110,15 @@ function is(value: unknown): TypeName {
 	return TypeName.Object;
 }
 
-// tslint:disable-next-line: strict-type-predicates
 const isObject = (value: unknown): value is object => typeof value === 'object';
 
 is.undefined = isOfType<undefined>('undefined');
 is.string = isOfType<string>('string');
 is.number = isOfType<number>('number');
+
+// eslint-disable-next-line @typescript-eslint/ban-types
 is.function_ = isOfType<Function>('function');
-// tslint:disable-next-line: strict-type-predicates
+
 is.null_ = (value: unknown): value is null => value === null;
 is.class_ = (value: unknown): value is Class => is.function_(value) && value.toString().startsWith('class ');
 is.boolean = (value: unknown): value is boolean => value === true || value === false;
@@ -133,7 +133,10 @@ is.buffer = (value: unknown): value is Buffer => !is.nullOrUndefined(value) && !
 is.nullOrUndefined = (value: unknown): value is null | undefined => is.null_(value) || is.undefined(value);
 is.object = (value: unknown): value is object => !is.nullOrUndefined(value) && (is.function_(value) || isObject(value));
 is.iterable = (value: unknown): value is IterableIterator<unknown> => !is.nullOrUndefined(value) && is.function_((value as IterableIterator<unknown>)[Symbol.iterator]);
+
+// eslint-disable-next-line no-use-extend-native/no-use-extend-native
 is.asyncIterable = (value: unknown): value is AsyncIterableIterator<unknown> => !is.nullOrUndefined(value) && is.function_((value as AsyncIterableIterator<unknown>)[Symbol.asyncIterator]);
+
 is.generator = (value: unknown): value is Generator => is.iterable(value) && is.function_(value.next) && is.function_(value.throw);
 
 is.nativePromise = (value: unknown): value is Promise<unknown> =>
@@ -148,7 +151,11 @@ const hasPromiseAPI = (value: unknown): value is Promise<unknown> =>
 is.promise = (value: unknown): value is Promise<unknown> => is.nativePromise(value) || hasPromiseAPI(value);
 
 is.generatorFunction = isObjectOfType<GeneratorFunction>(TypeName.GeneratorFunction);
+
+// eslint-disable-next-line @typescript-eslint/ban-types
 is.asyncFunction = isObjectOfType<Function>(TypeName.AsyncFunction);
+
+// eslint-disable-next-line no-prototype-builtins, @typescript-eslint/ban-types
 is.boundFunction = (value: unknown): value is Function => is.function_(value) && !value.hasOwnProperty('prototype');
 
 is.regExp = isObjectOfType<RegExp>(TypeName.RegExp);
@@ -182,7 +189,7 @@ is.urlString = (value: unknown): value is string => {
 	}
 
 	try {
-		new URLGlobal(value); // tslint:disable-line no-unused-expression
+		new URLGlobal(value); // eslint-disable-line no-new
 		return true;
 	} catch {
 		return false;
@@ -215,11 +222,13 @@ is.safeInteger = (value: unknown): value is number => Number.isSafeInteger(value
 
 is.plainObject = (value: unknown): value is {[key: string]: unknown} => {
 	// From: https://github.com/sindresorhus/is-plain-obj/blob/master/index.js
-	let prototype;
+	if (getObjectType(value) !== TypeName.Object) {
+		return false;
+	}
 
-	return getObjectType(value) === TypeName.Object &&
-		(prototype = Object.getPrototypeOf(value), prototype === null || // tslint:disable-line:ban-comma-operator
-			prototype === Object.getPrototypeOf({}));
+	const prototype = Object.getPrototypeOf(value);
+
+	return prototype === null || prototype === Object.getPrototypeOf({});
 };
 
 const typedArrayTypes = new Set([
@@ -250,7 +259,7 @@ export interface ArrayLike<T> {
 	readonly [index: number]: T;
 }
 
-const isValidLength = (value: unknown) => is.safeInteger(value) && value >= 0;
+const isValidLength = (value: unknown): value is number => is.safeInteger(value) && value >= 0;
 is.arrayLike = (value: unknown): value is ArrayLike<unknown> => !is.nullOrUndefined(value) && !is.function_(value) && isValidLength((value as ArrayLike<unknown>).length);
 
 is.inRange = (value: number, range: number | number[]): value is number => {
@@ -287,6 +296,7 @@ is.observable = (value: unknown): value is ObservableLike => {
 		return false;
 	}
 
+	// eslint-disable-next-line no-use-extend-native/no-use-extend-native
 	if ((value as any)[Symbol.observable] && value === (value as any)[Symbol.observable]()) {
 		return true;
 	}
@@ -298,13 +308,14 @@ is.observable = (value: unknown): value is ObservableLike => {
 	return false;
 };
 
+// eslint-disable-next-line @typescript-eslint/ban-types
 export type NodeStream = object & {readonly pipe: Function};
 
 is.nodeStream = (value: unknown): value is NodeStream => !is.nullOrUndefined(value) && isObject(value) as unknown && is.function_((value as NodeStream).pipe) && !is.observable(value);
 
 is.infinite = (value: unknown): value is number => value === Infinity || value === -Infinity;
 
-const isAbsoluteMod2 = (rem: number) => (value: number): value is number => is.integer(value) && Math.abs(value % 2) === rem;
+const isAbsoluteMod2 = (remainder: number) => (value: number): value is number => is.integer(value) && Math.abs(value % 2) === remainder;
 is.evenInteger = isAbsoluteMod2(0);
 is.oddInteger = isAbsoluteMod2(1);
 
@@ -316,7 +327,7 @@ is.emptyString = (value: unknown): value is '' => is.string(value) && value.leng
 // TODO: Use `not ''` when the `not` operator is available.
 is.nonEmptyString = (value: unknown): value is string => is.string(value) && value.length > 0;
 
-const isWhiteSpaceString = (value: unknown) => is.string(value) && /\S/.test(value) === false;
+const isWhiteSpaceString = (value: unknown): value is string => is.string(value) && /\S/.test(value) === false;
 is.emptyStringOrWhitespace = (value: unknown): value is string => is.emptyString(value) || isWhiteSpaceString(value);
 
 is.emptyObject = (value: unknown): value is {[key: string]: never} => is.object(value) && !is.map(value) && !is.set(value) && Object.keys(value).length === 0;
@@ -347,10 +358,8 @@ const predicateOnArray = (method: ArrayMethod, predicate: Predicate, values: unk
 	return method.call(values, predicate);
 };
 
-// tslint:disable variable-name
 is.any = (predicate: Predicate, ...values: unknown[]): boolean => predicateOnArray(Array.prototype.some, predicate, values);
 is.all = (predicate: Predicate, ...values: unknown[]): boolean => predicateOnArray(Array.prototype.every, predicate, values);
-// tslint:enable variable-name
 
 // Some few keywords are reserved, but we'll populate them for Node.js users
 // See https://github.com/Microsoft/TypeScript/issues/2536

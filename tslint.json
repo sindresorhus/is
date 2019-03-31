@@ -1,6 +1,0 @@
-{
-	"extends": "tslint-xo",
-	"rules": {
-		"interface-over-type-literal": false
-	}
-}
