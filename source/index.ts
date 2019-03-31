@@ -1,5 +1,4 @@
-/// <reference lib="es2016"/>
-/// <reference lib="es2017.sharedmemory"/>
+/// <reference lib="es2017"/>
 /// <reference lib="esnext.asynciterable"/>
 /// <reference lib="dom"/>
 
@@ -145,7 +144,7 @@ is.nativePromise = (value: unknown): value is Promise<unknown> =>
 const hasPromiseAPI = (value: unknown): value is Promise<unknown> =>
 	!is.null_(value) &&
 	isObject(value) as unknown &&
-	is.function_((value as Promise<unknown>).then) &&
+	is.function_((value as Promise<unknown>).then) && // eslint-disable-line promise/prefer-await-to-then
 	is.function_((value as Promise<unknown>).catch);
 
 is.promise = (value: unknown): value is Promise<unknown> => is.nativePromise(value) || hasPromiseAPI(value);
@@ -180,7 +179,7 @@ is.arrayBuffer = isObjectOfType<ArrayBuffer>(TypeName.ArrayBuffer);
 is.sharedArrayBuffer = isObjectOfType<SharedArrayBuffer>(TypeName.SharedArrayBuffer);
 is.dataView = isObjectOfType<DataView>(TypeName.DataView);
 
-is.directInstanceOf = <T>(instance: unknown, klass: Class<T>): instance is T => Object.getPrototypeOf(instance) === klass.prototype;
+is.directInstanceOf = <T>(instance: unknown, class_: Class<T>): instance is T => Object.getPrototypeOf(instance) === class_.prototype;
 is.urlInstance = (value: unknown): value is URL => isObjectOfType<URL>(TypeName.URL)(value);
 
 is.urlString = (value: unknown): value is string => {

@@ -10,7 +10,6 @@ import {Subject, Observable} from 'rxjs';
 import ZenObservable from 'zen-observable';
 import is from '../source';
 
-const isNode8orHigher = Number(process.versions.node.split('.')[0]) >= 8;
 const isNode10orHigher = Number(process.versions.node.split('.')[0]) >= 10;
 
 class PromiseSubclassFixture<T> extends Promise<T> {}
@@ -223,55 +222,55 @@ const types = new Map<string, Test>([
 	['int8Array', {
 		is: is.int8Array,
 		fixtures: [
-			new Int8Array(0)
+			new Int8Array()
 		]
 	}],
 	['uint8Array', {
 		is: is.uint8Array,
 		fixtures: [
-			new Uint8Array(0)
+			new Uint8Array()
 		]
 	}],
 	['uint8ClampedArray', {
 		is: is.uint8ClampedArray,
 		fixtures: [
-			new Uint8ClampedArray(0)
+			new Uint8ClampedArray()
 		]
 	}],
 	['int16Array', {
 		is: is.int16Array,
 		fixtures: [
-			new Int16Array(0)
+			new Int16Array()
 		]
 	}],
 	['uint16Array', {
 		is: is.uint16Array,
 		fixtures: [
-			new Uint16Array(0)
+			new Uint16Array()
 		]
 	}],
 	['int32Array', {
 		is: is.int32Array,
 		fixtures: [
-			new Int32Array(0)
+			new Int32Array()
 		]
 	}],
 	['uint32Array', {
 		is: is.uint32Array,
 		fixtures: [
-			new Uint32Array(0)
+			new Uint32Array()
 		]
 	}],
 	['float32Array', {
 		is: is.float32Array,
 		fixtures: [
-			new Float32Array(0)
+			new Float32Array()
 		]
 	}],
 	['float64Array', {
 		is: is.float64Array,
 		fixtures: [
-			new Float64Array(0)
+			new Float64Array()
 		]
 	}],
 	['arrayBuffer', {
@@ -480,21 +479,17 @@ test('is.error', t => {
 	testType(t, 'error');
 });
 
-if (isNode8orHigher) {
-	test('is.nativePromise', t => {
-		testType(t, 'nativePromise');
-	});
+test('is.nativePromise', t => {
+	testType(t, 'nativePromise');
+});
 
-	test('is.promise', t => {
-		testType(t, 'promise', ['nativePromise']);
-	});
+test('is.promise', t => {
+	testType(t, 'promise', ['nativePromise']);
+});
 
-	/*-
-	test('is.asyncFunction', t => {
-		testType(t, 'asyncFunction', ['function']);
-	});
-	*/
-}
+test('is.asyncFunction', t => {
+	testType(t, 'asyncFunction', ['function']);
+});
 
 test('is.generator', t => {
 	testType(t, 'generator');
@@ -691,18 +686,15 @@ test('is.class', t => {
 });
 
 test('is.typedArray', t => {
-	// TypeScript currently does not support empty constructors for these
-	// See https://github.com/Microsoft/TypeScript/issues/19680
-	// TODO: Remove the `0` when targeting `es2017` (Node.js 8), in other places of this file too.
 	const typedArrays = [
-		new Int8Array(0),
-		new Uint8Array(0),
-		new Uint8ClampedArray(0),
-		new Uint16Array(0),
-		new Int32Array(0),
-		new Uint32Array(0),
-		new Float32Array(0),
-		new Float64Array(0)
+		new Int8Array(),
+		new Uint8Array(),
+		new Uint8ClampedArray(),
+		new Uint16Array(),
+		new Int32Array(),
+		new Uint32Array(),
+		new Float32Array(),
+		new Float64Array()
 	];
 
 	for (const item of typedArrays) {
