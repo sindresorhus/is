@@ -800,7 +800,13 @@ test('is.inRange', t => {
 test('is.domElement', t => {
 	testType(t, 'domElement');
 	t.false(is.domElement({nodeType: 1, nodeName: 'div'}));
+
 	t.is(is(createDomElement('div')), 'HTMLDivElement');
+	t.is(is(createDomElement('input')), 'HTMLInputElement');
+	t.is(is(createDomElement('span')), 'HTMLSpanElement');
+	t.is(is(createDomElement('img')), 'HTMLImageElement');
+	t.is(is(createDomElement('canvas')), 'HTMLCanvasElement');
+	t.is(is(createDomElement('script')), 'HTMLScriptElement');
 });
 
 test('is.observable', t => {
