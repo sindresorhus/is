@@ -801,12 +801,19 @@ test('is.domElement', t => {
 	testType(t, 'domElement');
 	t.false(is.domElement({nodeType: 1, nodeName: 'div'}));
 
-	t.is(is(createDomElement('div')), 'HTMLDivElement');
-	t.is(is(createDomElement('input')), 'HTMLInputElement');
-	t.is(is(createDomElement('span')), 'HTMLSpanElement');
-	t.is(is(createDomElement('img')), 'HTMLImageElement');
-	t.is(is(createDomElement('canvas')), 'HTMLCanvasElement');
-	t.is(is(createDomElement('script')), 'HTMLScriptElement');
+	const htmlTagNameToTypeName = {
+		div: 'HTMLDivElement',
+		input: 'HTMLInputElement',
+		span: 'HTMLSpanElement',
+		img: 'HTMLImageElement',
+		canvas: 'HTMLCanvasElement',
+		script: 'HTMLScriptElement'
+	};
+
+	Object.entries(htmlTagNameToTypeName).forEach(([tagName, typeName]) => {
+		const domElement = createDomElement(tagName);
+		t.is(is(domElement), typeName);
+	});
 });
 
 test('is.observable', t => {
