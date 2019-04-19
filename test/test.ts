@@ -8,7 +8,7 @@ import test, {ExecutionContext} from 'ava';
 import {JSDOM} from 'jsdom';
 import {Subject, Observable} from 'rxjs';
 import ZenObservable from 'zen-observable';
-import is from '../source';
+import is, {TypeName} from '../source';
 
 const isNode10orHigher = Number(process.versions.node.split('.')[0]) >= 10;
 
@@ -21,6 +21,9 @@ const createDomElement = (element: string) => document.createElement(element);
 
 interface Test {
 	fixtures: unknown[];
+
+	// Cannot be TypeName because TypeName.GeneratorFunction does not match 'Generator'
+	typename?: TypeName | 'Generator';
 	is(value: unknown): boolean;
 }
 
@@ -29,13 +32,15 @@ const types = new Map<string, Test>([
 		is: is.undefined,
 		fixtures: [
 			undefined
-		]
+		],
+		typename: TypeName.undefined
 	}],
 	['null', {
 		is: is.null_,
 		fixtures: [
 			null
-		]
+		],
+		typename: TypeName.null
 	}],
 	['string', {
 		is: is.string,
@@ -43,14 +48,16 @@ const types = new Map<string, Test>([
 			'🦄',
 			'hello world',
 			''
-		]
+		],
+		typename: TypeName.string
 	}],
 	['emptyString', {
 		is: is.emptyString,
 		fixtures: [
 			'',
 			String()
-		]
+		],
+		typename: TypeName.string
 	}],
 	['number', {
 		is: is.number,
@@ -61,19 +68,22 @@ const types = new Map<string, Test>([
 			-0,
 			Infinity,
 			-Infinity
-		]
+		],
+		typename: TypeName.number
 	}],
 	['boolean', {
 		is: is.boolean,
 		fixtures: [
 			true, false
-		]
+		],
+		typename: TypeName.boolean
 	}],
 	['symbol', {
 		is: is.symbol,
 		fixtures: [
 			Symbol('🦄')
-		]
+		],
+		typename: TypeName.symbol
 	}],
 	['numericString', {
 		is: is.numericString,
@@ -81,21 +91,24 @@ const types = new Map<string, Test>([
 			'5',
 			'-3.2',
 			'Infinity'
-		]
+		],
+		typename: TypeName.string
 	}],
 	['array', {
 		is: is.array,
 		fixtures: [
 			[1, 2],
 			new Array(2)
-		]
+		],
+		typename: TypeName.Array
 	}],
 	['emptyArray', {
 		is: is.emptyArray,
 		fixtures: [
 			[],
 			new Array() // eslint-disable-line @typescript-eslint/no-array-constructor
-		]
+		],
+		typename: TypeName.Array
 	}],
 	['function', {
 		is: is.function_,
@@ -105,53 +118,61 @@ const types = new Map<string, Test>([
 			() => {},
 			async function () {},
 			function * (): unknown {}
-		]
+		],
+		typename: TypeName.Function
 	}],
 	['buffer', {
 		is: is.buffer,
 		fixtures: [
 			Buffer.from('🦄')
-		]
+		],
+		typename: TypeName.Buffer
 	}],
 	['object', {
 		is: is.object,
 		fixtures: [
 			{x: 1},
 			Object.create({x: 1})
-		]
+		],
+		typename: TypeName.Object
 	}],
 	['regExp', {
 		is: is.regExp,
 		fixtures: [
 			/\w/,
 			new RegExp('\\w')
-		]
+		],
+		typename: TypeName.RegExp
 	}],
 	['date', {
 		is: is.date,
 		fixtures: [
 			new Date()
-		]
+		],
+		typename: TypeName.Date
 	}],
 	['error', {
 		is: is.error,
 		fixtures: [
 			new Error('🦄'),
 			new ErrorSubclassFixture()
-		]
+		],
+		typename: TypeName.Error
 	}],
 	['nativePromise', {
 		is: is.nativePromise,
 		fixtures: [
 			Promise.resolve(),
 			PromiseSubclassFixture.resolve()
-		]
+		],
+		typename: TypeName.Promise
 	}],
 	['promise', {
 		is: is.promise,
 		fixtures: [
 			{then() {}, catch() {}}
-		]
+		],
+		typename: TypeName.Object
 	}],
 	['generator', {
 		is: is.generator,
@@ -159,7 +180,8 @@ const types = new Map<string, Test>([
 			(function * () {
 				yield 4;
 			})()
-		]
+		],
+		typename: 'Generator'
 	}],
 	['generatorFunction', {
 		is: is.generatorFunction,
@@ -167,130 +189,151 @@ const types = new Map<string, Test>([
 			function * () {
 				yield 4;
 			}
-		]
+		],
+		typename: TypeName.Function
 	}],
 	['asyncFunction', {
 		is: is.asyncFunction,
 		fixtures: [
 			async function () {},
 			async () => {}
-		]
+		],
+		typename: TypeName.Function
 	}],
 	['boundFunction', {
 		is: is.boundFunction,
 		fixtures: [
 			() => {},
 			function () {}.bind(null) // eslint-disable-line no-extra-bind
-		]
+		],
+		typename: TypeName.Function
 	}],
 	['map', {
 		is: is.map,
 		fixtures: [
 			new Map([['one', '1']])
-		]
+		],
+		typename: TypeName.Map
 	}],
 	['emptyMap', {
 		is: is.emptyMap,
 		fixtures: [
 			new Map()
-		]
+		],
+		typename: TypeName.Map
 	}],
 	['set', {
 		is: is.set,
 		fixtures: [
 			new Set(['one'])
-		]
+		],
+		typename: TypeName.Set
 	}],
 	['emptySet', {
 		is: is.emptySet,
 		fixtures: [
 			new Set()
-		]
+		],
+		typename: TypeName.Set
 	}],
 	['weakSet', {
 		is: is.weakSet,
 		fixtures: [
 			new WeakSet()
-		]
+		],
+		typename: TypeName.WeakSet
 	}],
 	['weakMap', {
 		is: is.weakMap,
 		fixtures: [
 			new WeakMap()
-		]
+		],
+		typename: TypeName.WeakMap
 	}],
 	['int8Array', {
 		is: is.int8Array,
 		fixtures: [
 			new Int8Array()
-		]
+		],
+		typename: TypeName.Int8Array
 	}],
 	['uint8Array', {
 		is: is.uint8Array,
 		fixtures: [
 			new Uint8Array()
-		]
+		],
+		typename: TypeName.Uint8Array
 	}],
 	['uint8ClampedArray', {
 		is: is.uint8ClampedArray,
 		fixtures: [
 			new Uint8ClampedArray()
-		]
+		],
+		typename: TypeName.Uint8ClampedArray
 	}],
 	['int16Array', {
 		is: is.int16Array,
 		fixtures: [
 			new Int16Array()
-		]
+		],
+		typename: TypeName.Int16Array
 	}],
 	['uint16Array', {
 		is: is.uint16Array,
 		fixtures: [
 			new Uint16Array()
-		]
+		],
+		typename: TypeName.Uint16Array
 	}],
 	['int32Array', {
 		is: is.int32Array,
 		fixtures: [
 			new Int32Array()
-		]
+		],
+		typename: TypeName.Int32Array
 	}],
 	['uint32Array', {
 		is: is.uint32Array,
 		fixtures: [
 			new Uint32Array()
-		]
+		],
+		typename: TypeName.Uint32Array
 	}],
 	['float32Array', {
 		is: is.float32Array,
 		fixtures: [
 			new Float32Array()
-		]
+		],
+		typename: TypeName.Float32Array
 	}],
 	['float64Array', {
 		is: is.float64Array,
 		fixtures: [
 			new Float64Array()
-		]
+		],
+		typename: TypeName.Float64Array
 	}],
 	['arrayBuffer', {
 		is: is.arrayBuffer,
 		fixtures: [
 			new ArrayBuffer(10)
-		]
+		],
+		typename: TypeName.ArrayBuffer
 	}],
 	['dataView', {
 		is: is.dataView,
 		fixtures: [
 			new DataView(new ArrayBuffer(10))
-		]
+		],
+		typename: TypeName.DataView
 	}],
 	['nan', {
 		is: is.nan,
 		fixtures: [
 			NaN,
 			Number.NaN
-		]
+		],
+		typename: TypeName.number
 	}],
 	['nullOrUndefined', {
 		is: is.nullOrUndefined,
@@ -305,20 +348,23 @@ const types = new Map<string, Test>([
 			{x: 1},
 			Object.create(null),
 			new Object() // eslint-disable-line no-new-object
-		]
+		],
+		typename: TypeName.Object
 	}],
 	['integer', {
 		is: is.integer,
 		fixtures: [
 			6
-		]
+		],
+		typename: TypeName.number
 	}],
 	['safeInteger', {
 		is: is.safeInteger,
 		fixtures: [
 			(2 ** 53) - 1,
 			-(2 ** 53) + 1
-		]
+		],
+		typename: TypeName.number
 	}],
 	['domElement', {
 		is: is.domElement,
@@ -348,7 +394,8 @@ const types = new Map<string, Test>([
 			new Observable(),
 			new Subject(),
 			new ZenObservable(() => {})
-		]
+		],
+		typename: TypeName.Observable
 	}],
 	['nodeStream', {
 		is: is.nodeStream,
@@ -362,14 +409,16 @@ const types = new Map<string, Test>([
 			new Stream.Transform(),
 			new Stream.Stream(),
 			new Stream.Writable()
-		]
+		],
+		typename: TypeName.Object
 	}],
 	['infinite', {
 		is: is.infinite,
 		fixtures: [
 			Infinity,
 			-Infinity
-		]
+		],
+		typename: TypeName.number
 	}]
 ]);
 
@@ -383,7 +432,7 @@ const testType = (t: ExecutionContext, type: string, exclude?: string[]) => {
 		return;
 	}
 
-	const {is: testIs} = testData;
+	const {is: testIs, typename} = testData;
 
 	for (const [key, {fixtures}] of types) {
 		// TODO: Automatically exclude value types in other tests that we have in the current one.
@@ -392,20 +441,18 @@ const testType = (t: ExecutionContext, type: string, exclude?: string[]) => {
 			continue;
 		}
 
-		const assert = key === type ? t.true.bind(t) : t.false.bind(t);
+		const isTypeUnderTest = key === type;
+		const assert = isTypeUnderTest ? t.true.bind(t) : t.false.bind(t);
 
 		for (const fixture of fixtures) {
 			assert(testIs(fixture), `Value: ${util.inspect(fixture)}`);
+
+			if (isTypeUnderTest && typename) {
+				t.is(is(fixture), typename);
+			}
 		}
 	}
 };
-
-test('is', t => {
-	t.is(is(null), 'null');
-	t.is(is(undefined), 'undefined');
-
-	// TODO: Expand this to all the supported types. Maybe reuse `testType()` somehow.
-});
 
 test('is.undefined', t => {
 	testType(t, 'undefined', ['nullOrUndefined']);
@@ -753,6 +800,7 @@ test('is.inRange', t => {
 test('is.domElement', t => {
 	testType(t, 'domElement');
 	t.false(is.domElement({nodeType: 1, nodeName: 'div'}));
+	t.is(is(createDomElement('div')), 'HTMLDivElement');
 });
 
 test('is.observable', t => {
