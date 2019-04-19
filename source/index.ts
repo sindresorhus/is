@@ -16,6 +16,7 @@ export const enum TypeName {
 	number = 'number',
 	symbol = 'symbol',
 	Function = 'Function',
+	Generator = 'Generator',
 	GeneratorFunction = 'GeneratorFunction',
 	AsyncFunction = 'AsyncFunction',
 	Observable = 'Observable',

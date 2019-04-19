@@ -21,9 +21,7 @@ const createDomElement = (element: string) => document.createElement(element);
 
 interface Test {
 	fixtures: unknown[];
-
-	// Cannot be TypeName because TypeName.GeneratorFunction does not match 'Generator'
-	typename?: TypeName | 'Generator';
+	typename?: TypeName;
 	is(value: unknown): boolean;
 }
 
@@ -181,7 +179,7 @@ const types = new Map<string, Test>([
 				yield 4;
 			})()
 		],
-		typename: 'Generator'
+		typename: TypeName.Generator
 	}],
 	['generatorFunction', {
 		is: is.generatorFunction,
