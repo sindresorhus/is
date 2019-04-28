@@ -808,10 +808,10 @@ test('is.domElement', t => {
 		script: 'HTMLScriptElement'
 	};
 
-	Object.entries(htmlTagNameToTypeName).forEach(([tagName, typeName]) => {
+	for (const [tagName, typeName] of Object.entries(htmlTagNameToTypeName)) {
 		const domElement = createDomElement(tagName);
 		t.is(is(domElement), typeName);
-	});
+	}
 });
 
 test('is.observable', t => {
