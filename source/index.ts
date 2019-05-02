@@ -9,7 +9,7 @@ export const enum TypeName {
 	undefined = 'undefined',
 	string = 'string',
 	number = 'number',
-	bigint = 'BigInt',
+	bigint = 'bigint',
 	symbol = 'symbol',
 	Function = 'Function',
 	Generator = 'Generator',
