@@ -2,10 +2,10 @@
 	"extends": "@sindresorhus/tsconfig",
 	"compilerOptions": {
 		"outDir": "dist",
-		"target": "es2017",
+		"target": "esnext",
 		"lib": [
 			"es2017",
-			"esnext.asynciterable",
+			"esnext",
 			"dom"
 		]
 	},

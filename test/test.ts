@@ -2,7 +2,6 @@ import fs from 'fs';
 import net from 'net';
 import Stream from 'stream';
 import util from 'util';
-import {URL} from 'url';
 import tempy from 'tempy';
 import test, {ExecutionContext} from 'ava';
 import {JSDOM} from 'jsdom';
@@ -68,6 +67,17 @@ const types = new Map<string, Test>([
 			-Infinity
 		],
 		typename: TypeName.number
+	}],
+	['bigint', {
+		is: is.bigint,
+		fixtures: [
+			1n,
+			0n,
+			-0n,
+			// eslint-disable-next-line new-cap
+			BigInt('1234')
+		],
+		typename: TypeName.bigint
 	}],
 	['boolean', {
 		is: is.boolean,
@@ -310,6 +320,20 @@ const types = new Map<string, Test>([
 			new Float64Array()
 		],
 		typename: TypeName.Float64Array
+	}],
+	['bigint64Array', {
+		is: is.bigint64Array,
+		fixtures: [
+			new BigInt64Array()
+		],
+		typename: TypeName.BigInt64Array
+	}],
+	['biguint64Array', {
+		is: is.biguint64Array,
+		fixtures: [
+			new BigUint64Array()
+		],
+		typename: TypeName.BigUint64Array
 	}],
 	['arrayBuffer', {
 		is: is.arrayBuffer,

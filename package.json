@@ -11,7 +11,7 @@
 	},
 	"main": "dist",
 	"engines": {
-		"node": ">=8"
+		"node": ">=10"
 	},
 	"scripts": {
 		"build": "del dist && tsc",
@@ -79,6 +79,11 @@
 		"extends": "xo-typescript",
 		"extensions": [
 			"ts"
+		],
+		"globals": [
+			"BigInt",
+			"BigInt64Array",
+			"BigUint64Array"
 		],
 		"rules": {
 			"@typescript-eslint/explicit-function-return-type": "off"
