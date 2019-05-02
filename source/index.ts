@@ -211,12 +211,13 @@ const primitiveTypeOfTypes = new Set([
 	'undefined',
 	'string',
 	'number',
+	'bigint',
 	'boolean',
 	'symbol'
 ]);
 
 // TODO: This should be able to be `not object` when the `not` operator is out
-export type Primitive = null | undefined | string | number | boolean | symbol;
+export type Primitive = null | undefined | string | number | bigint | boolean | symbol;
 
 is.primitive = (value: unknown): value is Primitive => is.null_(value) || primitiveTypeOfTypes.has(typeof value);
 
@@ -243,10 +244,12 @@ const typedArrayTypes = new Set([
 	TypeName.Int32Array,
 	TypeName.Uint32Array,
 	TypeName.Float32Array,
-	TypeName.Float64Array
+	TypeName.Float64Array,
+	TypeName.BigInt64Array,
+	TypeName.BigUint64Array
 ]);
 
-export type TypedArray = Int8Array | Uint8Array | Uint8ClampedArray | Int16Array | Uint16Array | Int32Array | Uint32Array | Float32Array | Float64Array;
+export type TypedArray = Int8Array | Uint8Array | Uint8ClampedArray | Int16Array | Uint16Array | Int32Array | Uint32Array | Float32Array | Float64Array | BigInt64Array | BigUint64Array;
 
 is.typedArray = (value: unknown): value is TypedArray => {
 	const objectType = getObjectType(value);
