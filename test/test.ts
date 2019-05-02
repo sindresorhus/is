@@ -492,6 +492,10 @@ test('is.number', t => {
 	testType(t, 'number', ['nan', 'integer', 'safeInteger', 'infinite']);
 });
 
+test('is.bigint', t => {
+	testType(t, 'bigint');
+});
+
 test('is.boolean', t => {
 	testType(t, 'boolean');
 });
@@ -620,6 +624,14 @@ test('is.float64Array', t => {
 	testType(t, 'float64Array');
 });
 
+test('is.bigint64Array', t => {
+	testType(t, 'bigint64Array');
+});
+
+test('is.biguint64Array', t => {
+	testType(t, 'biguint64Array');
+});
+
 test('is.arrayBuffer', t => {
 	testType(t, 'arrayBuffer');
 });
@@ -662,15 +674,22 @@ test('is.truthy', t => {
 	t.true(is.truthy(new Set()));
 	t.true(is.truthy(Symbol('🦄')));
 	t.true(is.truthy(true));
+	t.true(is.truthy(1));
+	t.true(is.truthy(1n));
+	// eslint-disable-next-line new-cap
+	t.true(is.truthy(BigInt(1)));
 });
 
 test('is.falsy', t => {
 	t.true(is.falsy(false));
 	t.true(is.falsy(0));
+	t.true(is.falsy(0n));
 	t.true(is.falsy(''));
 	t.true(is.falsy(null));
 	t.true(is.falsy(undefined));
 	t.true(is.falsy(NaN));
+	// eslint-disable-next-line new-cap
+	t.true(is.falsy(BigInt(0)));
 });
 
 test('is.nan', t => {
@@ -687,6 +706,7 @@ test('is.primitive', t => {
 		null,
 		'🦄',
 		6,
+		6n,
 		Infinity,
 		-Infinity,
 		true,
@@ -763,7 +783,9 @@ test('is.typedArray', t => {
 		new Int32Array(),
 		new Uint32Array(),
 		new Float32Array(),
-		new Float64Array()
+		new Float64Array(),
+		new BigInt64Array(),
+		new BigUint64Array()
 	];
 
 	for (const item of typedArrays) {
