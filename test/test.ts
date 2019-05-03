@@ -68,17 +68,18 @@ const types = new Map<string, Test>([
 		],
 		typename: TypeName.number
 	}],
-	['bigint', {
-		is: is.bigint,
-		fixtures: [
-			1n,
-			0n,
-			-0n,
-			// eslint-disable-next-line new-cap
-			BigInt('1234')
-		],
-		typename: TypeName.bigint
-	}],
+	// TODO: Nodejs 10 only
+	// ['bigint', {
+	// 	is: is.bigint,
+	// 	fixtures: [
+	// 		1n,
+	// 		0n,
+	// 		-0n,
+	// 		// eslint-disable-next-line new-cap
+	// 		BigInt('1234')
+	// 	],
+	// 	typename: TypeName.bigint
+	// }],
 	['boolean', {
 		is: is.boolean,
 		fixtures: [
@@ -321,20 +322,21 @@ const types = new Map<string, Test>([
 		],
 		typename: TypeName.Float64Array
 	}],
-	['bigint64Array', {
-		is: is.bigint64Array,
-		fixtures: [
-			new BigInt64Array()
-		],
-		typename: TypeName.BigInt64Array
-	}],
-	['biguint64Array', {
-		is: is.biguint64Array,
-		fixtures: [
-			new BigUint64Array()
-		],
-		typename: TypeName.BigUint64Array
-	}],
+	// TODO: Nodejs 10 only
+	// ['bigint64Array', {
+	// 	is: is.bigint64Array,
+	// 	fixtures: [
+	// 		new BigInt64Array()
+	// 	],
+	// 	typename: TypeName.BigInt64Array
+	// }],
+	// ['biguint64Array', {
+	// 	is: is.biguint64Array,
+	// 	fixtures: [
+	// 		new BigUint64Array()
+	// 	],
+	// 	typename: TypeName.BigUint64Array
+	// }],
 	['arrayBuffer', {
 		is: is.arrayBuffer,
 		fixtures: [
@@ -492,9 +494,10 @@ test('is.number', t => {
 	testType(t, 'number', ['nan', 'integer', 'safeInteger', 'infinite']);
 });
 
-test('is.bigint', t => {
-	testType(t, 'bigint');
-});
+// TODO: Nodejs 10 only
+// test('is.bigint', t => {
+// 	testType(t, 'bigint');
+// });
 
 test('is.boolean', t => {
 	testType(t, 'boolean');
@@ -624,13 +627,14 @@ test('is.float64Array', t => {
 	testType(t, 'float64Array');
 });
 
-test('is.bigint64Array', t => {
-	testType(t, 'bigint64Array');
-});
+// TODO: Nodejs 10 only
+// test('is.bigint64Array', t => {
+// 	testType(t, 'bigint64Array');
+// });
 
-test('is.biguint64Array', t => {
-	testType(t, 'biguint64Array');
-});
+// test('is.biguint64Array', t => {
+// 	testType(t, 'biguint64Array');
+// });
 
 test('is.arrayBuffer', t => {
 	testType(t, 'arrayBuffer');
@@ -675,21 +679,29 @@ test('is.truthy', t => {
 	t.true(is.truthy(Symbol('🦄')));
 	t.true(is.truthy(true));
 	t.true(is.truthy(1));
-	t.true(is.truthy(1n));
-	// eslint-disable-next-line new-cap
-	t.true(is.truthy(BigInt(1)));
+
+	// TODO: Nodejs 10 only
+	// if (isNode10orHigher) {
+	// 	t.true(is.truthy(1n));
+	// 	// eslint-disable-next-line new-cap
+	// 	t.true(is.truthy(BigInt(1)));
+	// }
 });
 
 test('is.falsy', t => {
 	t.true(is.falsy(false));
 	t.true(is.falsy(0));
-	t.true(is.falsy(0n));
 	t.true(is.falsy(''));
 	t.true(is.falsy(null));
 	t.true(is.falsy(undefined));
 	t.true(is.falsy(NaN));
-	// eslint-disable-next-line new-cap
-	t.true(is.falsy(BigInt(0)));
+
+	// TODO: Nodejs 10 only
+	// if (isNode10orHigher) {
+	// 	t.true(is.falsy(0n));
+	// 	// eslint-disable-next-line new-cap
+	// 	t.true(is.falsy(BigInt(0)));
+	// }
 });
 
 test('is.nan', t => {
@@ -706,13 +718,17 @@ test('is.primitive', t => {
 		null,
 		'🦄',
 		6,
-		6n,
 		Infinity,
 		-Infinity,
 		true,
 		false,
 		Symbol('🦄')
 	];
+
+	// TODO: Nodejs 10 only
+	// if (isNode10orHigher) {
+	// 	primitives.push(6n);
+	// }
 
 	for (const el of primitives) {
 		t.true(is.primitive(el));
@@ -783,10 +799,16 @@ test('is.typedArray', t => {
 		new Int32Array(),
 		new Uint32Array(),
 		new Float32Array(),
-		new Float64Array(),
-		new BigInt64Array(),
-		new BigUint64Array()
+		new Float64Array()
 	];
+
+	// TODO: Nodejs 10 only
+	// if (isNode10orHigher) {
+	// 	typedArrays.push(
+	// 		new BigInt64Array(),
+	// 		new BigUint64Array()
+	// 	);
+	// }
 
 	for (const item of typedArrays) {
 		t.true(is.typedArray(item));
