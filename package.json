@@ -11,7 +11,7 @@
 	},
 	"main": "dist",
 	"engines": {
-		"node": ">=10"
+		"node": ">=8"
 	},
 	"scripts": {
 		"build": "del dist && tsc",
