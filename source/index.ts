@@ -1,6 +1,10 @@
 /// <reference lib="esnext"/>
 /// <reference lib="dom"/>
 
+// TODO: Use the `URL` global when targeting Node.js 10
+// eslint-disable-next-line @typescript-eslint/no-require-imports
+const URLGlobal = typeof URL === 'undefined' ? require('url').URL : URL;
+
 export type Class<T = unknown> = new (...args: any[]) => T;
 
 export const enum TypeName {
@@ -192,7 +196,7 @@ is.urlString = (value: unknown): value is string => {
 	}
 
 	try {
-		new URL(value); // eslint-disable-line no-new
+		new URLGlobal(value); // eslint-disable-line no-new
 		return true;
 	} catch {
 		return false;
