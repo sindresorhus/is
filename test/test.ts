@@ -2,6 +2,8 @@ import fs from 'fs';
 import net from 'net';
 import Stream from 'stream';
 import util from 'util';
+// eslint-disable-next-line @typescript-eslint/no-require-imports
+const URLGlobal = typeof URL === 'undefined' ? require('url').URL : URL;
 import tempy from 'tempy';
 import test, {ExecutionContext} from 'ava';
 import {JSDOM} from 'jsdom';
@@ -656,7 +658,7 @@ test('is.directInstanceOf', t => {
 });
 
 test('is.urlInstance', t => {
-	const url = new URL('https://example.com');
+	const url = new URLGlobal('https://example.com');
 	t.true(is.urlInstance(url));
 	t.false(is.urlInstance({}));
 	t.false(is.urlInstance(undefined));
@@ -666,7 +668,7 @@ test('is.urlInstance', t => {
 test('is.urlString', t => {
 	const url = 'https://example.com';
 	t.true(is.urlString(url));
-	t.false(is.urlString(new URL(url)));
+	t.false(is.urlString(new URLGlobal(url)));
 	t.false(is.urlString({}));
 	t.false(is.urlString(undefined));
 	t.false(is.urlString(null));
