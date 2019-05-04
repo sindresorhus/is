@@ -80,6 +80,11 @@
 		"extensions": [
 			"ts"
 		],
+		"globals": [
+			"BigInt",
+			"BigInt64Array",
+			"BigUint64Array"
+		],
 		"rules": {
 			"@typescript-eslint/explicit-function-return-type": "off"
 		}

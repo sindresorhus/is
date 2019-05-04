@@ -1,5 +1,4 @@
-/// <reference lib="es2017"/>
-/// <reference lib="esnext.asynciterable"/>
+/// <reference lib="esnext"/>
 /// <reference lib="dom"/>
 
 // TODO: Use the `URL` global when targeting Node.js 10
@@ -14,6 +13,7 @@ export const enum TypeName {
 	undefined = 'undefined',
 	string = 'string',
 	number = 'number',
+	bigint = 'bigint',
 	symbol = 'symbol',
 	Function = 'Function',
 	Generator = 'Generator',
@@ -39,6 +39,8 @@ export const enum TypeName {
 	Uint32Array = 'Uint32Array',
 	Float32Array = 'Float32Array',
 	Float64Array = 'Float64Array',
+	BigInt64Array = 'BigInt64Array',
+	BigUint64Array = 'BigUint64Array',
 	ArrayBuffer = 'ArrayBuffer',
 	SharedArrayBuffer = 'SharedArrayBuffer',
 	DataView = 'DataView',
@@ -77,6 +79,8 @@ function is(value: unknown): TypeName {
 			return TypeName.string;
 		case 'number':
 			return TypeName.number;
+		case 'bigint':
+			return TypeName.bigint;
 		case 'symbol':
 			return TypeName.symbol;
 		default:
@@ -115,6 +119,7 @@ const isObject = (value: unknown): value is object => typeof value === 'object';
 is.undefined = isOfType<undefined>('undefined');
 is.string = isOfType<string>('string');
 is.number = isOfType<number>('number');
+is.bigint = isOfType<bigint>('bigint');
 
 // eslint-disable-next-line @typescript-eslint/ban-types
 is.function_ = isOfType<Function>('function');
@@ -175,6 +180,8 @@ is.int32Array = isObjectOfType<Int32Array>(TypeName.Int32Array);
 is.uint32Array = isObjectOfType<Uint32Array>(TypeName.Uint32Array);
 is.float32Array = isObjectOfType<Float32Array>(TypeName.Float32Array);
 is.float64Array = isObjectOfType<Float64Array>(TypeName.Float64Array);
+is.bigint64Array = isObjectOfType<BigInt64Array>(TypeName.BigInt64Array);
+is.biguint64Array = isObjectOfType<BigUint64Array>(TypeName.BigUint64Array);
 
 is.arrayBuffer = isObjectOfType<ArrayBuffer>(TypeName.ArrayBuffer);
 is.sharedArrayBuffer = isObjectOfType<SharedArrayBuffer>(TypeName.SharedArrayBuffer);
@@ -208,12 +215,13 @@ const primitiveTypeOfTypes = new Set([
 	'undefined',
 	'string',
 	'number',
+	'bigint',
 	'boolean',
 	'symbol'
 ]);
 
 // TODO: This should be able to be `not object` when the `not` operator is out
-export type Primitive = null | undefined | string | number | boolean | symbol;
+export type Primitive = null | undefined | string | number | bigint | boolean | symbol;
 
 is.primitive = (value: unknown): value is Primitive => is.null_(value) || primitiveTypeOfTypes.has(typeof value);
 
@@ -240,10 +248,12 @@ const typedArrayTypes = new Set([
 	TypeName.Int32Array,
 	TypeName.Uint32Array,
 	TypeName.Float32Array,
-	TypeName.Float64Array
+	TypeName.Float64Array,
+	TypeName.BigInt64Array,
+	TypeName.BigUint64Array
 ]);
 
-export type TypedArray = Int8Array | Uint8Array | Uint8ClampedArray | Int16Array | Uint16Array | Int32Array | Uint32Array | Float32Array | Float64Array;
+export type TypedArray = Int8Array | Uint8Array | Uint8ClampedArray | Int16Array | Uint16Array | Int32Array | Uint32Array | Float32Array | Float64Array | BigInt64Array | BigUint64Array;
 
 is.typedArray = (value: unknown): value is TypedArray => {
 	const objectType = getObjectType(value);
