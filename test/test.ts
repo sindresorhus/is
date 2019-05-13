@@ -326,15 +326,15 @@ const types = new Map<string, Test>([
 		typename: TypeName.Float64Array
 	}],
 	// TODO: Nodejs 10 only
-	// ['bigint64Array', {
-	// 	is: is.bigint64Array,
+	// ['bigInt64Array', {
+	// 	is: is.bigInt64Array,
 	// 	fixtures: [
 	// 		new BigInt64Array()
 	// 	],
 	// 	typename: TypeName.BigInt64Array
 	// }],
-	// ['biguint64Array', {
-	// 	is: is.biguint64Array,
+	// ['bigUint64Array', {
+	// 	is: is.bigUint64Array,
 	// 	fixtures: [
 	// 		new BigUint64Array()
 	// 	],
@@ -631,12 +631,12 @@ test('is.float64Array', t => {
 });
 
 // TODO: Nodejs 10 only
-// test('is.bigint64Array', t => {
-// 	testType(t, 'bigint64Array');
+// test('is.bigInt64Array', t => {
+// 	testType(t, 'bigInt64Array');
 // });
 
-// test('is.biguint64Array', t => {
-// 	testType(t, 'biguint64Array');
+// test('is.bigUint64Array', t => {
+// 	testType(t, 'bigUint64Array');
 // });
 
 test('is.arrayBuffer', t => {

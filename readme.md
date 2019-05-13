@@ -70,6 +70,7 @@ All the below methods accept a value and returns a boolean for whether the value
 ##### .number(value)
 ##### .boolean(value)
 ##### .symbol(value)
+##### .bigint(value)
 
 #### Built-in types
 
@@ -143,6 +144,8 @@ is.boundFunction(function () {});
 ##### .uint32Array(value)
 ##### .float32Array(value)
 ##### .float64Array(value)
+##### .bigInt64Array(value)
+##### .bigUint64Array(value)
 
 #### Structured data
 

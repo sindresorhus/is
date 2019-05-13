@@ -180,8 +180,8 @@ is.int32Array = isObjectOfType<Int32Array>(TypeName.Int32Array);
 is.uint32Array = isObjectOfType<Uint32Array>(TypeName.Uint32Array);
 is.float32Array = isObjectOfType<Float32Array>(TypeName.Float32Array);
 is.float64Array = isObjectOfType<Float64Array>(TypeName.Float64Array);
-is.bigint64Array = isObjectOfType<BigInt64Array>(TypeName.BigInt64Array);
-is.biguint64Array = isObjectOfType<BigUint64Array>(TypeName.BigUint64Array);
+is.bigInt64Array = isObjectOfType<BigInt64Array>(TypeName.BigInt64Array);
+is.bigUint64Array = isObjectOfType<BigUint64Array>(TypeName.BigUint64Array);
 
 is.arrayBuffer = isObjectOfType<ArrayBuffer>(TypeName.ArrayBuffer);
 is.sharedArrayBuffer = isObjectOfType<SharedArrayBuffer>(TypeName.SharedArrayBuffer);
