@@ -387,6 +387,6 @@ Object.defineProperties(is, {
 
 // ES module compatibility
 // TODO: Remove this for the next major release
-is.default = is; 
+is.default = is;
 
 export = is;
