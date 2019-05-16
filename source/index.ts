@@ -389,4 +389,4 @@ export = is;
 
 // ES module compatibility
 // TODO: Remove this for the next major release
-exports default is;
+export default is;
