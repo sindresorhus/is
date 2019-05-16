@@ -385,5 +385,8 @@ Object.defineProperties(is, {
 	}
 });
 
-module.exports = is; // For CommonJS default export support
-export default is;
+// ES module compatibility
+// TODO: Remove this for the next major release
+is.default = is; 
+
+export = is;
