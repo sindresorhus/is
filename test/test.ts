@@ -7,7 +7,7 @@ import test, {ExecutionContext} from 'ava';
 import {JSDOM} from 'jsdom';
 import {Subject, Observable} from 'rxjs';
 import ZenObservable from 'zen-observable';
-import is, {TypeName} from '../source';
+import is, {TypeName} = require('../source');
 
 // eslint-disable-next-line @typescript-eslint/no-require-imports
 const URLGlobal = typeof URL === 'undefined' ? require('url').URL : URL;
