@@ -7,14 +7,10 @@ import test, {ExecutionContext} from 'ava';
 import {JSDOM} from 'jsdom';
 import {Subject, Observable} from 'rxjs';
 import ZenObservable from 'zen-observable';
-
-// eslint-disable-next-line @typescript-eslint/no-require-imports
-import is = require('../source');
+import is, {TypeName} from '../source'; // eslint-disable-line import/default
 
 // eslint-disable-next-line @typescript-eslint/no-require-imports
 const URLGlobal = typeof URL === 'undefined' ? require('url').URL : URL;
-
-const {TypeName} = is;
 
 const isNode10orHigher = Number(process.versions.node.split('.')[0]) >= 10;
 
