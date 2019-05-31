@@ -68,6 +68,9 @@ All the below methods accept a value and returns a boolean for whether the value
 ##### .null(value)
 ##### .string(value)
 ##### .number(value)
+
+Note: `is.number(NaN)` returns `false`.
+
 ##### .boolean(value)
 ##### .symbol(value)
 ##### .bigint(value)
