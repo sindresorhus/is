@@ -118,7 +118,10 @@ const isObject = (value: unknown): value is object => typeof value === 'object';
 
 is.undefined = isOfType<undefined>('undefined');
 is.string = isOfType<string>('string');
-is.number = (value: unknown): value is number => isOfType<number>('number')(value) && !is.nan(value);
+
+const isNumberType = isOfType<number>('number');
+is.number = (value: unknown): value is number => isNumberType(value) && !is.nan(value);
+
 is.bigint = isOfType<bigint>('bigint');
 
 // eslint-disable-next-line @typescript-eslint/ban-types
