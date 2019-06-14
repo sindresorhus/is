@@ -1,15 +1,14 @@
-import fs from 'fs';
-import net from 'net';
-import Stream from 'stream';
-import util from 'util';
-import tempy from 'tempy';
+import fs = require('fs');
+import net = require('net');
+import Stream = require('stream');
+import {inspect} from 'util';
+import tempy = require('tempy');
 import test, {ExecutionContext} from 'ava';
 import {JSDOM} from 'jsdom';
 import {Subject, Observable} from 'rxjs';
-import ZenObservable from 'zen-observable';
+import ZenObservable = require('zen-observable');
 import is, {TypeName} from '../source';
 
-// eslint-disable-next-line @typescript-eslint/no-require-imports
 const URLGlobal = typeof URL === 'undefined' ? require('url').URL : URL;
 
 const isNode10orHigher = Number(process.versions.node.split('.')[0]) >= 10;
@@ -472,7 +471,7 @@ const testType = (t: ExecutionContext, type: string, exclude?: string[]) => {
 		const assert = isTypeUnderTest ? t.true.bind(t) : t.false.bind(t);
 
 		for (const fixture of fixtures) {
-			assert(testIs(fixture), `Value: ${util.inspect(fixture)}`);
+			assert(testIs(fixture), `Value: ${inspect(fixture)}`);
 
 			if (isTypeUnderTest && typename) {
 				t.is(is(fixture), typename);

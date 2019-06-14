@@ -2,7 +2,6 @@
 /// <reference lib="dom"/>
 
 // TODO: Use the `URL` global when targeting Node.js 10
-// eslint-disable-next-line @typescript-eslint/no-require-imports
 const URLGlobal = typeof URL === 'undefined' ? require('url').URL : URL;
 
 export type Class<T = unknown> = new (...args: any[]) => T;
