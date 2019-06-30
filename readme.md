@@ -86,7 +86,7 @@ Keep in mind that [functions are objects too](https://developer.mozilla.org/en-U
 
 ##### .numericString(value)
 
-Returns `true` for a string that represents a number satisfying `is.number`.
+Returns `true` for a string that represents a number satisfying `is.number`, for example, `'42'` and `'-8.3'`.
 
 Note: `'NaN'` returns `false`, but `'Infinity'` and `'-Infinity'` return `true`.
 
