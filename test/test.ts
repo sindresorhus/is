@@ -493,7 +493,7 @@ test('is.string', t => {
 });
 
 test('is.number', t => {
-	testType(t, 'number', ['nan', 'integer', 'safeInteger', 'infinite']);
+	testType(t, 'number', ['integer', 'safeInteger', 'infinite']);
 });
 
 // TODO: Nodejs 10 only

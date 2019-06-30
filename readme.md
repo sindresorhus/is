@@ -68,6 +68,9 @@ All the below methods accept a value and returns a boolean for whether the value
 ##### .null(value)
 ##### .string(value)
 ##### .number(value)
+
+Note: `is.number(NaN)` returns `false`. This intentionally deviates from `typeof` behavior to increase user-friendliness of `is` type checks.
+
 ##### .boolean(value)
 ##### .symbol(value)
 ##### .bigint(value)
@@ -83,7 +86,7 @@ Keep in mind that [functions are objects too](https://developer.mozilla.org/en-U
 
 ##### .numericString(value)
 
-Returns `true` for a string that represents a number. For example, `'42'` and `'-8'`.
+Returns `true` for a string that represents a number satisfying `is.number`, for example, `'42'` and `'-8.3'`.
 
 Note: `'NaN'` returns `false`, but `'Infinity'` and `'-Infinity'` return `true`.
 
