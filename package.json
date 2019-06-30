@@ -47,18 +47,18 @@
 	],
 	"devDependencies": {
 		"@sindresorhus/tsconfig": "^0.4.0",
-		"@types/jsdom": "^12.2.3",
-		"@types/node": "^12.0.0",
+		"@types/jsdom": "^12.2.4",
+		"@types/node": "^12.0.10",
 		"@types/zen-observable": "^0.8.0",
-		"@typescript-eslint/eslint-plugin": "^1.5.0",
-		"@typescript-eslint/parser": "^1.10.2",
+		"@typescript-eslint/eslint-plugin": "^1.11.0",
+		"@typescript-eslint/parser": "^1.11.0",
 		"ava": "^2.1.0",
 		"del-cli": "^2.0.0",
-		"eslint-config-xo-typescript": "^0.14.0",
+		"eslint-config-xo-typescript": "^0.15.0",
 		"jsdom": "^15.0.0",
 		"rxjs": "^6.4.0",
 		"tempy": "^0.3.0",
-		"ts-node": "^8.0.3",
+		"ts-node": "^8.3.0",
 		"typescript": "^3.4.1",
 		"xo": "^0.24.0",
 		"zen-observable": "^0.8.8"
@@ -88,6 +88,8 @@
 		"rules": {
 			"import/first": "off",
 			"import/newline-after-import": "off",
+			"@typescript-eslint/promise-function-async": "off",
+			"@typescript-eslint/no-empty-function": "off",
 			"@typescript-eslint/explicit-function-return-type": "off"
 		}
 	}

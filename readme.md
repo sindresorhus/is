@@ -458,13 +458,8 @@ The most common mistakes I noticed in these modules was using `instanceof` for t
 - [has-emoji](https://github.com/sindresorhus/has-emoji) - Check whether a string has any emoji
 
 
-## Created by
+## Maintainers
 
 - [Sindre Sorhus](https://github.com/sindresorhus)
 - [Giora Guttsait](https://github.com/gioragutt)
 - [Brandon Smith](https://github.com/brandon93s)
-
-
-## License
-
-MIT
