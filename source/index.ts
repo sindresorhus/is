@@ -113,8 +113,6 @@ function is(value: unknown): TypeName {
 	return TypeName.Object;
 }
 
-const isObject = (value: unknown): value is object => typeof value === 'object';
-
 is.undefined = isOfType<undefined>('undefined');
 is.string = isOfType<string>('string');
 
@@ -138,7 +136,7 @@ is.array = Array.isArray;
 is.buffer = (value: unknown): value is Buffer => !is.nullOrUndefined(value) && !is.nullOrUndefined((value as Buffer).constructor) && is.function_((value as Buffer).constructor.isBuffer) && (value as Buffer).constructor.isBuffer(value);
 
 is.nullOrUndefined = (value: unknown): value is null | undefined => is.null_(value) || is.undefined(value);
-is.object = (value: unknown): value is object => !is.nullOrUndefined(value) && (is.function_(value) || isObject(value));
+is.object = (value: unknown): value is object => !is.null_(value) && (typeof value === 'object' || is.function_(value));
 is.iterable = (value: unknown): value is IterableIterator<unknown> => !is.nullOrUndefined(value) && is.function_((value as IterableIterator<unknown>)[Symbol.iterator]);
 
 is.asyncIterable = (value: unknown): value is AsyncIterableIterator<unknown> => !is.nullOrUndefined(value) && is.function_((value as AsyncIterableIterator<unknown>)[Symbol.asyncIterator]);
@@ -149,8 +147,7 @@ is.nativePromise = (value: unknown): value is Promise<unknown> =>
 	isObjectOfType<Promise<unknown>>(TypeName.Promise)(value);
 
 const hasPromiseAPI = (value: unknown): value is Promise<unknown> =>
-	!is.null_(value) &&
-	isObject(value) as unknown &&
+	is.object(value) &&
 	is.function_((value as Promise<unknown>).then) && // eslint-disable-line promise/prefer-await-to-then
 	is.function_((value as Promise<unknown>).catch);
 
@@ -322,7 +319,7 @@ is.observable = (value: unknown): value is ObservableLike => {
 // eslint-disable-next-line @typescript-eslint/ban-types
 export type NodeStream = object & {readonly pipe: Function};
 
-is.nodeStream = (value: unknown): value is NodeStream => !is.nullOrUndefined(value) && isObject(value) as unknown && is.function_((value as NodeStream).pipe) && !is.observable(value);
+is.nodeStream = (value: unknown): value is NodeStream => is.object(value) && is.function_((value as NodeStream).pipe) && !is.observable(value);
 
 is.infinite = (value: unknown): value is number => value === Infinity || value === -Infinity;
 
