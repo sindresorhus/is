@@ -1,6 +1,3 @@
-/// <reference lib="esnext"/>
-/// <reference lib="dom"/>
-
 // TODO: Use the `URL` global when targeting Node.js 10
 const URLGlobal = typeof URL === 'undefined' ? require('url').URL : URL;
 
