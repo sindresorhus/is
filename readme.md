@@ -463,3 +463,16 @@ The most common mistakes I noticed in these modules was using `instanceof` for t
 - [Sindre Sorhus](https://github.com/sindresorhus)
 - [Giora Guttsait](https://github.com/gioragutt)
 - [Brandon Smith](https://github.com/brandon93s)
+
+
+---
+
+<div align="center">
+	<b>
+		<a href="https://tidelift.com/subscription/pkg/npm--sindresorhus-is?utm_source=npm--sindresorhus-is&utm_medium=referral&utm_campaign=readme">Get professional support for this package with a Tidelift subscription</a>
+	</b>
+	<br>
+	<sub>
+		Tidelift helps make open source sustainable for maintainers while giving companies<br>assurances about security, maintenance, and licensing for their dependencies.
+	</sub>
+</div>
