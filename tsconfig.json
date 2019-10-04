@@ -4,7 +4,8 @@
 		"outDir": "dist",
 		"target": "es2017",
 		"lib": [
-			"esnext"
+			"esnext",
+			"dom"
 		]
 	},
 	"include": [

@@ -1,46 +1,5 @@
 /// <reference lib="esnext"/>
-
-/* -- Copy-pasted DOM types -- */
-// TODO: Remove these when https://github.com/microsoft/TypeScript/issues/33111 is fixed.
-interface URLSearchParams {
-	append(name: string, value: string): void;
-	delete(name: string): void;
-	get(name: string): string | null;
-	getAll(name: string): string[];
-	has(name: string): boolean;
-	set(name: string, value: string): void;
-	sort(): void;
-	forEach(callbackfn: (value: string, key: string, parent: URLSearchParams) => void, thisArg?: any): void;
-}
-
-declare var URLSearchParams: { // eslint-disable-line no-var
-	prototype: URLSearchParams;
-	new(init?: string[][] | Record<string, string> | string | URLSearchParams): URLSearchParams;
-};
-
-interface URL {
-	hash: string;
-	host: string;
-	hostname: string;
-	href: string;
-	readonly origin: string;
-	password: string;
-	pathname: string;
-	port: string;
-	protocol: string;
-	search: string;
-	readonly searchParams: URLSearchParams;
-	username: string;
-	toJSON(): string;
-}
-
-declare var URL: { // eslint-disable-line no-var
-	prototype: URL;
-	new(url: string, base?: string | URL): URL;
-	createObjectURL(object: any): string;
-	revokeObjectURL(url: string): void;
-};
-/* ---- */
+/// <reference lib="dom"/>
 
 // TODO: Use the `URL` global when targeting Node.js 10
 const URLGlobal = typeof URL === 'undefined' ? require('url').URL : URL;
