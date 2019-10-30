@@ -444,6 +444,13 @@ For the ones I found, pick 3 of these.
 The most common mistakes I noticed in these modules was using `instanceof` for type checking, forgetting that functions are objects, and omitting `symbol` as a primitive.
 
 
+## For enterprise
+
+Available as part of the Tidelift Subscription.
+
+The maintainers of @sindresorhus/is and thousands of other packages are working with Tidelift to deliver commercial support and maintenance for the open source dependencies you use to build your applications. Save time, reduce risk, and improve code health, while paying the maintainers of the exact dependencies you use. [Learn more.](https://tidelift.com/subscription/pkg/npm--sindresorhus-is?utm_source=npm-sindresorhus-is&utm_medium=referral&utm_campaign=enterprise&utm_term=repo)
+
+
 ## Related
 
 - [ow](https://github.com/sindresorhus/ow) - Function argument validation for humans
@@ -463,16 +470,3 @@ The most common mistakes I noticed in these modules was using `instanceof` for t
 - [Sindre Sorhus](https://github.com/sindresorhus)
 - [Giora Guttsait](https://github.com/gioragutt)
 - [Brandon Smith](https://github.com/brandon93s)
-
-
----
-
-<div align="center">
-	<b>
-		<a href="https://tidelift.com/subscription/pkg/npm--sindresorhus-is?utm_source=npm--sindresorhus-is&utm_medium=referral&utm_campaign=readme">Get professional support for this package with a Tidelift subscription</a>
-	</b>
-	<br>
-	<sub>
-		Tidelift helps make open source sustainable for maintainers while giving companies<br>assurances about security, maintenance, and licensing for their dependencies.
-	</sub>
-</div>
