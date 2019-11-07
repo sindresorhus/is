@@ -1,8 +1,5 @@
-/// <reference lib="esnext"/>
+/// <reference lib="es2018"/>
 /// <reference lib="dom"/>
-
-// TODO: Use the `URL` global when targeting Node.js 10
-const URLGlobal = typeof URL === 'undefined' ? require('url').URL : URL;
 
 export type Class<T = unknown> = new (...args: any[]) => T;
 
@@ -194,7 +191,7 @@ is.urlString = (value: unknown): value is string => {
 	}
 
 	try {
-		new URLGlobal(value); // eslint-disable-line no-new
+		new URL(value); // eslint-disable-line no-new
 		return true;
 	} catch {
 		return false;
@@ -219,7 +216,14 @@ const primitiveTypeOfTypes = new Set([
 ]);
 
 // TODO: This should be able to be `not object` when the `not` operator is out
-export type Primitive = null | undefined | string | number | bigint | boolean | symbol;
+export type Primitive =
+	| null
+	| undefined
+	| string
+	| number
+	| bigint
+	| boolean
+	| symbol;
 
 is.primitive = (value: unknown): value is Primitive => is.null_(value) || primitiveTypeOfTypes.has(typeof value);
 
@@ -251,7 +255,18 @@ const typedArrayTypes = new Set([
 	TypeName.BigUint64Array
 ]);
 
-export type TypedArray = Int8Array | Uint8Array | Uint8ClampedArray | Int16Array | Uint16Array | Int32Array | Uint32Array | Float32Array | Float64Array | BigInt64Array | BigUint64Array;
+export type TypedArray =
+	| Int8Array
+	| Uint8Array
+	| Uint8ClampedArray
+	| Int16Array
+	| Uint16Array
+	| Int32Array
+	| Uint32Array
+	| Float32Array
+	| Float64Array
+	| BigInt64Array
+	| BigUint64Array;
 
 is.typedArray = (value: unknown): value is TypedArray => {
 	const objectType = getObjectType(value);

@@ -2,9 +2,9 @@
 	"extends": "@sindresorhus/tsconfig",
 	"compilerOptions": {
 		"outDir": "dist",
-		"target": "es2017",
+		"target": "es2018",
 		"lib": [
-			"esnext",
+			"es2018",
 			"dom"
 		]
 	},

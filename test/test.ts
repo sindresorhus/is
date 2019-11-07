@@ -9,10 +9,6 @@ import {Subject, Observable} from 'rxjs';
 import ZenObservable = require('zen-observable');
 import is, {TypeName} from '../source';
 
-const URLGlobal = typeof URL === 'undefined' ? require('url').URL : URL;
-
-const isNode10orHigher = Number(process.versions.node.split('.')[0]) >= 10;
-
 class PromiseSubclassFixture<T> extends Promise<T> {}
 class ErrorSubclassFixture extends Error {}
 
@@ -70,18 +66,17 @@ const types = new Map<string, Test>([
 		],
 		typename: TypeName.number
 	}],
-	// TODO: Nodejs 10 only
-	// ['bigint', {
-	// 	is: is.bigint,
-	// 	fixtures: [
-	// 		1n,
-	// 		0n,
-	// 		-0n,
-	// 		// eslint-disable-next-line new-cap
-	// 		BigInt('1234')
-	// 	],
-	// 	typename: TypeName.bigint
-	// }],
+	['bigint', {
+		is: is.bigint,
+		fixtures: [
+			// Disabled until TS supports it for an ESnnnn target.
+			// 1n,
+			// 0n,
+			// -0n,
+			BigInt('1234')
+		],
+		typename: TypeName.bigint
+	}],
 	['boolean', {
 		is: is.boolean,
 		fixtures: [
@@ -151,7 +146,7 @@ const types = new Map<string, Test>([
 		is: is.regExp,
 		fixtures: [
 			/\w/,
-			new RegExp('\\w')
+			new RegExp('\\w') // eslint-disable-line prefer-regex-literals
 		],
 		typename: TypeName.RegExp
 	}],
@@ -324,21 +319,20 @@ const types = new Map<string, Test>([
 		],
 		typename: TypeName.Float64Array
 	}],
-	// TODO: Nodejs 10 only
-	// ['bigInt64Array', {
-	// 	is: is.bigInt64Array,
-	// 	fixtures: [
-	// 		new BigInt64Array()
-	// 	],
-	// 	typename: TypeName.BigInt64Array
-	// }],
-	// ['bigUint64Array', {
-	// 	is: is.bigUint64Array,
-	// 	fixtures: [
-	// 		new BigUint64Array()
-	// 	],
-	// 	typename: TypeName.BigUint64Array
-	// }],
+	['bigInt64Array', {
+		is: is.bigInt64Array,
+		fixtures: [
+			new BigInt64Array()
+		],
+		typename: TypeName.BigInt64Array
+	}],
+	['bigUint64Array', {
+		is: is.bigUint64Array,
+		fixtures: [
+			new BigUint64Array()
+		],
+		typename: TypeName.BigUint64Array
+	}],
 	['arrayBuffer', {
 		is: is.arrayBuffer,
 		fixtures: [
@@ -496,10 +490,9 @@ test('is.number', t => {
 	testType(t, 'number', ['integer', 'safeInteger', 'infinite']);
 });
 
-// TODO: Nodejs 10 only
-// test('is.bigint', t => {
-// 	testType(t, 'bigint');
-// });
+test('is.bigint', t => {
+	testType(t, 'bigint');
+});
 
 test('is.boolean', t => {
 	testType(t, 'boolean');
@@ -629,14 +622,13 @@ test('is.float64Array', t => {
 	testType(t, 'float64Array');
 });
 
-// TODO: Nodejs 10 only
-// test('is.bigInt64Array', t => {
-// 	testType(t, 'bigInt64Array');
-// });
+test('is.bigInt64Array', t => {
+	testType(t, 'bigInt64Array');
+});
 
-// test('is.bigUint64Array', t => {
-// 	testType(t, 'bigUint64Array');
-// });
+test('is.bigUint64Array', t => {
+	testType(t, 'bigUint64Array');
+});
 
 test('is.arrayBuffer', t => {
 	testType(t, 'arrayBuffer');
@@ -658,7 +650,7 @@ test('is.directInstanceOf', t => {
 });
 
 test('is.urlInstance', t => {
-	const url = new URLGlobal('https://example.com');
+	const url = new URL('https://example.com');
 	t.true(is.urlInstance(url));
 	t.false(is.urlInstance({}));
 	t.false(is.urlInstance(undefined));
@@ -668,7 +660,7 @@ test('is.urlInstance', t => {
 test('is.urlString', t => {
 	const url = 'https://example.com';
 	t.true(is.urlString(url));
-	t.false(is.urlString(new URLGlobal(url)));
+	t.false(is.urlString(new URL(url)));
 	t.false(is.urlString({}));
 	t.false(is.urlString(undefined));
 	t.false(is.urlString(null));
@@ -681,13 +673,9 @@ test('is.truthy', t => {
 	t.true(is.truthy(Symbol('🦄')));
 	t.true(is.truthy(true));
 	t.true(is.truthy(1));
-
-	// TODO: Nodejs 10 only
-	// if (isNode10orHigher) {
-	// 	t.true(is.truthy(1n));
-	// 	// eslint-disable-next-line new-cap
-	// 	t.true(is.truthy(BigInt(1)));
-	// }
+	// Disabled until TS supports it for an ESnnnn target.
+	// t.true(is.truthy(1n));
+	t.true(is.truthy(BigInt(1)));
 });
 
 test('is.falsy', t => {
@@ -697,13 +685,9 @@ test('is.falsy', t => {
 	t.true(is.falsy(null));
 	t.true(is.falsy(undefined));
 	t.true(is.falsy(NaN));
-
-	// TODO: Nodejs 10 only
-	// if (isNode10orHigher) {
-	// 	t.true(is.falsy(0n));
-	// 	// eslint-disable-next-line new-cap
-	// 	t.true(is.falsy(BigInt(0)));
-	// }
+	// Disabled until TS supports it for an ESnnnn target.
+	// t.true(is.falsy(0n));
+	t.true(is.falsy(BigInt(0)));
 });
 
 test('is.nan', t => {
@@ -725,12 +709,9 @@ test('is.primitive', t => {
 		true,
 		false,
 		Symbol('🦄')
+		// Disabled until TS supports it for an ESnnnn target.
+		// 6n
 	];
-
-	// TODO: Nodejs 10 only
-	// if (isNode10orHigher) {
-	// 	primitives.push(6n);
-	// }
 
 	for (const el of primitives) {
 		t.true(is.primitive(el));
@@ -764,20 +745,18 @@ test('is.iterable', t => {
 	t.false(is.iterable({}));
 });
 
-if (isNode10orHigher) {
-	test('is.asyncIterable', t => {
-		t.true(is.asyncIterable({
-			[Symbol.asyncIterator]: () => {}
-		}));
+test('is.asyncIterable', t => {
+	t.true(is.asyncIterable({
+		[Symbol.asyncIterator]: () => {}
+	}));
 
-		t.false(is.asyncIterable(null));
-		t.false(is.asyncIterable(undefined));
-		t.false(is.asyncIterable(0));
-		t.false(is.asyncIterable(NaN));
-		t.false(is.asyncIterable(Infinity));
-		t.false(is.asyncIterable({}));
-	});
-}
+	t.false(is.asyncIterable(null));
+	t.false(is.asyncIterable(undefined));
+	t.false(is.asyncIterable(0));
+	t.false(is.asyncIterable(NaN));
+	t.false(is.asyncIterable(Infinity));
+	t.false(is.asyncIterable({}));
+});
 
 test('is.class', t => {
 	class Foo {} // eslint-disable-line @typescript-eslint/no-extraneous-class
@@ -801,16 +780,10 @@ test('is.typedArray', t => {
 		new Int32Array(),
 		new Uint32Array(),
 		new Float32Array(),
-		new Float64Array()
+		new Float64Array(),
+		new BigInt64Array(),
+		new BigUint64Array()
 	];
-
-	// TODO: Nodejs 10 only
-	// if (isNode10orHigher) {
-	// 	typedArrays.push(
-	// 		new BigInt64Array(),
-	// 		new BigUint64Array()
-	// 	);
-	// }
 
 	for (const item of typedArrays) {
 		t.true(is.typedArray(item));

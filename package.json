@@ -11,7 +11,7 @@
 	},
 	"main": "dist",
 	"engines": {
-		"node": ">=8"
+		"node": ">=10"
 	},
 	"scripts": {
 		"build": "del dist && tsc",
@@ -46,9 +46,9 @@
 		"types"
 	],
 	"devDependencies": {
-		"@sindresorhus/tsconfig": "^0.4.0",
+		"@sindresorhus/tsconfig": "^0.6.0",
 		"@types/jsdom": "^12.2.4",
-		"@types/node": "^12.0.10",
+		"@types/node": "^12.12.6",
 		"@types/zen-observable": "^0.8.0",
 		"@typescript-eslint/eslint-plugin": "^1.11.0",
 		"@typescript-eslint/parser": "^1.11.0",
@@ -60,7 +60,7 @@
 		"tempy": "^0.3.0",
 		"ts-node": "^8.3.0",
 		"typescript": "^3.4.1",
-		"xo": "^0.24.0",
+		"xo": "^0.25.3",
 		"zen-observable": "^0.8.8"
 	},
 	"types": "dist",
@@ -86,8 +86,6 @@
 			"BigUint64Array"
 		],
 		"rules": {
-			"import/first": "off",
-			"import/newline-after-import": "off",
 			"@typescript-eslint/promise-function-async": "off",
 			"@typescript-eslint/no-empty-function": "off",
 			"@typescript-eslint/explicit-function-return-type": "off"
