@@ -152,8 +152,7 @@ is.promise = (value: unknown): value is Promise<unknown> => is.nativePromise(val
 
 is.generatorFunction = isObjectOfType<GeneratorFunction>(TypeName.GeneratorFunction);
 
-// eslint-disable-next-line @typescript-eslint/ban-types
-is.asyncFunction = isObjectOfType<Function>(TypeName.AsyncFunction);
+is.asyncFunction = (value: unknown): value is ((...args: any[]) => Promise<unknown>) => getObjectType(value) === TypeName.AsyncFunction;
 
 // eslint-disable-next-line no-prototype-builtins, @typescript-eslint/ban-types
 is.boundFunction = (value: unknown): value is Function => is.function_(value) && !value.hasOwnProperty('prototype');

@@ -560,6 +560,12 @@ test('is.promise', t => {
 
 test('is.asyncFunction', t => {
 	testType(t, 'asyncFunction', ['function']);
+
+	const fixture = async () => {};
+	if (is.asyncFunction(fixture)) {
+		// eslint-disable-next-line promise/prefer-await-to-then
+		t.true(is.function_(fixture().then));
+	}
 });
 
 test('is.generator', t => {

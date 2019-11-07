@@ -59,7 +59,7 @@
 		"rxjs": "^6.4.0",
 		"tempy": "^0.3.0",
 		"ts-node": "^8.3.0",
-		"typescript": "^3.4.1",
+		"typescript": "^3.7.2",
 		"xo": "^0.25.3",
 		"zen-observable": "^0.8.8"
 	},
