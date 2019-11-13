@@ -1,5 +1,6 @@
 /// <reference lib="es2018"/>
 /// <reference lib="dom"/>
+/// <reference types="node"/>
 
 export type Class<T = unknown> = new (...args: any[]) => T;
 
@@ -330,8 +331,9 @@ is.observable = (value: unknown): value is ObservableLike => {
 	return false;
 };
 
-// eslint-disable-next-line @typescript-eslint/ban-types
-export type NodeStream = object & {readonly pipe: Function};
+export interface NodeStream extends NodeJS.EventEmitter {
+	pipe<T extends NodeJS.WritableStream>(destination: T, options?: {end?: boolean}): T;
+}
 
 is.nodeStream = (value: unknown): value is NodeStream => is.object(value) && is.function_((value as NodeStream).pipe) && !is.observable(value);
 
