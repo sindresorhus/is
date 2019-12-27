@@ -14,7 +14,9 @@ export const enum TypeName {
 	symbol = 'symbol',
 	Function = 'Function',
 	Generator = 'Generator',
+	AsyncGenerator = 'AsyncGenerator',
 	GeneratorFunction = 'GeneratorFunction',
+	AsyncGeneratorFunction = 'AsyncGeneratorFunction',
 	AsyncFunction = 'AsyncFunction',
 	Observable = 'Observable',
 	Array = 'Array',
@@ -141,6 +143,8 @@ is.asyncIterable = (value: unknown): value is AsyncIterableIterator<unknown> => 
 
 is.generator = (value: unknown): value is Generator => is.iterable(value) && is.function_(value.next) && is.function_(value.throw);
 
+is.asyncGenerator = (value: unknown): value is AsyncGenerator => is.asyncIterable(value) && is.function_(value.next) && is.function_(value.throw);
+
 is.nativePromise = (value: unknown): value is Promise<unknown> =>
 	isObjectOfType<Promise<unknown>>(TypeName.Promise)(value);
 
@@ -152,6 +156,8 @@ const hasPromiseAPI = (value: unknown): value is Promise<unknown> =>
 is.promise = (value: unknown): value is Promise<unknown> => is.nativePromise(value) || hasPromiseAPI(value);
 
 is.generatorFunction = isObjectOfType<GeneratorFunction>(TypeName.GeneratorFunction);
+
+is.asyncGeneratorFunction = (value: unknown): value is ((...args: any[]) => Promise<unknown>) => getObjectType(value) === TypeName.AsyncGeneratorFunction;
 
 is.asyncFunction = (value: unknown): value is ((...args: any[]) => Promise<unknown>) => getObjectType(value) === TypeName.AsyncFunction;
 
