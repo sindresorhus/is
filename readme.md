@@ -116,6 +116,38 @@ is.asyncFunction(() => {});
 // => false
 ```
 
+##### .asyncGenerator(value)
+
+```js
+is.asyncGenerator(
+	(async function * () {
+		yield 4;
+	})()
+);
+// => true
+
+is.asyncGenerator(
+	(function * () {
+		yield 4;
+	})()
+);
+// => false
+```
+
+##### .asyncGeneratorFunction(value)
+
+```js
+is.asyncGeneratorFunction(async function * () {
+	yield 4;
+});
+// => true
+
+is.asyncGeneratorFunction(function * () {
+	yield 4;
+});
+// => false
+```
+
 ##### .boundFunction(value)
 
 Returns `true` for any `bound` function.
