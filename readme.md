@@ -38,7 +38,7 @@ is.number(6);
 //=> true
 ```
 
-Assertions perform the same type checks, but throw errors if the type does not match.
+[Assertions](#type-assertions) perform the same type checks, but throw errors if the type does not match.
 
 ```js
 const {assert} = require('@sindresorhus/is');
