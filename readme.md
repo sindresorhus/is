@@ -44,7 +44,7 @@ is.number(6);
 const {assert} = require('@sindresorhus/is');
 
 assert.string(foo);
-//=> foo is known to be a string
+// foo is known to be a string here
 ```
 
 
