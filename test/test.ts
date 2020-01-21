@@ -457,7 +457,7 @@ const testType = (t: ExecutionContext, type: string, exclude?: string[]) => {
 	for (const [key, {fixtures}] of types) {
 		// TODO: Automatically exclude value types in other tests that we have in the current one.
 		// Could reduce the use of `exclude`.
-		if (exclude && exclude.includes(key)) {
+		if (exclude?.includes(key)) {
 			continue;
 		}
 
