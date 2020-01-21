@@ -278,8 +278,8 @@ is.typedArray = (value: unknown): value is TypedArray => {
 };
 
 export interface ArrayLike<T> {
-	readonly length: number;
 	readonly [index: number]: T;
+	readonly length: number;
 }
 
 const isValidLength = (value: unknown): value is number => is.safeInteger(value) && value >= 0;
