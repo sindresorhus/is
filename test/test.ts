@@ -25,8 +25,8 @@ interface Test {
 	is(value: unknown): boolean;
 }
 
-const invertAssertThrow = (description: string, fn: () => void | never): void | never => {
-	const expectedAssertErrorMessage = `Expected value which is "${description}".`;
+const invertAssertThrow = (description: string, fn: () => void | never, value: unknown): void | never => {
+	const expectedAssertErrorMessage = `Expected value which is "${description}", received value of type ${is(value)}.`;
 
 	try {
 		fn();
@@ -481,7 +481,7 @@ const types = new Map<string, Test>([
 	}],
 	['non-domElements', {
 		is: value => !is.domElement(value),
-		assert: (value: unknown) => invertAssertThrow(AssertionTypeDescription.domElement, () => assert.domElement(value)),
+		assert: (value: unknown) => invertAssertThrow(AssertionTypeDescription.domElement, () => assert.domElement(value), value),
 		fixtures: [
 			document.createTextNode('data'),
 			document.createProcessingInstruction('xml-stylesheet', 'href="mycss.css" type="text/css"'),
@@ -556,7 +556,7 @@ const testType = (t: ExecutionContext, type: string, exclude?: string[]) => {
 		for (const fixture of fixtures) {
 			assertIs(testIs(fixture), `Value: ${inspect(fixture)}`);
 			const valueType = JSON.stringify(typeDescription ? typeDescription : typename);
-			assertAsserts(() => testAssert(fixture), `Expected value which is ${valueType}.`);
+			assertAsserts(() => testAssert(fixture), `Expected value which is ${valueType}, received value of type ${is(fixture)}.`);
 
 			if (isTypeUnderTest && typename) {
 				t.is(is(fixture), typename);
