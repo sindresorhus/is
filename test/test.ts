@@ -1,14 +1,13 @@
+import fs = require('fs');
+import net = require('net');
+import Stream = require('stream');
 import {inspect} from 'util';
 import test, {ExecutionContext} from 'ava';
 import {JSDOM} from 'jsdom';
 import {Subject, Observable} from 'rxjs';
-import is, {assert, AssertionTypeDescription, TypeName} from '../source';
-
-import fs = require('fs');
-import net = require('net');
-import Stream = require('stream');
 import tempy = require('tempy');
 import ZenObservable = require('zen-observable');
+import is, {assert, AssertionTypeDescription, TypeName} from '../source';
 
 class PromiseSubclassFixture<T> extends Promise<T> {}
 class ErrorSubclassFixture extends Error {}
@@ -26,7 +25,7 @@ interface Test {
 }
 
 const invertAssertThrow = (description: string, fn: () => void | never, value: unknown): void | never => {
-	const expectedAssertErrorMessage = `Expected value which is "${description}", received value of type ${is(value)}.`;
+	const expectedAssertErrorMessage = `Expected value which is \`${description}\`, received value of type \`${is(value)}\`.`;
 
 	try {
 		fn();
@@ -555,8 +554,8 @@ const testType = (t: ExecutionContext, type: string, exclude?: string[]) => {
 
 		for (const fixture of fixtures) {
 			assertIs(testIs(fixture), `Value: ${inspect(fixture)}`);
-			const valueType = JSON.stringify(typeDescription ? typeDescription : typename);
-			assertAsserts(() => testAssert(fixture), `Expected value which is ${valueType}, received value of type ${is(fixture)}.`);
+			const valueType = typeDescription ? typeDescription : typename;
+			assertAsserts(() => testAssert(fixture), `Expected value which is \`${valueType!}\`, received value of type \`${is(fixture)}\`.`);
 
 			if (isTypeUnderTest && typename) {
 				t.is(is(fixture), typename);
@@ -597,8 +596,12 @@ test('is.numericString', t => {
 	testType(t, 'numericString');
 	t.false(is.numericString(''));
 	t.false(is.numericString(1));
-	t.throws(() => assert.numericString(''));
-	t.throws(() => assert.numericString(1));
+	t.throws(() => {
+		assert.numericString('');
+	});
+	t.throws(() => {
+		assert.numericString(1);
+	});
 });
 
 test('is.array', t => {
@@ -611,7 +614,10 @@ test('is.function', t => {
 
 test('is.boundFunction', t => {
 	t.false(is.boundFunction(function () {})); // eslint-disable-line prefer-arrow-callback
-	t.throws(() => assert.boundFunction(function () {})); // eslint-disable-line prefer-arrow-callback
+
+	t.throws(() => {
+		assert.boundFunction(function () {}); // eslint-disable-line prefer-arrow-callback
+	});
 });
 
 test('is.buffer', t => {
@@ -660,8 +666,11 @@ test('is.asyncFunction', t => {
 	if (is.asyncFunction(fixture)) {
 		// eslint-disable-next-line promise/prefer-await-to-then
 		t.true(is.function_(fixture().then));
-		// eslint-disable-next-line promise/prefer-await-to-then
-		t.notThrows(() => assert.function_(fixture().then));
+
+		t.notThrows(() => {
+			// eslint-disable-next-line promise/prefer-await-to-then
+			assert.function_(fixture().then);
+		});
 	}
 });
 
@@ -747,13 +756,21 @@ test('is.directInstanceOf', t => {
 
 	t.true(is.directInstanceOf(error, Error));
 	t.true(is.directInstanceOf(errorSubclass, ErrorSubclassFixture));
-	t.notThrows(() => assert.directInstanceOf(error, Error));
-	t.notThrows(() => assert.directInstanceOf(errorSubclass, ErrorSubclassFixture));
+	t.notThrows(() => {
+		assert.directInstanceOf(error, Error);
+	});
+	t.notThrows(() => {
+		assert.directInstanceOf(errorSubclass, ErrorSubclassFixture);
+	});
 
 	t.false(is.directInstanceOf(error, ErrorSubclassFixture));
 	t.false(is.directInstanceOf(errorSubclass, Error));
-	t.throws(() => assert.directInstanceOf(error, ErrorSubclassFixture));
-	t.throws(() => assert.directInstanceOf(errorSubclass, Error));
+	t.throws(() => {
+		assert.directInstanceOf(error, ErrorSubclassFixture);
+	});
+	t.throws(() => {
+		assert.directInstanceOf(errorSubclass, Error);
+	});
 });
 
 test('is.urlInstance', t => {
@@ -763,10 +780,18 @@ test('is.urlInstance', t => {
 	t.false(is.urlInstance(undefined));
 	t.false(is.urlInstance(null));
 
-	t.notThrows(() => assert.urlInstance(url));
-	t.throws(() => assert.urlInstance({}));
-	t.throws(() => assert.urlInstance(undefined));
-	t.throws(() => assert.urlInstance(null));
+	t.notThrows(() => {
+		assert.urlInstance(url);
+	});
+	t.throws(() => {
+		assert.urlInstance({});
+	});
+	t.throws(() => {
+		assert.urlInstance(undefined);
+	});
+	t.throws(() => {
+		assert.urlInstance(null);
+	});
 });
 
 test('is.urlString', t => {
@@ -777,11 +802,21 @@ test('is.urlString', t => {
 	t.false(is.urlString(undefined));
 	t.false(is.urlString(null));
 
-	t.notThrows(() => assert.urlString(url));
-	t.throws(() => assert.urlString(new URL(url)));
-	t.throws(() => assert.urlString({}));
-	t.throws(() => assert.urlString(undefined));
-	t.throws(() => assert.urlString(null));
+	t.notThrows(() => {
+		assert.urlString(url);
+	});
+	t.throws(() => {
+		assert.urlString(new URL(url));
+	});
+	t.throws(() => {
+		assert.urlString({});
+	});
+	t.throws(() => {
+		assert.urlString(undefined);
+	});
+	t.throws(() => {
+		assert.urlString(null);
+	});
 });
 
 test('is.truthy', t => {
@@ -795,16 +830,30 @@ test('is.truthy', t => {
 	// t.true(is.truthy(1n));
 	t.true(is.truthy(BigInt(1)));
 
-	t.notThrows(() => assert.truthy('unicorn'));
-	t.notThrows(() => assert.truthy('🦄'));
-	t.notThrows(() => assert.truthy(new Set()));
-	t.notThrows(() => assert.truthy(Symbol('🦄')));
-	t.notThrows(() => assert.truthy(true));
-	t.notThrows(() => assert.truthy(1));
+	t.notThrows(() => {
+		assert.truthy('unicorn');
+	});
+	t.notThrows(() => {
+		assert.truthy('🦄');
+	});
+	t.notThrows(() => {
+		assert.truthy(new Set());
+	});
+	t.notThrows(() => {
+		assert.truthy(Symbol('🦄'));
+	});
+	t.notThrows(() => {
+		assert.truthy(true);
+	});
+	t.notThrows(() => {
+		assert.truthy(1);
+	});
 
-	// Disabled until TS supports it for an ESnnnn target.
+	// TODO: Disabled until TS supports it for an ESnnnn target.
 	// t.notThrows(() => assert.truthy(1n));
-	t.notThrows(() => assert.truthy(BigInt(1)));
+	t.notThrows(() => {
+		assert.truthy(BigInt(1));
+	});
 });
 
 test('is.falsy', t => {
@@ -814,19 +863,33 @@ test('is.falsy', t => {
 	t.true(is.falsy(null));
 	t.true(is.falsy(undefined));
 	t.true(is.falsy(NaN));
-	// Disabled until TS supports it for an ESnnnn target.
+	// TODO: Disabled until TS supports it for an ESnnnn target.
 	// t.true(is.falsy(0n));
 	t.true(is.falsy(BigInt(0)));
 
-	t.notThrows(() => assert.falsy(false));
-	t.notThrows(() => assert.falsy(0));
-	t.notThrows(() => assert.falsy(''));
-	t.notThrows(() => assert.falsy(null));
-	t.notThrows(() => assert.falsy(undefined));
-	t.notThrows(() => assert.falsy(NaN));
-	// Disabled until TS supports it for an ESnnnn target.
+	t.notThrows(() => {
+		assert.falsy(false);
+	});
+	t.notThrows(() => {
+		assert.falsy(0);
+	});
+	t.notThrows(() => {
+		assert.falsy('');
+	});
+	t.notThrows(() => {
+		assert.falsy(null);
+	});
+	t.notThrows(() => {
+		assert.falsy(undefined);
+	});
+	t.notThrows(() => {
+		assert.falsy(NaN);
+	});
+	// TODO: Disabled until TS supports it for an ESnnnn target.
 	// t.notThrows(() => assert.falsy(0n));
-	t.notThrows(() => assert.falsy(BigInt(0)));
+	t.notThrows(() => {
+		assert.falsy(BigInt(0));
+	});
 });
 
 test('is.nan', t => {
@@ -852,24 +915,32 @@ test('is.primitive', t => {
 		// 6n
 	];
 
-	for (const el of primitives) {
-		t.true(is.primitive(el));
-		t.notThrows(() => assert.primitive(el));
+	for (const element of primitives) {
+		t.true(is.primitive(element));
+		t.notThrows(() => {
+			assert.primitive(element);
+		});
 	}
 });
 
 test('is.integer', t => {
 	testType(t, 'integer', ['number', 'safeInteger']);
 	t.false(is.integer(1.4));
-	t.throws(() => assert.integer(1.4));
+	t.throws(() => {
+		assert.integer(1.4);
+	});
 });
 
 test('is.safeInteger', t => {
 	testType(t, 'safeInteger', ['number', 'integer']);
 	t.false(is.safeInteger(2 ** 53));
 	t.false(is.safeInteger(-(2 ** 53)));
-	t.throws(() => assert.safeInteger(2 ** 53));
-	t.throws(() => assert.safeInteger(-(2 ** 53)));
+	t.throws(() => {
+		assert.safeInteger(2 ** 53);
+	});
+	t.throws(() => {
+		assert.safeInteger(-(2 ** 53));
+	});
 });
 
 test('is.plainObject', t => {
@@ -887,15 +958,33 @@ test('is.iterable', t => {
 	t.false(is.iterable(Infinity));
 	t.false(is.iterable({}));
 
-	t.notThrows(() => assert.iterable(''));
-	t.notThrows(() => assert.iterable([]));
-	t.notThrows(() => assert.iterable(new Map()));
-	t.throws(() => assert.iterable(null));
-	t.throws(() => assert.iterable(undefined));
-	t.throws(() => assert.iterable(0));
-	t.throws(() => assert.iterable(NaN));
-	t.throws(() => assert.iterable(Infinity));
-	t.throws(() => assert.iterable({}));
+	t.notThrows(() => {
+		assert.iterable('');
+	});
+	t.notThrows(() => {
+		assert.iterable([]);
+	});
+	t.notThrows(() => {
+		assert.iterable(new Map());
+	});
+	t.throws(() => {
+		assert.iterable(null);
+	});
+	t.throws(() => {
+		assert.iterable(undefined);
+	});
+	t.throws(() => {
+		assert.iterable(0);
+	});
+	t.throws(() => {
+		assert.iterable(NaN);
+	});
+	t.throws(() => {
+		assert.iterable(Infinity);
+	});
+	t.throws(() => {
+		assert.iterable({});
+	});
 });
 
 test('is.asyncIterable', t => {
@@ -910,16 +999,30 @@ test('is.asyncIterable', t => {
 	t.false(is.asyncIterable(Infinity));
 	t.false(is.asyncIterable({}));
 
-	t.notThrows(() => assert.asyncIterable({
-		[Symbol.asyncIterator]: () => { }
-	}));
+	t.notThrows(() => {
+		assert.asyncIterable({
+			[Symbol.asyncIterator]: () => { }
+		});
+	});
 
-	t.throws(() => assert.asyncIterable(null));
-	t.throws(() => assert.asyncIterable(undefined));
-	t.throws(() => assert.asyncIterable(0));
-	t.throws(() => assert.asyncIterable(NaN));
-	t.throws(() => assert.asyncIterable(Infinity));
-	t.throws(() => assert.asyncIterable({}));
+	t.throws(() => {
+		assert.asyncIterable(null);
+	});
+	t.throws(() => {
+		assert.asyncIterable(undefined);
+	});
+	t.throws(() => {
+		assert.asyncIterable(0);
+	});
+	t.throws(() => {
+		assert.asyncIterable(NaN);
+	});
+	t.throws(() => {
+		assert.asyncIterable(Infinity);
+	});
+	t.throws(() => {
+		assert.asyncIterable({});
+	});
 });
 
 test('is.class', t => {
@@ -932,7 +1035,10 @@ test('is.class', t => {
 
 	for (const classDeclaration of classDeclarations) {
 		t.true(is.class_(classDeclaration));
-		t.notThrows(() => assert.class_(classDeclaration));
+
+		t.notThrows(() => {
+			assert.class_(classDeclaration);
+		});
 	}
 });
 
@@ -952,16 +1058,25 @@ test('is.typedArray', t => {
 
 	for (const item of typedArrays) {
 		t.true(is.typedArray(item));
-		t.notThrows(() => assert.typedArray(item));
+
+		t.notThrows(() => {
+			assert.typedArray(item);
+		});
 	}
 
 	t.false(is.typedArray(new ArrayBuffer(1)));
 	t.false(is.typedArray([]));
 	t.false(is.typedArray({}));
 
-	t.throws(() => assert.typedArray(new ArrayBuffer(1)));
-	t.throws(() => assert.typedArray([]));
-	t.throws(() => assert.typedArray({}));
+	t.throws(() => {
+		assert.typedArray(new ArrayBuffer(1));
+	});
+	t.throws(() => {
+		assert.typedArray([]);
+	});
+	t.throws(() => {
+		assert.typedArray({});
+	});
 });
 
 test('is.arrayLike', t => {
@@ -977,15 +1092,27 @@ test('is.arrayLike', t => {
 	t.false(is.arrayLike(new Map()));
 
 	(function () {
-		t.notThrows(() => assert.arrayLike(arguments)); // eslint-disable-line prefer-rest-params
+		t.notThrows(() => {
+			assert.arrayLike(arguments); // eslint-disable-line prefer-rest-params
+		});
 	})();
 
-	t.notThrows(() => assert.arrayLike([]));
-	t.notThrows(() => assert.arrayLike('unicorn'));
+	t.notThrows(() => {
+		assert.arrayLike([]);
+	});
+	t.notThrows(() => {
+		assert.arrayLike('unicorn');
+	});
 
-	t.throws(() => assert.arrayLike({}));
-	t.throws(() => assert.arrayLike(() => { }));
-	t.throws(() => assert.arrayLike(new Map()));
+	t.throws(() => {
+		assert.arrayLike({});
+	});
+	t.throws(() => {
+		assert.arrayLike(() => {});
+	});
+	t.throws(() => {
+		assert.arrayLike(new Map());
+	});
 });
 
 test('is.inRange', t => {
@@ -1018,20 +1145,57 @@ test('is.inRange', t => {
 		is.inRange(0, [1, 2, 3]);
 	});
 
-	t.notThrows(() => assert.inRange(x, [0, 5]));
-	t.notThrows(() => assert.inRange(x, [5, 0]));
-	t.notThrows(() => assert.inRange(x, [-5, 5]));
-	t.notThrows(() => assert.inRange(x, [5, -5]));
-	t.throws(() => assert.inRange(x, [4, 8]));
-	t.notThrows(() => assert.inRange(-7, [-5, -10]));
-	t.notThrows(() => assert.inRange(-5, [-5, -10]));
-	t.notThrows(() => assert.inRange(-10, [-5, -10]));
+	t.notThrows(() => {
+		assert.inRange(x, [0, 5]);
+	});
 
-	t.notThrows(() => assert.inRange(x, 10));
-	t.notThrows(() => assert.inRange(0, 0));
-	t.notThrows(() => assert.inRange(-2, -3));
-	t.throws(() => assert.inRange(x, 2));
-	t.throws(() => assert.inRange(-3, -2));
+	t.notThrows(() => {
+		assert.inRange(x, [5, 0]);
+	});
+
+	t.notThrows(() => {
+		assert.inRange(x, [-5, 5]);
+	});
+
+	t.notThrows(() => {
+		assert.inRange(x, [5, -5]);
+	});
+
+	t.throws(() => {
+		assert.inRange(x, [4, 8]);
+	});
+
+	t.notThrows(() => {
+		assert.inRange(-7, [-5, -10]);
+	});
+
+	t.notThrows(() => {
+		assert.inRange(-5, [-5, -10]);
+	});
+
+	t.notThrows(() => {
+		assert.inRange(-10, [-5, -10]);
+	});
+
+	t.notThrows(() => {
+		assert.inRange(x, 10);
+	});
+
+	t.notThrows(() => {
+		assert.inRange(0, 0);
+	});
+
+	t.notThrows(() => {
+		assert.inRange(-2, -3);
+	});
+
+	t.throws(() => {
+		assert.inRange(x, 2);
+	});
+
+	t.throws(() => {
+		assert.inRange(-3, -2);
+	});
 
 	t.throws(() => {
 		assert.inRange(0, []);
@@ -1049,7 +1213,9 @@ test('is.inRange', t => {
 test('is.domElement', t => {
 	testType(t, 'domElement');
 	t.false(is.domElement({nodeType: 1, nodeName: 'div'}));
-	t.throws(() => assert.domElement({nodeType: 1, nodeName: 'div'}));
+	t.throws(() => {
+		assert.domElement({nodeType: 1, nodeName: 'div'});
+	});
 
 	const htmlTagNameToTypeName = {
 		div: 'HTMLDivElement',
@@ -1081,24 +1247,32 @@ test('is.infinite', t => {
 test('is.evenInteger', t => {
 	for (const el of [-6, 2, 4]) {
 		t.true(is.evenInteger(el));
-		t.notThrows(() => assert.evenInteger(el));
+		t.notThrows(() => {
+			assert.evenInteger(el);
+		});
 	}
 
 	for (const el of [-3, 1, 5]) {
 		t.false(is.evenInteger(el));
-		t.throws(() => assert.evenInteger(el));
+		t.throws(() => {
+			assert.evenInteger(el);
+		});
 	}
 });
 
 test('is.oddInteger', t => {
 	for (const el of [-5, 7, 13]) {
 		t.true(is.oddInteger(el));
-		t.notThrows(() => assert.oddInteger(el));
+		t.notThrows(() => {
+			assert.oddInteger(el);
+		});
 	}
 
 	for (const el of [-8, 8, 10]) {
 		t.false(is.oddInteger(el));
-		t.throws(() => assert.oddInteger(el));
+		t.throws(() => {
+			assert.oddInteger(el);
+		});
 	}
 });
 
@@ -1111,15 +1285,23 @@ test('is.nonEmptyArray', t => {
 	t.false(is.nonEmptyArray([]));
 	t.false(is.nonEmptyArray(new Array())); // eslint-disable-line @typescript-eslint/no-array-constructor
 
-	t.notThrows(() => assert.nonEmptyArray([1, 2, 3]));
-	t.throws(() => assert.nonEmptyArray([]));
-	t.throws(() => assert.nonEmptyArray(new Array())); // eslint-disable-line @typescript-eslint/no-array-constructor
+	t.notThrows(() => {
+		assert.nonEmptyArray([1, 2, 3]);
+	});
+	t.throws(() => {
+		assert.nonEmptyArray([]);
+	});
+	t.throws(() => {
+		assert.nonEmptyArray(new Array()); // eslint-disable-line @typescript-eslint/no-array-constructor
+	});
 });
 
 test('is.emptyString', t => {
 	testType(t, 'emptyString', ['string']);
 	t.false(is.emptyString('🦄'));
-	t.throws(() => assert.emptyString('🦄'));
+	t.throws(() => {
+		assert.emptyString('🦄');
+	});
 });
 
 test('is.nonEmptyString', t => {
@@ -1127,9 +1309,15 @@ test('is.nonEmptyString', t => {
 	t.false(is.nonEmptyString(String()));
 	t.true(is.nonEmptyString('🦄'));
 
-	t.throws(() => assert.nonEmptyString(''));
-	t.throws(() => assert.nonEmptyString(String()));
-	t.notThrows(() => assert.nonEmptyString('🦄'));
+	t.throws(() => {
+		assert.nonEmptyString('');
+	});
+	t.throws(() => {
+		assert.nonEmptyString(String());
+	});
+	t.notThrows(() => {
+		assert.nonEmptyString('🦄');
+	});
 });
 
 test('is.emptyStringOrWhitespace', t => {
@@ -1138,9 +1326,15 @@ test('is.emptyStringOrWhitespace', t => {
 	t.false(is.emptyStringOrWhitespace('🦄'));
 	t.false(is.emptyStringOrWhitespace('unicorn'));
 
-	t.notThrows(() => assert.emptyStringOrWhitespace('  '));
-	t.throws(() => assert.emptyStringOrWhitespace('🦄'));
-	t.throws(() => assert.emptyStringOrWhitespace('unicorn'));
+	t.notThrows(() => {
+		assert.emptyStringOrWhitespace('  ');
+	});
+	t.throws(() => {
+		assert.emptyStringOrWhitespace('🦄');
+	});
+	t.throws(() => {
+		assert.emptyStringOrWhitespace('unicorn');
+	});
 });
 
 test('is.emptyObject', t => {
@@ -1148,9 +1342,15 @@ test('is.emptyObject', t => {
 	t.true(is.emptyObject(new Object())); // eslint-disable-line no-new-object
 	t.false(is.emptyObject({unicorn: '🦄'}));
 
-	t.notThrows(() => assert.emptyObject({}));
-	t.notThrows(() => assert.emptyObject(new Object())); // eslint-disable-line no-new-object
-	t.throws(() => assert.emptyObject({unicorn: '🦄'}));
+	t.notThrows(() => {
+		assert.emptyObject({});
+	});
+	t.notThrows(() => {
+		assert.emptyObject(new Object()); // eslint-disable-line no-new-object
+	});
+	t.throws(() => {
+		assert.emptyObject({unicorn: '🦄'});
+	});
 });
 
 test('is.nonEmptyObject', t => {
@@ -1161,9 +1361,15 @@ test('is.nonEmptyObject', t => {
 	t.false(is.nonEmptyObject(new Object())); // eslint-disable-line no-new-object
 	t.true(is.nonEmptyObject({unicorn: '🦄'}));
 
-	t.throws(() => assert.nonEmptyObject({}));
-	t.throws(() => assert.nonEmptyObject(new Object())); // eslint-disable-line no-new-object
-	t.notThrows(() => assert.nonEmptyObject({unicorn: '🦄'}));
+	t.throws(() => {
+		assert.nonEmptyObject({});
+	});
+	t.throws(() => {
+		assert.nonEmptyObject(new Object()); // eslint-disable-line no-new-object
+	});
+	t.notThrows(() => {
+		assert.nonEmptyObject({unicorn: '🦄'});
+	});
 });
 
 test('is.emptySet', t => {
@@ -1173,11 +1379,15 @@ test('is.emptySet', t => {
 test('is.nonEmptySet', t => {
 	const tempSet = new Set();
 	t.false(is.nonEmptySet(tempSet));
-	t.throws(() => assert.nonEmptySet(tempSet));
+	t.throws(() => {
+		assert.nonEmptySet(tempSet);
+	});
 
 	tempSet.add(1);
 	t.true(is.nonEmptySet(tempSet));
-	t.notThrows(() => assert.nonEmptySet(tempSet));
+	t.notThrows(() => {
+		assert.nonEmptySet(tempSet);
+	});
 });
 
 test('is.emptyMap', t => {
@@ -1187,11 +1397,15 @@ test('is.emptyMap', t => {
 test('is.nonEmptyMap', t => {
 	const tempMap = new Map();
 	t.false(is.nonEmptyMap(tempMap));
-	t.throws(() => assert.nonEmptyMap(tempMap));
+	t.throws(() => {
+		assert.nonEmptyMap(tempMap);
+	});
 
 	tempMap.set('unicorn', '🦄');
 	t.true(is.nonEmptyMap(tempMap));
-	t.notThrows(() => assert.nonEmptyMap(tempMap));
+	t.notThrows(() => {
+		assert.nonEmptyMap(tempMap);
+	});
 });
 
 test('is.any', t => {
@@ -1208,10 +1422,21 @@ test('is.any', t => {
 		is.any(is.string);
 	});
 
-	t.notThrows(() => assert.any(is.string, {}, true, '🦄'));
-	t.notThrows(() => assert.any(is.object, false, {}, 'unicorns'));
-	t.throws(() => assert.any(is.boolean, '🦄', [], 3));
-	t.throws(() => assert.any(is.integer, true, 'lol', {}));
+	t.notThrows(() => {
+		assert.any(is.string, {}, true, '🦄');
+	});
+
+	t.notThrows(() => {
+		assert.any(is.object, false, {}, 'unicorns');
+	});
+
+	t.throws(() => {
+		assert.any(is.boolean, '🦄', [], 3);
+	});
+
+	t.throws(() => {
+		assert.any(is.integer, true, 'lol', {});
+	});
 
 	t.throws(() => {
 		assert.any(null as any, true);
@@ -1236,10 +1461,21 @@ test('is.all', t => {
 		is.all(is.string);
 	});
 
-	t.notThrows(() => assert.all(is.object, {}, new Set(), new Map()));
-	t.notThrows(() => assert.all(is.boolean, true, false));
-	t.throws(() => assert.all(is.string, '🦄', []));
-	t.throws(() => assert.all(is.set, new Map(), {}));
+	t.notThrows(() => {
+		assert.all(is.object, {}, new Set(), new Map());
+	});
+
+	t.notThrows(() => {
+		assert.all(is.boolean, true, false);
+	});
+
+	t.throws(() => {
+		assert.all(is.string, '🦄', []);
+	});
+
+	t.throws(() => {
+		assert.all(is.set, new Map(), {});
+	});
 
 	t.throws(() => {
 		assert.all(null as any, true);
@@ -1251,18 +1487,18 @@ test('is.all', t => {
 });
 
 test('assert', t => {
-	// Contrived test showing that typescript acknowledges the type assertion in assert.number().
-	// Real world usage includes asserting user input, but here we use a random number/string generator.
+	// Contrived test showing that TypeScript acknowledges the type assertion in `assert.number()`.
+	// Real--world usage includes asserting user input, but here we use a random number/string generator.
 	t.plan(2);
 
 	const getNumberOrStringRandomly = (): number | string => {
-		const rnd = Math.random();
+		const random = Math.random();
 
-		if (rnd < 0.5) {
+		if (random < 0.5) {
 			return 'sometimes this function returns text';
 		}
 
-		return rnd;
+		return random;
 	};
 
 	const canUseOnlyNumber = (badlyTypedArgument: any): number => {

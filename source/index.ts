@@ -387,7 +387,7 @@ is.all = (predicate: Predicate, ...values: unknown[]): boolean => predicateOnArr
 
 const assertType = (condition: boolean, description: string, value: unknown): asserts condition => {
 	if (!condition) {
-		throw new TypeError(`Expected value which is "${description}", received value of type ${is(value)}.`);
+		throw new TypeError(`Expected value which is \`${description}\`, received value of type \`${is(value)}\`.`);
 	}
 };
 

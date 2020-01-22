@@ -4,6 +4,7 @@
 	"description": "Type check values",
 	"license": "MIT",
 	"repository": "sindresorhus/is",
+	"funding": "https://github.com/sindresorhus/is?sponsor=1",
 	"author": {
 		"name": "Sindre Sorhus",
 		"email": "sindresorhus@gmail.com",
