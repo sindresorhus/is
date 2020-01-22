@@ -11,6 +11,7 @@ For example, `is.string('🦄') //=> true`
 
 - Written in TypeScript
 - [Extensive use of type guards](#type-guards)
+- [Supports type assertions](#type-assertions)
 - Actively maintained
 - 2 million weekly downloads
 
@@ -35,6 +36,15 @@ is(new Map());
 
 is.number(6);
 //=> true
+```
+
+[Assertions](#type-assertions) perform the same type checks, but throw errors if the type does not match.
+
+```js
+const {assert} = require('@sindresorhus/is');
+
+assert.string(foo);
+// foo is known to be a string here
 ```
 
 
@@ -425,6 +435,30 @@ padLeft('🦄', '🌈');
 //=> '🌈🦄'
 ```
 
+## Type assertions
+
+The type guards are also available as [typescript assertions](https://www.typescriptlang.org/docs/handbook/release-notes/typescript-3-7.html#assertion-functions), which throw an error for unexpected types. It is a convenient one-line version of the often repetitive "if-not-expected-type-throw" pattern.
+
+```ts
+import {assert} from '@sindresorhus/is';
+
+const handleMovieRatingApiResponse = (response: unknown) => {
+	assert.plainObject(response);
+	// `response` is typed as a plain `object` with `unknown` properties
+	assert.number(response.rating);
+	// `response.rating` is typed as a `number`
+	assert.string(response.title);
+	// `response.title` is typed as a `string`
+
+	return `${response.title} (${response.rating * 10})`;
+};
+
+handleMovieRatingApiResponse({rating: 0.87, title: 'The Matrix'});
+//=> 'The Matrix (8.7)'
+
+handleMovieRatingApiResponse({status: 'system maintenance'});
+//=> throws error
+```
 
 ## FAQ
 
