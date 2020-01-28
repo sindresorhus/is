@@ -6,21 +6,19 @@ For example, `is.string('🦄') //=> true`
 
 <img src="header.gif" width="182" align="right">
 
-
 ## Highlights
 
 - Written in TypeScript
 - [Extensive use of type guards](#type-guards)
+- [Supports type assertions](#type-assertions)
 - Actively maintained
 - 2 million weekly downloads
-
 
 ## Install
 
 ```
 $ npm install @sindresorhus/is
 ```
-
 
 ## Usage
 
@@ -37,6 +35,23 @@ is.number(6);
 //=> true
 ```
 
+[Assertions](#type-assertions) perform the same type checks, but throw an error if the type does not match.
+
+```js
+const {assert} = require('@sindresorhus/is');
+
+assert.string(2);
+//=> Error: Expected value which is `string`, received value of type `number`.
+```
+
+And with TypeScript:
+
+```ts
+import {assert} from '@sindresorhus/is';
+
+assert.string(foo);
+// `foo` is now typed as a `string`.
+```
 
 ## API
 
@@ -428,7 +443,6 @@ is.all(is.string, '🦄', [], 'unicorns');
 //=> false
 ```
 
-
 ## Type guards
 
 When using `is` together with TypeScript, [type guards](http://www.typescriptlang.org/docs/handbook/advanced-types.html#type-guards-and-differentiating-types) are being used extensively to infer the correct type inside if-else statements.
@@ -457,6 +471,32 @@ padLeft('🦄', '🌈');
 //=> '🌈🦄'
 ```
 
+## Type assertions
+
+The type guards are also available as [type assertions](https://www.typescriptlang.org/docs/handbook/release-notes/typescript-3-7.html#assertion-functions), which throw an error for unexpected types. It is a convenient one-line version of the often repetitive "if-not-expected-type-throw" pattern.
+
+```ts
+import {assert} from '@sindresorhus/is';
+
+const handleMovieRatingApiResponse = (response: unknown) => {
+	assert.plainObject(response);
+	// `response` is now typed as a plain `object` with `unknown` properties.
+
+	assert.number(response.rating);
+	// `response.rating` is now typed as a `number`.
+
+	assert.string(response.title);
+	// `response.title` is now typed as a `string`.
+
+	return `${response.title} (${response.rating * 10})`;
+};
+
+handleMovieRatingApiResponse({rating: 0.87, title: 'The Matrix'});
+//=> 'The Matrix (8.7)'
+
+// This throws an error.
+handleMovieRatingApiResponse({rating: '🦄'});
+```
 
 ## FAQ
 
@@ -475,13 +515,11 @@ For the ones I found, pick 3 of these.
 
 The most common mistakes I noticed in these modules was using `instanceof` for type checking, forgetting that functions are objects, and omitting `symbol` as a primitive.
 
-
 ## For enterprise
 
 Available as part of the Tidelift Subscription.
 
 The maintainers of @sindresorhus/is and thousands of other packages are working with Tidelift to deliver commercial support and maintenance for the open source dependencies you use to build your applications. Save time, reduce risk, and improve code health, while paying the maintainers of the exact dependencies you use. [Learn more.](https://tidelift.com/subscription/pkg/npm-sindresorhus-is?utm_source=npm-sindresorhus-is&utm_medium=referral&utm_campaign=enterprise&utm_term=repo)
-
 
 ## Related
 
@@ -495,7 +533,6 @@ The maintainers of @sindresorhus/is and thousands of other packages are working 
 - [is-empty-iterable](https://github.com/sindresorhus/is-empty-iterable) - Check if an Iterable is empty
 - [is-blob](https://github.com/sindresorhus/is-blob) - Check if a value is a Blob - File-like object of immutable, raw data
 - [has-emoji](https://github.com/sindresorhus/has-emoji) - Check whether a string has any emoji
-
 
 ## Maintainers
 

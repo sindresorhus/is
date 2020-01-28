@@ -4,6 +4,7 @@
 	"description": "Type check values",
 	"license": "MIT",
 	"repository": "sindresorhus/is",
+	"funding": "https://github.com/sindresorhus/is?sponsor=1",
 	"author": {
 		"name": "Sindre Sorhus",
 		"email": "sindresorhus@gmail.com",
@@ -46,20 +47,20 @@
 		"types"
 	],
 	"devDependencies": {
-		"@sindresorhus/tsconfig": "^0.6.0",
+		"@sindresorhus/tsconfig": "^0.7.0",
 		"@types/jsdom": "^12.2.4",
 		"@types/node": "^12.12.6",
 		"@types/zen-observable": "^0.8.0",
-		"@typescript-eslint/eslint-plugin": "^1.11.0",
-		"@typescript-eslint/parser": "^1.11.0",
+		"@typescript-eslint/eslint-plugin": "^2.17.0",
+		"@typescript-eslint/parser": "^2.17.0",
 		"ava": "^2.1.0",
 		"del-cli": "^2.0.0",
-		"eslint-config-xo-typescript": "^0.15.0",
+		"eslint-config-xo-typescript": "^0.24.1",
 		"jsdom": "^15.0.0",
 		"rxjs": "^6.4.0",
 		"tempy": "^0.3.0",
 		"ts-node": "^8.3.0",
-		"typescript": "^3.7.2",
+		"typescript": "^3.7.5",
 		"xo": "^0.25.3",
 		"zen-observable": "^0.8.8"
 	},
@@ -80,6 +81,9 @@
 		"extensions": [
 			"ts"
 		],
+		"parserOptions": {
+			"project": "./tsconfig.xo.json"
+		},
 		"globals": [
 			"BigInt",
 			"BigInt64Array",
