@@ -235,6 +235,7 @@ const types = new Map<string, Test>([
 	}],
 	['asyncGenerator', {
 		is: is.asyncGenerator,
+		assert: assert.asyncGenerator,
 		fixtures: [
 			(async function * () {
 				yield 4;
@@ -255,12 +256,14 @@ const types = new Map<string, Test>([
 	}],
 	['asyncGeneratorFunction', {
 		is: is.asyncGeneratorFunction,
+		assert: assert.asyncGeneratorFunction,
 		fixtures: [
 			async function * () {
 				yield 4;
 			}
 		],
-		typename: TypeName.Function
+		typename: TypeName.Function,
+		typeDescription: TypeName.AsyncGeneratorFunction
 	}],
 	['asyncFunction', {
 		is: is.asyncFunction,

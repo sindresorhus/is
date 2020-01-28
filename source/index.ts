@@ -460,9 +460,11 @@ interface Assert {
 	iterable: <T = unknown>(value: unknown) => asserts value is Iterable<T>;
 	asyncIterable: <T = unknown>(value: unknown) => asserts value is AsyncIterable<T>;
 	generator: (value: unknown) => asserts value is Generator;
+	asyncGenerator: (value: unknown) => asserts value is AsyncGenerator;
 	nativePromise: <T = unknown>(value: unknown) => asserts value is Promise<T>;
 	promise: <T = unknown>(value: unknown) => asserts value is Promise<T>;
 	generatorFunction: (value: unknown) => asserts value is GeneratorFunction;
+	asyncGeneratorFunction: (value: unknown) => asserts value is AsyncGeneratorFunction;
 	// eslint-disable-next-line @typescript-eslint/ban-types
 	asyncFunction: (value: unknown) => asserts value is Function;
 	// eslint-disable-next-line @typescript-eslint/ban-types
@@ -548,9 +550,11 @@ export const assert: Assert = {
 	iterable: <T = unknown>(value: unknown): asserts value is Iterable<T> => assertType(is.iterable(value), AssertionTypeDescription.iterable, value),
 	asyncIterable: <T = unknown>(value: unknown): asserts value is AsyncIterable<T> => assertType(is.asyncIterable(value), AssertionTypeDescription.asyncIterable, value),
 	generator: (value: unknown): asserts value is Generator => assertType(is.generator(value), TypeName.Generator, value),
+	asyncGenerator: (value: unknown): asserts value is AsyncGenerator => assertType(is.asyncGenerator(value), TypeName.AsyncGenerator, value),
 	nativePromise: <T = unknown>(value: unknown): asserts value is Promise<T> => assertType(is.nativePromise(value), AssertionTypeDescription.nativePromise, value),
 	promise: <T = unknown>(value: unknown): asserts value is Promise<T> => assertType(is.promise(value), TypeName.Promise, value),
 	generatorFunction: (value: unknown): asserts value is GeneratorFunction => assertType(is.generatorFunction(value), TypeName.GeneratorFunction, value),
+	asyncGeneratorFunction: (value: unknown): asserts value is AsyncGeneratorFunction => assertType(is.asyncGeneratorFunction(value), TypeName.AsyncGeneratorFunction, value),
 	// eslint-disable-next-line @typescript-eslint/ban-types
 	asyncFunction: (value: unknown): asserts value is Function => assertType(is.asyncFunction(value), TypeName.AsyncFunction, value),
 	// eslint-disable-next-line @typescript-eslint/ban-types
