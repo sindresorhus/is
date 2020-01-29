@@ -156,7 +156,8 @@ const types = new Map<string, Test>([
 			function () {},
 			() => {},
 			async function () {},
-			function * (): unknown {}
+			function * (): unknown {},
+			async function * (): unknown {}
 		],
 		typename: TypeName.Function
 	}],
@@ -232,6 +233,16 @@ const types = new Map<string, Test>([
 		],
 		typename: TypeName.Generator
 	}],
+	['asyncGenerator', {
+		is: is.asyncGenerator,
+		assert: assert.asyncGenerator,
+		fixtures: [
+			(async function * () {
+				yield 4;
+			})()
+		],
+		typename: TypeName.AsyncGenerator
+	}],
 	['generatorFunction', {
 		is: is.generatorFunction,
 		assert: assert.generatorFunction,
@@ -242,6 +253,17 @@ const types = new Map<string, Test>([
 		],
 		typename: TypeName.Function,
 		typeDescription: TypeName.GeneratorFunction
+	}],
+	['asyncGeneratorFunction', {
+		is: is.asyncGeneratorFunction,
+		assert: assert.asyncGeneratorFunction,
+		fixtures: [
+			async function * () {
+				yield 4;
+			}
+		],
+		typename: TypeName.Function,
+		typeDescription: TypeName.AsyncGeneratorFunction
 	}],
 	['asyncFunction', {
 		is: is.asyncFunction,
@@ -609,7 +631,7 @@ test('is.array', t => {
 });
 
 test('is.function', t => {
-	testType(t, 'function', ['generatorFunction', 'asyncFunction', 'boundFunction']);
+	testType(t, 'function', ['generatorFunction', 'asyncGeneratorFunction', 'asyncFunction', 'boundFunction']);
 });
 
 test('is.boundFunction', t => {
@@ -678,8 +700,31 @@ test('is.generator', t => {
 	testType(t, 'generator');
 });
 
+test('is.asyncGenerator', t => {
+	testType(t, 'asyncGenerator');
+
+	const fixture = (async function * () {
+		yield 4;
+	})();
+	if (is.asyncGenerator(fixture)) {
+		t.true(is.function_(fixture.next));
+	}
+});
+
 test('is.generatorFunction', t => {
 	testType(t, 'generatorFunction', ['function']);
+});
+
+test('is.asyncGeneratorFunction', t => {
+	testType(t, 'asyncGeneratorFunction', ['function']);
+
+	const fixture = async function * () {
+		yield 4;
+	};
+
+	if (is.asyncGeneratorFunction(fixture)) {
+		t.true(is.function_(fixture().next));
+	}
 });
 
 test('is.map', t => {
