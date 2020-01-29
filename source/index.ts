@@ -137,29 +137,29 @@ is.buffer = (value: unknown): value is Buffer => !is.nullOrUndefined(value) && !
 
 is.nullOrUndefined = (value: unknown): value is null | undefined => is.null_(value) || is.undefined(value);
 is.object = (value: unknown): value is object => !is.null_(value) && (typeof value === 'object' || is.function_(value));
-is.iterable = (value: unknown): value is IterableIterator<unknown> => !is.nullOrUndefined(value) && is.function_((value as IterableIterator<unknown>)[Symbol.iterator]);
+is.iterable = <T = unknown>(value: unknown): value is IterableIterator<T> => !is.nullOrUndefined(value) && is.function_((value as IterableIterator<T>)[Symbol.iterator]);
 
-is.asyncIterable = (value: unknown): value is AsyncIterableIterator<unknown> => !is.nullOrUndefined(value) && is.function_((value as AsyncIterableIterator<unknown>)[Symbol.asyncIterator]);
+is.asyncIterable = <T = unknown>(value: unknown): value is AsyncIterableIterator<T> => !is.nullOrUndefined(value) && is.function_((value as AsyncIterableIterator<T>)[Symbol.asyncIterator]);
 
 is.generator = (value: unknown): value is Generator => is.iterable(value) && is.function_(value.next) && is.function_(value.throw);
 
 is.asyncGenerator = (value: unknown): value is AsyncGenerator => is.asyncIterable(value) && is.function_(value.next) && is.function_(value.throw);
 
-is.nativePromise = (value: unknown): value is Promise<unknown> =>
-	isObjectOfType<Promise<unknown>>(TypeName.Promise)(value);
+is.nativePromise = <T = unknown>(value: unknown): value is Promise<T> =>
+	isObjectOfType<Promise<T>>(TypeName.Promise)(value);
 
-const hasPromiseAPI = (value: unknown): value is Promise<unknown> =>
+const hasPromiseAPI = <T = unknown>(value: unknown): value is Promise<T> =>
 	is.object(value) &&
-	is.function_((value as Promise<unknown>).then) && // eslint-disable-line promise/prefer-await-to-then
-	is.function_((value as Promise<unknown>).catch);
+	is.function_((value as Promise<T>).then) && // eslint-disable-line promise/prefer-await-to-then
+	is.function_((value as Promise<T>).catch);
 
-is.promise = (value: unknown): value is Promise<unknown> => is.nativePromise(value) || hasPromiseAPI(value);
+is.promise = <T = unknown>(value: unknown): value is Promise<T> => is.nativePromise(value) || hasPromiseAPI(value);
 
 is.generatorFunction = isObjectOfType<GeneratorFunction>(TypeName.GeneratorFunction);
 
 is.asyncGeneratorFunction = (value: unknown): value is ((...args: any[]) => Promise<unknown>) => getObjectType(value) === TypeName.AsyncGeneratorFunction;
 
-is.asyncFunction = (value: unknown): value is ((...args: any[]) => Promise<unknown>) => getObjectType(value) === TypeName.AsyncFunction;
+is.asyncFunction = <T = unknown>(value: unknown): value is ((...args: any[]) => Promise<T>) => getObjectType(value) === TypeName.AsyncFunction;
 
 // eslint-disable-next-line no-prototype-builtins, @typescript-eslint/ban-types
 is.boundFunction = (value: unknown): value is Function => is.function_(value) && !value.hasOwnProperty('prototype');
@@ -167,9 +167,9 @@ is.boundFunction = (value: unknown): value is Function => is.function_(value) &&
 is.regExp = isObjectOfType<RegExp>(TypeName.RegExp);
 is.date = isObjectOfType<Date>(TypeName.Date);
 is.error = isObjectOfType<Error>(TypeName.Error);
-is.map = (value: unknown): value is Map<unknown, unknown> => isObjectOfType<Map<unknown, unknown>>(TypeName.Map)(value);
-is.set = (value: unknown): value is Set<unknown> => isObjectOfType<Set<unknown>>(TypeName.Set)(value);
-is.weakMap = (value: unknown): value is WeakMap<object, unknown> => isObjectOfType<WeakMap<object, unknown>>(TypeName.WeakMap)(value);
+is.map = <Key = unknown, Value = unknown>(value: unknown): value is Map<Key, Value> => isObjectOfType<Map<Key, Value>>(TypeName.Map)(value);
+is.set = <T = unknown>(value: unknown): value is Set<T> => isObjectOfType<Set<T>>(TypeName.Set)(value);
+is.weakMap = <Key extends object = object, Value = unknown>(value: unknown): value is WeakMap<Key, Value> => isObjectOfType<WeakMap<Key, Value>>(TypeName.WeakMap)(value);
 is.weakSet = (value: unknown): value is WeakSet<object> => isObjectOfType<WeakSet<object>>(TypeName.WeakSet)(value);
 
 is.int8Array = isObjectOfType<Int8Array>(TypeName.Int8Array);
@@ -236,7 +236,7 @@ is.primitive = (value: unknown): value is Primitive => is.null_(value) || primit
 is.integer = (value: unknown): value is number => Number.isInteger(value as number);
 is.safeInteger = (value: unknown): value is number => Number.isSafeInteger(value as number);
 
-is.plainObject = (value: unknown): value is {[key: string]: unknown} => {
+is.plainObject = <Value = unknown>(value: unknown): value is Record<string, Value> => {
 	// From: https://github.com/sindresorhus/is-plain-obj/blob/master/index.js
 	if (getObjectType(value) !== TypeName.Object) {
 		return false;
@@ -289,7 +289,7 @@ export interface ArrayLike<T> {
 }
 
 const isValidLength = (value: unknown): value is number => is.safeInteger(value) && value >= 0;
-is.arrayLike = (value: unknown): value is ArrayLike<unknown> => !is.nullOrUndefined(value) && !is.function_(value) && isValidLength((value as ArrayLike<unknown>).length);
+is.arrayLike = <T = unknown>(value: unknown): value is ArrayLike<T> => !is.nullOrUndefined(value) && !is.function_(value) && isValidLength((value as ArrayLike<T>).length);
 
 is.inRange = (value: number, range: number | number[]): value is number => {
 	if (is.number(range)) {
@@ -360,17 +360,17 @@ is.nonEmptyString = (value: unknown): value is string => is.string(value) && val
 const isWhiteSpaceString = (value: unknown): value is string => is.string(value) && /\S/.test(value) === false;
 is.emptyStringOrWhitespace = (value: unknown): value is string => is.emptyString(value) || isWhiteSpaceString(value);
 
-is.emptyObject = (value: unknown): value is {[key: string]: never} => is.object(value) && !is.map(value) && !is.set(value) && Object.keys(value).length === 0;
+is.emptyObject = <Key extends keyof any = string>(value: unknown): value is Record<Key, never> => is.object(value) && !is.map(value) && !is.set(value) && Object.keys(value).length === 0;
 
 // TODO: Use `not` operator here to remove `Map` and `Set` from type guard:
 // - https://github.com/Microsoft/TypeScript/pull/29317
-is.nonEmptyObject = (value: unknown): value is {[key: string]: unknown} => is.object(value) && !is.map(value) && !is.set(value) && Object.keys(value).length > 0;
+is.nonEmptyObject = <Key extends keyof any = string, Value = unknown>(value: unknown): value is Record<Key, Value> => is.object(value) && !is.map(value) && !is.set(value) && Object.keys(value).length > 0;
 
 is.emptySet = (value: unknown): value is Set<never> => is.set(value) && value.size === 0;
-is.nonEmptySet = (value: unknown): value is Set<unknown> => is.set(value) && value.size > 0;
+is.nonEmptySet = <T = unknown>(value: unknown): value is Set<T> => is.set(value) && value.size > 0;
 
 is.emptyMap = (value: unknown): value is Map<never, never> => is.map(value) && value.size === 0;
-is.nonEmptyMap = (value: unknown): value is Map<unknown, unknown> => is.map(value) && value.size > 0;
+is.nonEmptyMap = <Key = unknown, Value = unknown>(value: unknown): value is Map<Key, Value> => is.map(value) && value.size > 0;
 
 export type Predicate = (value: unknown) => boolean;
 
@@ -456,7 +456,7 @@ interface Assert {
 	array: <T = unknown>(value: unknown) => asserts value is T[];
 	buffer: (value: unknown) => asserts value is Buffer;
 	nullOrUndefined: (value: unknown) => asserts value is null | undefined;
-	object: (value: unknown) => asserts value is Record<string, unknown>;
+	object: <Key extends keyof any = string, Value = unknown>(value: unknown) => asserts value is Record<Key, Value>;
 	iterable: <T = unknown>(value: unknown) => asserts value is Iterable<T>;
 	asyncIterable: <T = unknown>(value: unknown) => asserts value is AsyncIterable<T>;
 	generator: (value: unknown) => asserts value is Generator;
@@ -472,9 +472,9 @@ interface Assert {
 	regExp: (value: unknown) => asserts value is RegExp;
 	date: (value: unknown) => asserts value is Date;
 	error: (value: unknown) => asserts value is Error;
-	map: <TKey = unknown, TValue = unknown>(value: unknown) => asserts value is Map<TKey, TValue>;
+	map: <Key = unknown, Value = unknown>(value: unknown) => asserts value is Map<Key, Value>;
 	set: <T = unknown>(value: unknown) => asserts value is Set<T>;
-	weakMap: <TKey extends object = object, TValue = unknown>(value: unknown) => asserts value is WeakMap<TKey, TValue>;
+	weakMap: <Key extends object = object, Value = unknown>(value: unknown) => asserts value is WeakMap<Key, Value>;
 	weakSet: <T extends object = object>(value: unknown) => asserts value is WeakSet<T>;
 	int8Array: (value: unknown) => asserts value is Int8Array;
 	uint8Array: (value: unknown) => asserts value is Uint8Array;
@@ -498,7 +498,7 @@ interface Assert {
 	primitive: (value: unknown) => asserts value is Primitive;
 	integer: (value: unknown) => asserts value is number;
 	safeInteger: (value: unknown) => asserts value is number;
-	plainObject: (value: unknown) => asserts value is {[key: string]: unknown};
+	plainObject: <Value = unknown>(value: unknown) => asserts value is Record<string, Value>;
 	typedArray: (value: unknown) => asserts value is TypedArray;
 	arrayLike: <T = unknown>(value: unknown) => asserts value is ArrayLike<T>;
 	domElement: (value: unknown) => asserts value is Element;
@@ -510,12 +510,12 @@ interface Assert {
 	emptyString: (value: unknown) => asserts value is '';
 	nonEmptyString: (value: unknown) => asserts value is string;
 	emptyStringOrWhitespace: (value: unknown) => asserts value is string;
-	emptyObject: (value: unknown) => asserts value is {[key: string]: never};
-	nonEmptyObject: (value: unknown) => asserts value is {[key: string]: unknown};
+	emptyObject: <Key extends keyof any = string>(value: unknown) => asserts value is Record<Key, never>;
+	nonEmptyObject: <Key extends keyof any = string, Value = unknown>(value: unknown) => asserts value is Record<Key, Value>;
 	emptySet: (value: unknown) => asserts value is Set<never>;
-	nonEmptySet: (value: unknown) => asserts value is Set<unknown>;
+	nonEmptySet: <T = unknown>(value: unknown) => asserts value is Set<T>;
 	emptyMap: (value: unknown) => asserts value is Map<never, never>;
-	nonEmptyMap: (value: unknown) => asserts value is Map<unknown, unknown>;
+	nonEmptyMap: <Key = unknown, Value = unknown>(value: unknown) => asserts value is Map<Key, Value>;
 
 	// Numbers.
 	evenInteger: (value: number) => asserts value is number;
@@ -546,7 +546,7 @@ export const assert: Assert = {
 	array: <T = unknown>(value: unknown): asserts value is T[] => assertType(is.array(value), TypeName.Array, value),
 	buffer: (value: unknown): asserts value is Buffer => assertType(is.buffer(value), TypeName.Buffer, value),
 	nullOrUndefined: (value: unknown): asserts value is null | undefined => assertType(is.nullOrUndefined(value), AssertionTypeDescription.nullOrUndefined, value),
-	object: (value: unknown): asserts value is Record<string, unknown> => assertType(is.object(value), TypeName.Object, value),
+	object: (value: unknown): asserts value is object => assertType(is.object(value), TypeName.Object, value),
 	iterable: <T = unknown>(value: unknown): asserts value is Iterable<T> => assertType(is.iterable(value), AssertionTypeDescription.iterable, value),
 	asyncIterable: <T = unknown>(value: unknown): asserts value is AsyncIterable<T> => assertType(is.asyncIterable(value), AssertionTypeDescription.asyncIterable, value),
 	generator: (value: unknown): asserts value is Generator => assertType(is.generator(value), TypeName.Generator, value),
@@ -562,9 +562,9 @@ export const assert: Assert = {
 	regExp: (value: unknown): asserts value is RegExp => assertType(is.regExp(value), TypeName.RegExp, value),
 	date: (value: unknown): asserts value is Date => assertType(is.date(value), TypeName.Date, value),
 	error: (value: unknown): asserts value is Error => assertType(is.error(value), TypeName.Error, value),
-	map: <TKey = unknown, TValue = unknown>(value: unknown): asserts value is Map<TKey, TValue> => assertType(is.map(value), TypeName.Map, value),
+	map: <Key = unknown, Value = unknown>(value: unknown): asserts value is Map<Key, Value> => assertType(is.map(value), TypeName.Map, value),
 	set: <T = unknown>(value: unknown): asserts value is Set<T> => assertType(is.set(value), TypeName.Set, value),
-	weakMap: <TKey extends object = object, TValue = unknown>(value: unknown): asserts value is WeakMap<TKey, TValue> => assertType(is.weakMap(value), TypeName.WeakMap, value),
+	weakMap: <Key extends object = object, Value = unknown>(value: unknown): asserts value is WeakMap<Key, Value> => assertType(is.weakMap(value), TypeName.WeakMap, value),
 	weakSet: <T extends object = object>(value: unknown): asserts value is WeakSet<T> => assertType(is.weakSet(value), TypeName.WeakSet, value),
 	int8Array: (value: unknown): asserts value is Int8Array => assertType(is.int8Array(value), TypeName.Int8Array, value),
 	uint8Array: (value: unknown): asserts value is Uint8Array => assertType(is.uint8Array(value), TypeName.Uint8Array, value),
@@ -588,7 +588,7 @@ export const assert: Assert = {
 	primitive: (value: unknown): asserts value is Primitive => assertType(is.primitive(value), AssertionTypeDescription.primitive, value),
 	integer: (value: unknown): asserts value is number => assertType(is.integer(value), AssertionTypeDescription.integer, value),
 	safeInteger: (value: unknown): asserts value is number => assertType(is.safeInteger(value), AssertionTypeDescription.safeInteger, value),
-	plainObject: (value: unknown): asserts value is {[key: string]: unknown} => assertType(is.plainObject(value), AssertionTypeDescription.plainObject, value),
+	plainObject: <Value = unknown>(value: unknown): asserts value is Record<string, Value> => assertType(is.plainObject(value), AssertionTypeDescription.plainObject, value),
 	typedArray: (value: unknown): asserts value is TypedArray => assertType(is.typedArray(value), AssertionTypeDescription.typedArray, value),
 	arrayLike: <T = unknown>(value: unknown): asserts value is ArrayLike<T> => assertType(is.arrayLike(value), AssertionTypeDescription.arrayLike, value),
 	domElement: (value: unknown): asserts value is Element => assertType(is.domElement(value), AssertionTypeDescription.domElement, value),
@@ -600,12 +600,12 @@ export const assert: Assert = {
 	emptyString: (value: unknown): asserts value is '' => assertType(is.emptyString(value), AssertionTypeDescription.emptyString, value),
 	nonEmptyString: (value: unknown): asserts value is string => assertType(is.nonEmptyString(value), AssertionTypeDescription.nonEmptyString, value),
 	emptyStringOrWhitespace: (value: unknown): asserts value is string => assertType(is.emptyStringOrWhitespace(value), AssertionTypeDescription.emptyStringOrWhitespace, value),
-	emptyObject: (value: unknown): asserts value is {[key: string]: never} => assertType(is.emptyObject(value), AssertionTypeDescription.emptyObject, value),
-	nonEmptyObject: (value: unknown): asserts value is {[key: string]: unknown} => assertType(is.nonEmptyObject(value), AssertionTypeDescription.nonEmptyObject, value),
+	emptyObject: <Key extends keyof any = string>(value: unknown): asserts value is Record<Key, never> => assertType(is.emptyObject(value), AssertionTypeDescription.emptyObject, value),
+	nonEmptyObject: <Key extends keyof any = string, Value = unknown>(value: unknown): asserts value is Record<Key, Value> => assertType(is.nonEmptyObject(value), AssertionTypeDescription.nonEmptyObject, value),
 	emptySet: (value: unknown): asserts value is Set<never> => assertType(is.emptySet(value), AssertionTypeDescription.emptySet, value),
-	nonEmptySet: (value: unknown): asserts value is Set<unknown> => assertType(is.nonEmptySet(value), AssertionTypeDescription.nonEmptySet, value),
+	nonEmptySet: <T = unknown>(value: unknown): asserts value is Set<T> => assertType(is.nonEmptySet(value), AssertionTypeDescription.nonEmptySet, value),
 	emptyMap: (value: unknown): asserts value is Map<never, never> => assertType(is.emptyMap(value), AssertionTypeDescription.emptyMap, value),
-	nonEmptyMap: (value: unknown): asserts value is Map<unknown, unknown> => assertType(is.nonEmptyMap(value), AssertionTypeDescription.nonEmptyMap, value),
+	nonEmptyMap: <Key = unknown, Value = unknown>(value: unknown): asserts value is Map<Key, Value> => assertType(is.nonEmptyMap(value), AssertionTypeDescription.nonEmptyMap, value),
 
 	// Numbers.
 	evenInteger: (value: number): asserts value is number => assertType(is.evenInteger(value), AssertionTypeDescription.evenInteger, value),

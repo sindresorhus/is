@@ -11,6 +11,7 @@ For example, `is.string('🦄') //=> true`
 - Written in TypeScript
 - [Extensive use of type guards](#type-guards)
 - [Supports type assertions](#type-assertions)
+- [Aware of generic type parameters](#generic-type-parameters) (use with caution)
 - Actively maintained
 - 2 million weekly downloads
 
@@ -496,6 +497,48 @@ handleMovieRatingApiResponse({rating: 0.87, title: 'The Matrix'});
 
 // This throws an error.
 handleMovieRatingApiResponse({rating: '🦄'});
+```
+
+## Generic type parameters
+
+The type guards and type assertions are aware of [generic type parameters](https://www.typescriptlang.org/docs/handbook/generics.html), such as `Promise<T>` and `Map<Key, Value>`. The default is `unknown` for most cases, since `is` can not check them at runtime. If the generic type is known at compile-time, either implicitly (inferred) or explicitly (provided), `is` propagates the type so it can be used later.
+
+Use generic type parameters with caution. They are only checked by the TypeScript compiler, and not checked by `is` at runtime. This can lead to unexpected behavior, where the generic type is _assumed_ at compile-time, but actually is something completely different at runtime. It is best to use `unknown` (default) and type-check the value of the generic type parameter at runtime with `is` or `assert`.
+
+```ts
+import { assert } from '@sindresorhus/is';
+
+async function badNumberAssumption(input: unknown) {
+    // Bad assumption about the generic type parameter fools the compile-time type system.
+    assert.promise<number>(input);
+    // `input` is a `Promise` but only assumed to be `Promise<number>`.
+
+    const resolved = await input;
+    // `resolved` is typed as `number` but was not actually checked at runtime.
+
+    // Multiplication will return NaN if the input promise did not actually contain a number.
+    return 2 * resolved;
+}
+
+async function goodNumberAssertion(input: unknown) {
+    assert.promise(input);
+    // `input` is typed as `Promise<unknown>`
+
+    const resolved = await input;
+    // `resolved` is typed as `unknown`
+
+    assert.number(resolved);
+    // `resolved` is typed as `number`
+
+    // Uses runtime checks so only numbers will reach the multiplication.
+    return 2 * resolved;
+}
+
+badNumberAssumption(Promise.resolve("an unexpected string"));
+//=> 'NaN'
+
+// This correctly throws an error because of the unexpected string value.
+goodNumberAssertion(Promise.resolve("an unexpected string"));
 ```
 
 ## FAQ
