@@ -126,10 +126,10 @@ Returns `true` for any `async` function that can be called with the `await` oper
 
 ```js
 is.asyncFunction(async () => {});
-// => true
+//=> true
 
 is.asyncFunction(() => {});
-// => false
+//=> false
 ```
 
 ##### .asyncGenerator(value)
@@ -140,14 +140,14 @@ is.asyncGenerator(
 		yield 4;
 	})()
 );
-// => true
+//=> true
 
 is.asyncGenerator(
 	(function * () {
 		yield 4;
 	})()
 );
-// => false
+//=> false
 ```
 
 ##### .asyncGeneratorFunction(value)
@@ -156,12 +156,12 @@ is.asyncGenerator(
 is.asyncGeneratorFunction(async function * () {
 	yield 4;
 });
-// => true
+//=> true
 
 is.asyncGeneratorFunction(function * () {
 	yield 4;
 });
-// => false
+//=> false
 ```
 
 ##### .boundFunction(value)
@@ -170,13 +170,13 @@ Returns `true` for any `bound` function.
 
 ```js
 is.boundFunction(() => {});
-// => true
+//=> true
 
 is.boundFunction(function () {}.bind(null));
-// => true
+//=> true
 
 is.boundFunction(function () {});
-// => false
+//=> false
 ```
 
 ##### .map(value)
@@ -243,7 +243,7 @@ Object.defineProperty(object1, 'property1', {
 });
 
 is.emptyObject(object1);
-// => true
+//=> true
 ```
 
 ##### .nonEmptyObject(value)
@@ -501,12 +501,12 @@ handleMovieRatingApiResponse({rating: '🦄'});
 
 ## Generic type parameters
 
-The type guards and type assertions are aware of [generic type parameters](https://www.typescriptlang.org/docs/handbook/generics.html), such as `Promise<T>` and `Map<Key, Value>`. The default is `unknown` for most cases, since `is` can not check them at runtime. If the generic type is known at compile-time, either implicitly (inferred) or explicitly (provided), `is` propagates the type so it can be used later.
+The type guards and type assertions are aware of [generic type parameters](https://www.typescriptlang.org/docs/handbook/generics.html), such as `Promise<T>` and `Map<Key, Value>`. The default is `unknown` for most cases, since `is` cannot check them at runtime. If the generic type is known at compile-time, either implicitly (inferred) or explicitly (provided), `is` propagates the type so it can be used later.
 
 Use generic type parameters with caution. They are only checked by the TypeScript compiler, and not checked by `is` at runtime. This can lead to unexpected behavior, where the generic type is _assumed_ at compile-time, but actually is something completely different at runtime. It is best to use `unknown` (default) and type-check the value of the generic type parameter at runtime with `is` or `assert`.
 
 ```ts
-import { assert } from '@sindresorhus/is';
+import {assert} from '@sindresorhus/is';
 
 async function badNumberAssumption(input: unknown) {
     // Bad assumption about the generic type parameter fools the compile-time type system.
@@ -534,11 +534,11 @@ async function goodNumberAssertion(input: unknown) {
     return 2 * resolved;
 }
 
-badNumberAssumption(Promise.resolve("an unexpected string"));
-//=> 'NaN'
+badNumberAssumption(Promise.resolve('An unexpected string'));
+//=> NaN
 
 // This correctly throws an error because of the unexpected string value.
-goodNumberAssertion(Promise.resolve("an unexpected string"));
+goodNumberAssertion(Promise.resolve('An unexpected string'));
 ```
 
 ## FAQ
