@@ -509,29 +509,29 @@ Use generic type parameters with caution. They are only checked by the TypeScrip
 import {assert} from '@sindresorhus/is';
 
 async function badNumberAssumption(input: unknown) {
-    // Bad assumption about the generic type parameter fools the compile-time type system.
-    assert.promise<number>(input);
-    // `input` is a `Promise` but only assumed to be `Promise<number>`.
+	// Bad assumption about the generic type parameter fools the compile-time type system.
+	assert.promise<number>(input);
+	// `input` is a `Promise` but only assumed to be `Promise<number>`.
 
-    const resolved = await input;
-    // `resolved` is typed as `number` but was not actually checked at runtime.
+	const resolved = await input;
+	// `resolved` is typed as `number` but was not actually checked at runtime.
 
-    // Multiplication will return NaN if the input promise did not actually contain a number.
-    return 2 * resolved;
+	// Multiplication will return NaN if the input promise did not actually contain a number.
+	return 2 * resolved;
 }
 
 async function goodNumberAssertion(input: unknown) {
-    assert.promise(input);
-    // `input` is typed as `Promise<unknown>`
+	assert.promise(input);
+	// `input` is typed as `Promise<unknown>`
 
-    const resolved = await input;
-    // `resolved` is typed as `unknown`
+	const resolved = await input;
+	// `resolved` is typed as `unknown`
 
-    assert.number(resolved);
-    // `resolved` is typed as `number`
+	assert.number(resolved);
+	// `resolved` is typed as `number`
 
-    // Uses runtime checks so only numbers will reach the multiplication.
-    return 2 * resolved;
+	// Uses runtime checks so only numbers will reach the multiplication.
+	return 2 * resolved;
 }
 
 badNumberAssumption(Promise.resolve('An unexpected string'));
