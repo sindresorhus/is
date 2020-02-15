@@ -373,6 +373,7 @@ is.emptyMap = (value: unknown): value is Map<never, never> => is.map(value) && v
 is.nonEmptyMap = <Key = unknown, Value = unknown>(value: unknown): value is Map<Key, Value> => is.map(value) && value.size > 0;
 
 export type Predicate = (value: unknown) => boolean;
+export type OverloadedPredicate = Predicate | Predicate[];
 
 type ArrayMethod = (fn: (value: unknown, index: number, array: unknown[]) => boolean, thisArg?: unknown) => boolean;
 
@@ -388,7 +389,16 @@ const predicateOnArray = (method: ArrayMethod, predicate: Predicate, values: unk
 	return method.call(values, predicate);
 };
 
-is.any = (predicate: Predicate, ...values: unknown[]): boolean => predicateOnArray(Array.prototype.some, predicate, values);
+is.any = (predicate: OverloadedPredicate, ...values: unknown[]): boolean => {
+	if (is.array(predicate) === true) {
+		return (predicate as Predicate[]).some((singlePredicate: Predicate) =>
+			predicateOnArray(Array.prototype.some, singlePredicate, values)
+		);
+	}
+
+	return predicateOnArray(Array.prototype.some, predicate as Predicate, values);
+};
+
 is.all = (predicate: Predicate, ...values: unknown[]): boolean => predicateOnArray(Array.prototype.every, predicate, values);
 
 const assertType = (condition: boolean, description: string, value: unknown): asserts condition => {
@@ -526,7 +536,7 @@ interface Assert {
 	inRange: (value: number, range: number | number[]) => asserts value is number;
 
 	// Variadic functions.
-	any: (predicate: Predicate, ...values: unknown[]) => void | never;
+	any: (predicate: OverloadedPredicate, ...values: unknown[]) => void | never;
 	all: (predicate: Predicate, ...values: unknown[]) => void | never;
 }
 
@@ -616,7 +626,7 @@ export const assert: Assert = {
 	inRange: (value: number, range: number | number[]): asserts value is number => assertType(is.inRange(value, range), AssertionTypeDescription.inRange, value),
 
 	// Variadic functions.
-	any: (predicate: Predicate, ...values: unknown[]): void | never => assertType(is.any(predicate, ...values), AssertionTypeDescription.any, values),
+	any: (predicate: OverloadedPredicate, ...values: unknown[]): void | never => assertType(is.any(predicate, ...values), AssertionTypeDescription.any, values),
 	all: (predicate: Predicate, ...values: unknown[]): void | never => assertType(is.all(predicate, ...values), AssertionTypeDescription.all, values)
 };
 

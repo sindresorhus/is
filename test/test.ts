@@ -1458,6 +1458,8 @@ test('is.any', t => {
 	t.true(is.any(is.object, false, {}, 'unicorns'));
 	t.false(is.any(is.boolean, '🦄', [], 3));
 	t.false(is.any(is.integer, true, 'lol', {}));
+	t.true(is.any([is.string, is.number], {}, true, '🦄'));
+	t.false(is.any([is.boolean, is.number], 'unicorns', [], new Map()));
 
 	t.throws(() => {
 		is.any(null as any, true);
