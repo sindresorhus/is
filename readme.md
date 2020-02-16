@@ -432,6 +432,20 @@ is.any(is.boolean, 'unicorns', [], new Map());
 //=> false
 ```
 
+See below for use with multiple predicates.
+
+##### .any(predicates[], ...values)
+
+Returns `true` if **any** of the input `values` returns true in **any** of the `predicates` provided in an array:
+
+```js
+is.any([is.string, is.number], {}, true, '🦄');
+//=> true
+
+is.any([is.boolean, is.number], 'unicorns', [], new Map());
+//=> false
+```
+
 ##### .all(predicate, ...values)
 
 Returns `true` if **all** of the input `values` returns true in the `predicate`:
