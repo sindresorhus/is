@@ -420,15 +420,25 @@ Returns `true` if `value` is an even integer.
 
 Returns `true` if `value` is an odd integer.
 
-##### .any(predicate, ...values)
+##### .any(predicate | predicate[], ...values)
 
-Returns `true` if **any** of the input `values` returns true in the `predicate`:
+Using a single `predicate` argument, returns `true` if **any** of the input `values` returns true in the `predicate`:
 
 ```js
 is.any(is.string, {}, true, '🦄');
 //=> true
 
 is.any(is.boolean, 'unicorns', [], new Map());
+//=> false
+```
+
+Using an array of `predicate[]`, returns `true` if **any** of the input `values` returns true for **any** of the `predicates` provided in an array:
+
+```js
+is.any([is.string, is.number], {}, true, '🦄');
+//=> true
+
+is.any([is.boolean, is.number], 'unicorns', [], new Map());
 //=> false
 ```
 
