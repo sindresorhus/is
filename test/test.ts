@@ -571,13 +571,23 @@ const testType = (t: ExecutionContext, type: string, exclude?: string[]) => {
 		}
 
 		const isTypeUnderTest = key === type;
-		const assertIs = isTypeUnderTest ? t.true.bind(t) : t.false.bind(t);
-		const assertAsserts = isTypeUnderTest ? t.notThrows.bind(t) : t.throws.bind(t);
+		const assertIs = isTypeUnderTest ? t.true : t.false;
 
 		for (const fixture of fixtures) {
 			assertIs(testIs(fixture), `Value: ${inspect(fixture)}`);
 			const valueType = typeDescription ? typeDescription : typename;
-			assertAsserts(() => testAssert(fixture), `Expected value which is \`${valueType!}\`, received value of type \`${is(fixture)}\`.`);
+
+			if (isTypeUnderTest) {
+				t.notThrows(() => {
+					testAssert(fixture);
+				});
+			} else {
+				t.throws(() => {
+					testAssert(fixture);
+				}, {
+					message: `Expected value which is \`${valueType!}\`, received value of type \`${is(fixture)}\`.`
+				});
+			}
 
 			if (isTypeUnderTest && typename) {
 				t.is(is(fixture), typename);

@@ -8,7 +8,7 @@
 	"author": {
 		"name": "Sindre Sorhus",
 		"email": "sindresorhus@gmail.com",
-		"url": "sindresorhus.com"
+		"url": "https://sindresorhus.com"
 	},
 	"main": "dist",
 	"engines": {
@@ -48,27 +48,25 @@
 	],
 	"devDependencies": {
 		"@sindresorhus/tsconfig": "^0.7.0",
-		"@types/jsdom": "^12.2.4",
-		"@types/node": "^12.12.6",
+		"@types/jsdom": "^16.1.0",
+		"@types/node": "^13.7.4",
 		"@types/zen-observable": "^0.8.0",
-		"@typescript-eslint/eslint-plugin": "^2.18.0",
-		"@typescript-eslint/parser": "^2.18.0",
-		"ava": "^2.1.0",
+		"@typescript-eslint/eslint-plugin": "^2.20.0",
+		"@typescript-eslint/parser": "^2.20.0",
+		"ava": "^3.3.0",
 		"del-cli": "^2.0.0",
-		"eslint-config-xo-typescript": "^0.24.1",
+		"eslint-config-xo-typescript": "^0.26.0",
 		"jsdom": "^16.0.1",
 		"rxjs": "^6.4.0",
-		"tempy": "^0.3.0",
+		"tempy": "^0.4.0",
 		"ts-node": "^8.3.0",
-		"typescript": "^3.7.5",
-		"xo": "^0.25.3",
+		"typescript": "~3.8.2",
+		"xo": "^0.26.1",
 		"zen-observable": "^0.8.8"
 	},
 	"types": "dist",
 	"sideEffects": false,
 	"ava": {
-		"babel": false,
-		"compileEnhancements": false,
 		"extensions": [
 			"ts"
 		],

@@ -133,13 +133,13 @@ is.numericString = (value: unknown): value is string =>
 	is.string(value) && value.length > 0 && !Number.isNaN(Number(value));
 
 is.array = Array.isArray;
-is.buffer = (value: unknown): value is Buffer => !is.nullOrUndefined(value) && !is.nullOrUndefined((value as Buffer).constructor) && is.function_((value as Buffer).constructor.isBuffer) && (value as Buffer).constructor.isBuffer(value);
+is.buffer = (value: unknown): value is Buffer => (value as any)?.constructor?.isBuffer?.(value) ?? false;
 
 is.nullOrUndefined = (value: unknown): value is null | undefined => is.null_(value) || is.undefined(value);
 is.object = (value: unknown): value is object => !is.null_(value) && (typeof value === 'object' || is.function_(value));
-is.iterable = <T = unknown>(value: unknown): value is IterableIterator<T> => !is.nullOrUndefined(value) && is.function_((value as IterableIterator<T>)[Symbol.iterator]);
+is.iterable = <T = unknown>(value: unknown): value is IterableIterator<T> => is.function_((value as IterableIterator<T>)?.[Symbol.iterator]);
 
-is.asyncIterable = <T = unknown>(value: unknown): value is AsyncIterableIterator<T> => !is.nullOrUndefined(value) && is.function_((value as AsyncIterableIterator<T>)[Symbol.asyncIterator]);
+is.asyncIterable = <T = unknown>(value: unknown): value is AsyncIterableIterator<T> => is.function_((value as AsyncIterableIterator<T>)?.[Symbol.asyncIterator]);
 
 is.generator = (value: unknown): value is Generator => is.iterable(value) && is.function_(value.next) && is.function_(value.throw);
 
@@ -149,9 +149,8 @@ is.nativePromise = <T = unknown>(value: unknown): value is Promise<T> =>
 	isObjectOfType<Promise<T>>(TypeName.Promise)(value);
 
 const hasPromiseAPI = <T = unknown>(value: unknown): value is Promise<T> =>
-	is.object(value) &&
-	is.function_((value as Promise<T>).then) && // eslint-disable-line promise/prefer-await-to-then
-	is.function_((value as Promise<T>).catch);
+	is.function_((value as Promise<T>)?.then) &&
+	is.function_((value as Promise<T>)?.catch);
 
 is.promise = <T = unknown>(value: unknown): value is Promise<T> => is.nativePromise(value) || hasPromiseAPI(value);
 
@@ -326,11 +325,11 @@ is.observable = (value: unknown): value is ObservableLike => {
 	}
 
 	// eslint-disable-next-line no-use-extend-native/no-use-extend-native
-	if ((value as any)[Symbol.observable] && value === (value as any)[Symbol.observable]()) {
+	if (value === (value as any)[Symbol.observable]?.()) {
 		return true;
 	}
 
-	if ((value as any)['@@observable'] && value === (value as any)['@@observable']()) {
+	if (value === (value as any)['@@observable']?.()) {
 		return true;
 	}
 
@@ -357,7 +356,7 @@ is.emptyString = (value: unknown): value is '' => is.string(value) && value.leng
 // TODO: Use `not ''` when the `not` operator is available.
 is.nonEmptyString = (value: unknown): value is string => is.string(value) && value.length > 0;
 
-const isWhiteSpaceString = (value: unknown): value is string => is.string(value) && /\S/.test(value) === false;
+const isWhiteSpaceString = (value: unknown): value is string => is.string(value) && !/\S/.test(value);
 is.emptyStringOrWhitespace = (value: unknown): value is string => is.emptyString(value) || isWhiteSpaceString(value);
 
 is.emptyObject = <Key extends keyof any = string>(value: unknown): value is Record<Key, never> => is.object(value) && !is.map(value) && !is.set(value) && Object.keys(value).length === 0;
@@ -377,7 +376,7 @@ export type Predicate = (value: unknown) => boolean;
 type ArrayMethod = (fn: (value: unknown, index: number, array: unknown[]) => boolean, thisArg?: unknown) => boolean;
 
 const predicateOnArray = (method: ArrayMethod, predicate: Predicate, values: unknown[]) => {
-	if (is.function_(predicate) === false) {
+	if (!is.function_(predicate)) {
 		throw new TypeError(`Invalid predicate: ${JSON.stringify(predicate)}`);
 	}
 
