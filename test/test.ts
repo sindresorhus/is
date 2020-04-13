@@ -124,7 +124,8 @@ const types = new Map<string, Test>([
 		fixtures: [
 			'5',
 			'-3.2',
-			'Infinity'
+			'Infinity',
+			'0x56'
 		],
 		typename: TypeName.string,
 		typeDescription: AssertionTypeDescription.numericString
@@ -627,6 +628,8 @@ test('is.symbol', t => {
 test('is.numericString', t => {
 	testType(t, 'numericString');
 	t.false(is.numericString(''));
+	t.false(is.numericString(' '));
+	t.false(is.numericString(' \t\t\n'));
 	t.false(is.numericString(1));
 	t.throws(() => {
 		assert.numericString('');

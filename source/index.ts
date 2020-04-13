@@ -130,7 +130,7 @@ is.boolean = (value: unknown): value is boolean => value === true || value === f
 is.symbol = isOfType<symbol>('symbol');
 
 is.numericString = (value: unknown): value is string =>
-	is.string(value) && value.length > 0 && !Number.isNaN(Number(value));
+	is.string(value) && !is.emptyStringOrWhitespace(value) && !Number.isNaN(Number(value));
 
 is.array = Array.isArray;
 is.buffer = (value: unknown): value is Buffer => (value as any)?.constructor?.isBuffer?.(value) ?? false;
