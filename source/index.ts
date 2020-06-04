@@ -4,48 +4,72 @@
 
 export type Class<T = unknown> = new (...args: any[]) => T;
 
-export const enum TypeName {
-	null = 'null',
-	boolean = 'boolean',
-	undefined = 'undefined',
-	string = 'string',
-	number = 'number',
-	bigint = 'bigint',
-	symbol = 'symbol',
-	Function = 'Function',
-	Generator = 'Generator',
-	AsyncGenerator = 'AsyncGenerator',
-	GeneratorFunction = 'GeneratorFunction',
-	AsyncGeneratorFunction = 'AsyncGeneratorFunction',
-	AsyncFunction = 'AsyncFunction',
-	Observable = 'Observable',
-	Array = 'Array',
-	Buffer = 'Buffer',
-	Object = 'Object',
-	RegExp = 'RegExp',
-	Date = 'Date',
-	Error = 'Error',
-	Map = 'Map',
-	Set = 'Set',
-	WeakMap = 'WeakMap',
-	WeakSet = 'WeakSet',
-	Int8Array = 'Int8Array',
-	Uint8Array = 'Uint8Array',
-	Uint8ClampedArray = 'Uint8ClampedArray',
-	Int16Array = 'Int16Array',
-	Uint16Array = 'Uint16Array',
-	Int32Array = 'Int32Array',
-	Uint32Array = 'Uint32Array',
-	Float32Array = 'Float32Array',
-	Float64Array = 'Float64Array',
-	BigInt64Array = 'BigInt64Array',
-	BigUint64Array = 'BigUint64Array',
-	ArrayBuffer = 'ArrayBuffer',
-	SharedArrayBuffer = 'SharedArrayBuffer',
-	DataView = 'DataView',
-	Promise = 'Promise',
-	URL = 'URL'
+const objectTypeNames = [
+	'Function',
+	'Generator',
+	'AsyncGenerator',
+	'GeneratorFunction',
+	'AsyncGeneratorFunction',
+	'AsyncFunction',
+	'Observable',
+	'Array',
+	'Buffer',
+	'Object',
+	'RegExp',
+	'Date',
+	'Error',
+	'Map',
+	'Set',
+	'WeakMap',
+	'WeakSet',
+	'ArrayBuffer',
+	'SharedArrayBuffer',
+	'DataView',
+	'Promise',
+	'URL'
+] as const;
+
+type ObjectTypeName = typeof objectTypeNames[number];
+
+const primitives = {
+	null: null,
+	undefined,
+	string: String(),
+	number: Number(),
+	bigint: BigInt(0),
+	boolean: Boolean(),
+	symbol: Symbol('')
+} as const;
+
+type PrimitiveTypeName = keyof typeof primitives;
+export type Primitive = typeof primitives[PrimitiveTypeName];
+
+function isPrimitiveTypeName(name: string): name is PrimitiveTypeName {
+	return Object.prototype.hasOwnProperty.call(primitives, name);
 }
+
+const typedArrays = {
+	Int8Array: new Int8Array(),
+	Uint8Array: new Uint8Array(),
+	Uint8ClampedArray: new Uint8ClampedArray(),
+	Int16Array: new Int16Array(),
+	Uint16Array: new Uint16Array(),
+	Int32Array: new Int32Array(),
+	Uint32Array: new Uint32Array(),
+	Float32Array: new Float32Array(),
+	Float64Array: new Float64Array(),
+	BigInt64Array: new BigInt64Array(),
+	BigUint64Array: new BigUint64Array()
+} as const;
+
+type TypedArrayTypeName = keyof typeof typedArrays;
+export type TypedArray = typeof typedArrays[TypedArrayTypeName];
+
+function isTypedArrayName(value: any): value is TypedArrayTypeName {
+	return Object.prototype.hasOwnProperty.call(typedArrays, value);
+}
+
+export type TypeName = ObjectTypeName | PrimitiveTypeName | TypedArrayTypeName;
 
 const {toString} = Object.prototype;
 const isOfType = <T>(type: string) => (value: unknown): value is T => typeof value === type;
@@ -64,41 +88,41 @@ const isObjectOfType = <T>(type: TypeName) => (value: unknown): value is T => ge
 function is(value: unknown): TypeName {
 	switch (value) {
 		case null:
-			return TypeName.null;
+			return 'null';
 		case true:
 		case false:
-			return TypeName.boolean;
+			return 'boolean';
 		default:
 	}
 
 	switch (typeof value) {
 		case 'undefined':
-			return TypeName.undefined;
+			return 'undefined';
 		case 'string':
-			return TypeName.string;
+			return 'string';
 		case 'number':
-			return TypeName.number;
+			return 'number';
 		case 'bigint':
-			return TypeName.bigint;
+			return 'bigint';
 		case 'symbol':
-			return TypeName.symbol;
+			return 'symbol';
 		default:
 	}
 
 	if (is.function_(value)) {
-		return TypeName.Function;
+		return 'Function';
 	}
 
 	if (is.observable(value)) {
-		return TypeName.Observable;
+		return 'Observable';
 	}
 
 	if (is.array(value)) {
-		return TypeName.Array;
+		return 'Array';
 	}
 
 	if (is.buffer(value)) {
-		return TypeName.Buffer;
+		return 'Buffer';
 	}
 
 	const tagType = getObjectType(value);
@@ -110,7 +134,7 @@ function is(value: unknown): TypeName {
 		throw new TypeError('Please don\'t use object wrappers for primitive types');
 	}
 
-	return TypeName.Object;
+	return 'Object';
 }
 
 is.undefined = isOfType<undefined>('undefined');
@@ -146,7 +170,7 @@ is.generator = (value: unknown): value is Generator => is.iterable(value) && is.
 is.asyncGenerator = (value: unknown): value is AsyncGenerator => is.asyncIterable(value) && is.function_(value.next) && is.function_(value.throw);
 
 is.nativePromise = <T = unknown>(value: unknown): value is Promise<T> =>
-	isObjectOfType<Promise<T>>(TypeName.Promise)(value);
+	isObjectOfType<Promise<T>>('Promise')(value);
 
 const hasPromiseAPI = <T = unknown>(value: unknown): value is Promise<T> =>
 	is.function_((value as Promise<T>)?.then) &&
@@ -154,41 +178,41 @@ const hasPromiseAPI = <T = unknown>(value: unknown): value is Promise<T> =>
 
 is.promise = <T = unknown>(value: unknown): value is Promise<T> => is.nativePromise(value) || hasPromiseAPI(value);
 
-is.generatorFunction = isObjectOfType<GeneratorFunction>(TypeName.GeneratorFunction);
+is.generatorFunction = isObjectOfType<GeneratorFunction>('GeneratorFunction');
 
-is.asyncGeneratorFunction = (value: unknown): value is ((...args: any[]) => Promise<unknown>) => getObjectType(value) === TypeName.AsyncGeneratorFunction;
+is.asyncGeneratorFunction = (value: unknown): value is ((...args: any[]) => Promise<unknown>) => getObjectType(value) === 'AsyncGeneratorFunction';
 
-is.asyncFunction = <T = unknown>(value: unknown): value is ((...args: any[]) => Promise<T>) => getObjectType(value) === TypeName.AsyncFunction;
+is.asyncFunction = <T = unknown>(value: unknown): value is ((...args: any[]) => Promise<T>) => getObjectType(value) === 'AsyncFunction';
 
 // eslint-disable-next-line no-prototype-builtins, @typescript-eslint/ban-types
 is.boundFunction = (value: unknown): value is Function => is.function_(value) && !value.hasOwnProperty('prototype');
 
-is.regExp = isObjectOfType<RegExp>(TypeName.RegExp);
-is.date = isObjectOfType<Date>(TypeName.Date);
-is.error = isObjectOfType<Error>(TypeName.Error);
-is.map = <Key = unknown, Value = unknown>(value: unknown): value is Map<Key, Value> => isObjectOfType<Map<Key, Value>>(TypeName.Map)(value);
-is.set = <T = unknown>(value: unknown): value is Set<T> => isObjectOfType<Set<T>>(TypeName.Set)(value);
-is.weakMap = <Key extends object = object, Value = unknown>(value: unknown): value is WeakMap<Key, Value> => isObjectOfType<WeakMap<Key, Value>>(TypeName.WeakMap)(value);
-is.weakSet = (value: unknown): value is WeakSet<object> => isObjectOfType<WeakSet<object>>(TypeName.WeakSet)(value);
+is.regExp = isObjectOfType<RegExp>('RegExp');
+is.date = isObjectOfType<Date>('Date');
+is.error = isObjectOfType<Error>('Error');
+is.map = <Key = unknown, Value = unknown>(value: unknown): value is Map<Key, Value> => isObjectOfType<Map<Key, Value>>('Map')(value);
+is.set = <T = unknown>(value: unknown): value is Set<T> => isObjectOfType<Set<T>>('Set')(value);
+is.weakMap = <Key extends object = object, Value = unknown>(value: unknown): value is WeakMap<Key, Value> => isObjectOfType<WeakMap<Key, Value>>('WeakMap')(value);
+is.weakSet = (value: unknown): value is WeakSet<object> => isObjectOfType<WeakSet<object>>('WeakSet')(value);
 
-is.int8Array = isObjectOfType<Int8Array>(TypeName.Int8Array);
-is.uint8Array = isObjectOfType<Uint8Array>(TypeName.Uint8Array);
-is.uint8ClampedArray = isObjectOfType<Uint8ClampedArray>(TypeName.Uint8ClampedArray);
-is.int16Array = isObjectOfType<Int16Array>(TypeName.Int16Array);
-is.uint16Array = isObjectOfType<Uint16Array>(TypeName.Uint16Array);
-is.int32Array = isObjectOfType<Int32Array>(TypeName.Int32Array);
-is.uint32Array = isObjectOfType<Uint32Array>(TypeName.Uint32Array);
-is.float32Array = isObjectOfType<Float32Array>(TypeName.Float32Array);
-is.float64Array = isObjectOfType<Float64Array>(TypeName.Float64Array);
-is.bigInt64Array = isObjectOfType<BigInt64Array>(TypeName.BigInt64Array);
-is.bigUint64Array = isObjectOfType<BigUint64Array>(TypeName.BigUint64Array);
+is.int8Array = isObjectOfType<Int8Array>('Int8Array');
+is.uint8Array = isObjectOfType<Uint8Array>('Uint8Array');
+is.uint8ClampedArray = isObjectOfType<Uint8ClampedArray>('Uint8ClampedArray');
+is.int16Array = isObjectOfType<Int16Array>('Int16Array');
+is.uint16Array = isObjectOfType<Uint16Array>('Uint16Array');
+is.int32Array = isObjectOfType<Int32Array>('Int32Array');
+is.uint32Array = isObjectOfType<Uint32Array>('Uint32Array');
+is.float32Array = isObjectOfType<Float32Array>('Float32Array');
+is.float64Array = isObjectOfType<Float64Array>('Float64Array');
+is.bigInt64Array = isObjectOfType<BigInt64Array>('BigInt64Array');
+is.bigUint64Array = isObjectOfType<BigUint64Array>('BigUint64Array');
 
-is.arrayBuffer = isObjectOfType<ArrayBuffer>(TypeName.ArrayBuffer);
-is.sharedArrayBuffer = isObjectOfType<SharedArrayBuffer>(TypeName.SharedArrayBuffer);
-is.dataView = isObjectOfType<DataView>(TypeName.DataView);
+is.arrayBuffer = isObjectOfType<ArrayBuffer>('ArrayBuffer');
+is.sharedArrayBuffer = isObjectOfType<SharedArrayBuffer>('SharedArrayBuffer');
+is.dataView = isObjectOfType<DataView>('DataView');
 
 is.directInstanceOf = <T>(instance: unknown, class_: Class<T>): instance is T => Object.getPrototypeOf(instance) === class_.prototype;
-is.urlInstance = (value: unknown): value is URL => isObjectOfType<URL>(TypeName.URL)(value);
+is.urlInstance = (value: unknown): value is URL => isObjectOfType<URL>('URL')(value);
 
 is.urlString = (value: unknown): value is string => {
 	if (!is.string(value)) {
@@ -211,33 +235,14 @@ is.falsy = (value: unknown) => !value;
 
 is.nan = (value: unknown) => Number.isNaN(value as number);
 
-const primitiveTypeOfTypes = new Set([
-	'undefined',
-	'string',
-	'number',
-	'bigint',
-	'boolean',
-	'symbol'
-]);
-
-// TODO: This should be able to be `not object` when the `not` operator is out
-export type Primitive =
-	| null
-	| undefined
-	| string
-	| number
-	| bigint
-	| boolean
-	| symbol;
-
-is.primitive = (value: unknown): value is Primitive => is.null_(value) || primitiveTypeOfTypes.has(typeof value);
+is.primitive = (value: unknown): value is Primitive => is.null_(value) || isPrimitiveTypeName(typeof value);
 
 is.integer = (value: unknown): value is number => Number.isInteger(value as number);
 is.safeInteger = (value: unknown): value is number => Number.isSafeInteger(value as number);
 
 is.plainObject = <Value = unknown>(value: unknown): value is Record<string, Value> => {
 	// From: https://github.com/sindresorhus/is-plain-obj/blob/master/index.js
-	if (getObjectType(value) !== TypeName.Object) {
+	if (getObjectType(value) !== 'Object') {
 		return false;
 	}
 
@@ -246,41 +251,7 @@ is.plainObject = <Value = unknown>(value: unknown): value is Record<string, Valu
 	return prototype === null || prototype === Object.getPrototypeOf({});
 };
 
-const typedArrayTypes = new Set([
-	TypeName.Int8Array,
-	TypeName.Uint8Array,
-	TypeName.Uint8ClampedArray,
-	TypeName.Int16Array,
-	TypeName.Uint16Array,
-	TypeName.Int32Array,
-	TypeName.Uint32Array,
-	TypeName.Float32Array,
-	TypeName.Float64Array,
-	TypeName.BigInt64Array,
-	TypeName.BigUint64Array
-]);
-
-export type TypedArray =
-	| Int8Array
-	| Uint8Array
-	| Uint8ClampedArray
-	| Int16Array
-	| Uint16Array
-	| Int32Array
-	| Uint32Array
-	| Float32Array
-	| Float64Array
-	| BigInt64Array
-	| BigUint64Array;
-
-is.typedArray = (value: unknown): value is TypedArray => {
-	const objectType = getObjectType(value);
-	if (objectType === undefined) {
-		return false;
-	}
-
-	return typedArrayTypes.has(objectType);
-};
+is.typedArray = (value: unknown): value is TypedArray => isTypedArrayName(getObjectType(value));
 
 export interface ArrayLike<T> {
 	readonly [index: number]: T;
@@ -537,55 +508,55 @@ interface Assert {
 
 export const assert: Assert = {
 	// Unknowns.
-	undefined: (value: unknown): asserts value is undefined => assertType(is.undefined(value), TypeName.undefined, value),
-	string: (value: unknown): asserts value is string => assertType(is.string(value), TypeName.string, value),
-	number: (value: unknown): asserts value is number => assertType(is.number(value), TypeName.number, value),
-	bigint: (value: unknown): asserts value is bigint => assertType(is.bigint(value), TypeName.bigint, value),
+	undefined: (value: unknown): asserts value is undefined => assertType(is.undefined(value), 'undefined', value),
+	string: (value: unknown): asserts value is string => assertType(is.string(value), 'string', value),
+	number: (value: unknown): asserts value is number => assertType(is.number(value), 'number', value),
+	bigint: (value: unknown): asserts value is bigint => assertType(is.bigint(value), 'bigint', value),
 	// eslint-disable-next-line @typescript-eslint/ban-types
-	function_: (value: unknown): asserts value is Function => assertType(is.function_(value), TypeName.Function, value),
-	null_: (value: unknown): asserts value is null => assertType(is.null_(value), TypeName.null, value),
+	function_: (value: unknown): asserts value is Function => assertType(is.function_(value), 'Function', value),
+	null_: (value: unknown): asserts value is null => assertType(is.null_(value), 'null', value),
 	class_: (value: unknown): asserts value is Class => assertType(is.class_(value), AssertionTypeDescription.class_, value),
-	boolean: (value: unknown): asserts value is boolean => assertType(is.boolean(value), TypeName.boolean, value),
-	symbol: (value: unknown): asserts value is symbol => assertType(is.symbol(value), TypeName.symbol, value),
+	boolean: (value: unknown): asserts value is boolean => assertType(is.boolean(value), 'boolean', value),
+	symbol: (value: unknown): asserts value is symbol => assertType(is.symbol(value), 'symbol', value),
 	numericString: (value: unknown): asserts value is string => assertType(is.numericString(value), AssertionTypeDescription.numericString, value),
-	array: <T = unknown>(value: unknown): asserts value is T[] => assertType(is.array(value), TypeName.Array, value),
-	buffer: (value: unknown): asserts value is Buffer => assertType(is.buffer(value), TypeName.Buffer, value),
+	array: <T = unknown>(value: unknown): asserts value is T[] => assertType(is.array(value), 'Array', value),
+	buffer: (value: unknown): asserts value is Buffer => assertType(is.buffer(value), 'Buffer', value),
 	nullOrUndefined: (value: unknown): asserts value is null | undefined => assertType(is.nullOrUndefined(value), AssertionTypeDescription.nullOrUndefined, value),
-	object: (value: unknown): asserts value is object => assertType(is.object(value), TypeName.Object, value),
+	object: (value: unknown): asserts value is object => assertType(is.object(value), 'Object', value),
 	iterable: <T = unknown>(value: unknown): asserts value is Iterable<T> => assertType(is.iterable(value), AssertionTypeDescription.iterable, value),
 	asyncIterable: <T = unknown>(value: unknown): asserts value is AsyncIterable<T> => assertType(is.asyncIterable(value), AssertionTypeDescription.asyncIterable, value),
-	generator: (value: unknown): asserts value is Generator => assertType(is.generator(value), TypeName.Generator, value),
-	asyncGenerator: (value: unknown): asserts value is AsyncGenerator => assertType(is.asyncGenerator(value), TypeName.AsyncGenerator, value),
+	generator: (value: unknown): asserts value is Generator => assertType(is.generator(value), 'Generator', value),
+	asyncGenerator: (value: unknown): asserts value is AsyncGenerator => assertType(is.asyncGenerator(value), 'AsyncGenerator', value),
 	nativePromise: <T = unknown>(value: unknown): asserts value is Promise<T> => assertType(is.nativePromise(value), AssertionTypeDescription.nativePromise, value),
-	promise: <T = unknown>(value: unknown): asserts value is Promise<T> => assertType(is.promise(value), TypeName.Promise, value),
-	generatorFunction: (value: unknown): asserts value is GeneratorFunction => assertType(is.generatorFunction(value), TypeName.GeneratorFunction, value),
-	asyncGeneratorFunction: (value: unknown): asserts value is AsyncGeneratorFunction => assertType(is.asyncGeneratorFunction(value), TypeName.AsyncGeneratorFunction, value),
+	promise: <T = unknown>(value: unknown): asserts value is Promise<T> => assertType(is.promise(value), 'Promise', value),
+	generatorFunction: (value: unknown): asserts value is GeneratorFunction => assertType(is.generatorFunction(value), 'GeneratorFunction', value),
+	asyncGeneratorFunction: (value: unknown): asserts value is AsyncGeneratorFunction => assertType(is.asyncGeneratorFunction(value), 'AsyncGeneratorFunction', value),
 	// eslint-disable-next-line @typescript-eslint/ban-types
-	asyncFunction: (value: unknown): asserts value is Function => assertType(is.asyncFunction(value), TypeName.AsyncFunction, value),
+	asyncFunction: (value: unknown): asserts value is Function => assertType(is.asyncFunction(value), 'AsyncFunction', value),
 	// eslint-disable-next-line @typescript-eslint/ban-types
-	boundFunction: (value: unknown): asserts value is Function => assertType(is.boundFunction(value), TypeName.Function, value),
-	regExp: (value: unknown): asserts value is RegExp => assertType(is.regExp(value), TypeName.RegExp, value),
-	date: (value: unknown): asserts value is Date => assertType(is.date(value), TypeName.Date, value),
-	error: (value: unknown): asserts value is Error => assertType(is.error(value), TypeName.Error, value),
-	map: <Key = unknown, Value = unknown>(value: unknown): asserts value is Map<Key, Value> => assertType(is.map(value), TypeName.Map, value),
-	set: <T = unknown>(value: unknown): asserts value is Set<T> => assertType(is.set(value), TypeName.Set, value),
-	weakMap: <Key extends object = object, Value = unknown>(value: unknown): asserts value is WeakMap<Key, Value> => assertType(is.weakMap(value), TypeName.WeakMap, value),
-	weakSet: <T extends object = object>(value: unknown): asserts value is WeakSet<T> => assertType(is.weakSet(value), TypeName.WeakSet, value),
-	int8Array: (value: unknown): asserts value is Int8Array => assertType(is.int8Array(value), TypeName.Int8Array, value),
-	uint8Array: (value: unknown): asserts value is Uint8Array => assertType(is.uint8Array(value), TypeName.Uint8Array, value),
-	uint8ClampedArray: (value: unknown): asserts value is Uint8ClampedArray => assertType(is.uint8ClampedArray(value), TypeName.Uint8ClampedArray, value),
-	int16Array: (value: unknown): asserts value is Int16Array => assertType(is.int16Array(value), TypeName.Int16Array, value),
-	uint16Array: (value: unknown): asserts value is Uint16Array => assertType(is.uint16Array(value), TypeName.Uint16Array, value),
-	int32Array: (value: unknown): asserts value is Int32Array => assertType(is.int32Array(value), TypeName.Int32Array, value),
-	uint32Array: (value: unknown): asserts value is Uint32Array => assertType(is.uint32Array(value), TypeName.Uint32Array, value),
-	float32Array: (value: unknown): asserts value is Float32Array => assertType(is.float32Array(value), TypeName.Float32Array, value),
-	float64Array: (value: unknown): asserts value is Float64Array => assertType(is.float64Array(value), TypeName.Float64Array, value),
-	bigInt64Array: (value: unknown): asserts value is BigInt64Array => assertType(is.bigInt64Array(value), TypeName.BigInt64Array, value),
-	bigUint64Array: (value: unknown): asserts value is BigUint64Array => assertType(is.bigUint64Array(value), TypeName.BigUint64Array, value),
-	arrayBuffer: (value: unknown): asserts value is ArrayBuffer => assertType(is.arrayBuffer(value), TypeName.ArrayBuffer, value),
-	sharedArrayBuffer: (value: unknown): asserts value is SharedArrayBuffer => assertType(is.sharedArrayBuffer(value), TypeName.SharedArrayBuffer, value),
-	dataView: (value: unknown): asserts value is DataView => assertType(is.dataView(value), TypeName.DataView, value),
-	urlInstance: (value: unknown): asserts value is URL => assertType(is.urlInstance(value), TypeName.URL, value),
+	boundFunction: (value: unknown): asserts value is Function => assertType(is.boundFunction(value), 'Function', value),
+	regExp: (value: unknown): asserts value is RegExp => assertType(is.regExp(value), 'RegExp', value),
+	date: (value: unknown): asserts value is Date => assertType(is.date(value), 'Date', value),
+	error: (value: unknown): asserts value is Error => assertType(is.error(value), 'Error', value),
+	map: <Key = unknown, Value = unknown>(value: unknown): asserts value is Map<Key, Value> => assertType(is.map(value), 'Map', value),
+	set: <T = unknown>(value: unknown): asserts value is Set<T> => assertType(is.set(value), 'Set', value),
+	weakMap: <Key extends object = object, Value = unknown>(value: unknown): asserts value is WeakMap<Key, Value> => assertType(is.weakMap(value), 'WeakMap', value),
+	weakSet: <T extends object = object>(value: unknown): asserts value is WeakSet<T> => assertType(is.weakSet(value), 'WeakSet', value),
+	int8Array: (value: unknown): asserts value is Int8Array => assertType(is.int8Array(value), 'Int8Array', value),
+	uint8Array: (value: unknown): asserts value is Uint8Array => assertType(is.uint8Array(value), 'Uint8Array', value),
+	uint8ClampedArray: (value: unknown): asserts value is Uint8ClampedArray => assertType(is.uint8ClampedArray(value), 'Uint8ClampedArray', value),
+	int16Array: (value: unknown): asserts value is Int16Array => assertType(is.int16Array(value), 'Int16Array', value),
+	uint16Array: (value: unknown): asserts value is Uint16Array => assertType(is.uint16Array(value), 'Uint16Array', value),
+	int32Array: (value: unknown): asserts value is Int32Array => assertType(is.int32Array(value), 'Int32Array', value),
+	uint32Array: (value: unknown): asserts value is Uint32Array => assertType(is.uint32Array(value), 'Uint32Array', value),
+	float32Array: (value: unknown): asserts value is Float32Array => assertType(is.float32Array(value), 'Float32Array', value),
+	float64Array: (value: unknown): asserts value is Float64Array => assertType(is.float64Array(value), 'Float64Array', value),
+	bigInt64Array: (value: unknown): asserts value is BigInt64Array => assertType(is.bigInt64Array(value), 'BigInt64Array', value),
+	bigUint64Array: (value: unknown): asserts value is BigUint64Array => assertType(is.bigUint64Array(value), 'BigUint64Array', value),
+	arrayBuffer: (value: unknown): asserts value is ArrayBuffer => assertType(is.arrayBuffer(value), 'ArrayBuffer', value),
+	sharedArrayBuffer: (value: unknown): asserts value is SharedArrayBuffer => assertType(is.sharedArrayBuffer(value), 'SharedArrayBuffer', value),
+	dataView: (value: unknown): asserts value is DataView => assertType(is.dataView(value), 'DataView', value),
+	urlInstance: (value: unknown): asserts value is URL => assertType(is.urlInstance(value), 'URL', value),
 	urlString: (value: unknown): asserts value is string => assertType(is.urlString(value), AssertionTypeDescription.urlString, value),
 	truthy: (value: unknown): asserts value is unknown => assertType(is.truthy(value), AssertionTypeDescription.truthy, value),
 	falsy: (value: unknown): asserts value is unknown => assertType(is.falsy(value), AssertionTypeDescription.falsy, value),
@@ -597,7 +568,7 @@ export const assert: Assert = {
 	typedArray: (value: unknown): asserts value is TypedArray => assertType(is.typedArray(value), AssertionTypeDescription.typedArray, value),
 	arrayLike: <T = unknown>(value: unknown): asserts value is ArrayLike<T> => assertType(is.arrayLike(value), AssertionTypeDescription.arrayLike, value),
 	domElement: (value: unknown): asserts value is Element => assertType(is.domElement(value), AssertionTypeDescription.domElement, value),
-	observable: (value: unknown): asserts value is ObservableLike => assertType(is.observable(value), TypeName.Observable, value),
+	observable: (value: unknown): asserts value is ObservableLike => assertType(is.observable(value), 'Observable', value),
 	nodeStream: (value: unknown): asserts value is NodeStream => assertType(is.nodeStream(value), AssertionTypeDescription.nodeStream, value),
 	infinite: (value: unknown): asserts value is number => assertType(is.infinite(value), AssertionTypeDescription.infinite, value),
 	emptyArray: (value: unknown): asserts value is never[] => assertType(is.emptyArray(value), AssertionTypeDescription.emptyArray, value),

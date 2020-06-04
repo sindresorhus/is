@@ -7,7 +7,7 @@ import {JSDOM} from 'jsdom';
 import {Subject, Observable} from 'rxjs';
 import tempy = require('tempy');
 import ZenObservable = require('zen-observable');
-import is, {assert, AssertionTypeDescription, TypeName} from '../source';
+import is, {assert, AssertionTypeDescription, Primitive, TypedArray, TypeName} from '../source';
 
 class PromiseSubclassFixture<T> extends Promise<T> {}
 class ErrorSubclassFixture extends Error {}
@@ -47,7 +47,7 @@ const types = new Map<string, Test>([
 		fixtures: [
 			undefined
 		],
-		typename: TypeName.undefined
+		typename: 'undefined'
 	}],
 	['null', {
 		is: is.null_,
@@ -55,7 +55,7 @@ const types = new Map<string, Test>([
 		fixtures: [
 			null
 		],
-		typename: TypeName.null
+		typename: 'null'
 	}],
 	['string', {
 		is: is.string,
@@ -65,7 +65,7 @@ const types = new Map<string, Test>([
 			'hello world',
 			''
 		],
-		typename: TypeName.string
+		typename: 'string'
 	}],
 	['emptyString', {
 		is: is.emptyString,
@@ -74,7 +74,7 @@ const types = new Map<string, Test>([
 			'',
 			String()
 		],
-		typename: TypeName.string,
+		typename: 'string',
 		typeDescription: AssertionTypeDescription.emptyString
 	}],
 	['number', {
@@ -88,7 +88,7 @@ const types = new Map<string, Test>([
 			Infinity,
 			-Infinity
 		],
-		typename: TypeName.number
+		typename: 'number'
 	}],
 	['bigint', {
 		is: is.bigint,
@@ -100,7 +100,7 @@ const types = new Map<string, Test>([
 			// -0n,
 			BigInt('1234')
 		],
-		typename: TypeName.bigint
+		typename: 'bigint'
 	}],
 	['boolean', {
 		is: is.boolean,
@@ -108,7 +108,7 @@ const types = new Map<string, Test>([
 		fixtures: [
 			true, false
 		],
-		typename: TypeName.boolean
+		typename: 'boolean'
 	}],
 	['symbol', {
 		is: is.symbol,
@@ -116,7 +116,7 @@ const types = new Map<string, Test>([
 		fixtures: [
 			Symbol('🦄')
 		],
-		typename: TypeName.symbol
+		typename: 'symbol'
 	}],
 	['numericString', {
 		is: is.numericString,
@@ -127,7 +127,7 @@ const types = new Map<string, Test>([
 			'Infinity',
 			'0x56'
 		],
-		typename: TypeName.string,
+		typename: 'string',
 		typeDescription: AssertionTypeDescription.numericString
 	}],
 	['array', {
@@ -137,7 +137,7 @@ const types = new Map<string, Test>([
 			[1, 2],
 			new Array(2)
 		],
-		typename: TypeName.Array
+		typename: 'Array'
 	}],
 	['emptyArray', {
 		is: is.emptyArray,
@@ -146,7 +146,7 @@ const types = new Map<string, Test>([
 			[],
 			new Array() // eslint-disable-line @typescript-eslint/no-array-constructor
 		],
-		typename: TypeName.Array,
+		typename: 'Array',
 		typeDescription: AssertionTypeDescription.emptyArray
 	}],
 	['function', {
@@ -160,7 +160,7 @@ const types = new Map<string, Test>([
 			function * (): unknown {},
 			async function * (): unknown {}
 		],
-		typename: TypeName.Function
+		typename: 'Function'
 	}],
 	['buffer', {
 		is: is.buffer,
@@ -168,7 +168,7 @@ const types = new Map<string, Test>([
 		fixtures: [
 			Buffer.from('🦄')
 		],
-		typename: TypeName.Buffer
+		typename: 'Buffer'
 	}],
 	['object', {
 		is: is.object,
@@ -177,7 +177,7 @@ const types = new Map<string, Test>([
 			{x: 1},
 			Object.create({x: 1})
 		],
-		typename: TypeName.Object
+		typename: 'Object'
 	}],
 	['regExp', {
 		is: is.regExp,
@@ -186,7 +186,7 @@ const types = new Map<string, Test>([
 			/\w/,
 			new RegExp('\\w') // eslint-disable-line prefer-regex-literals
 		],
-		typename: TypeName.RegExp
+		typename: 'RegExp'
 	}],
 	['date', {
 		is: is.date,
@@ -194,7 +194,7 @@ const types = new Map<string, Test>([
 		fixtures: [
 			new Date()
 		],
-		typename: TypeName.Date
+		typename: 'Date'
 	}],
 	['error', {
 		is: is.error,
@@ -203,7 +203,7 @@ const types = new Map<string, Test>([
 			new Error('🦄'),
 			new ErrorSubclassFixture()
 		],
-		typename: TypeName.Error
+		typename: 'Error'
 	}],
 	['nativePromise', {
 		is: is.nativePromise,
@@ -212,7 +212,7 @@ const types = new Map<string, Test>([
 			Promise.resolve(),
 			PromiseSubclassFixture.resolve()
 		],
-		typename: TypeName.Promise,
+		typename: 'Promise',
 		typeDescription: AssertionTypeDescription.nativePromise
 	}],
 	['promise', {
@@ -221,8 +221,8 @@ const types = new Map<string, Test>([
 		fixtures: [
 			{then() {}, catch() {}}
 		],
-		typename: TypeName.Object,
-		typeDescription: TypeName.Promise
+		typename: 'Object',
+		typeDescription: 'Promise'
 	}],
 	['generator', {
 		is: is.generator,
@@ -232,7 +232,7 @@ const types = new Map<string, Test>([
 				yield 4;
 			})()
 		],
-		typename: TypeName.Generator
+		typename: 'Generator'
 	}],
 	['asyncGenerator', {
 		is: is.asyncGenerator,
@@ -242,7 +242,7 @@ const types = new Map<string, Test>([
 				yield 4;
 			})()
 		],
-		typename: TypeName.AsyncGenerator
+		typename: 'AsyncGenerator'
 	}],
 	['generatorFunction', {
 		is: is.generatorFunction,
@@ -252,8 +252,8 @@ const types = new Map<string, Test>([
 				yield 4;
 			}
 		],
-		typename: TypeName.Function,
-		typeDescription: TypeName.GeneratorFunction
+		typename: 'Function',
+		typeDescription: 'GeneratorFunction'
 	}],
 	['asyncGeneratorFunction', {
 		is: is.asyncGeneratorFunction,
@@ -263,8 +263,8 @@ const types = new Map<string, Test>([
 				yield 4;
 			}
 		],
-		typename: TypeName.Function,
-		typeDescription: TypeName.AsyncGeneratorFunction
+		typename: 'Function',
+		typeDescription: 'AsyncGeneratorFunction'
 	}],
 	['asyncFunction', {
 		is: is.asyncFunction,
@@ -273,8 +273,8 @@ const types = new Map<string, Test>([
 			async function () {},
 			async () => {}
 		],
-		typename: TypeName.Function,
-		typeDescription: TypeName.AsyncFunction
+		typename: 'Function',
+		typeDescription: 'AsyncFunction'
 	}],
 	['boundFunction', {
 		is: is.boundFunction,
@@ -283,7 +283,7 @@ const types = new Map<string, Test>([
 			() => {},
 			function () {}.bind(null) // eslint-disable-line no-extra-bind
 		],
-		typename: TypeName.Function
+		typename: 'Function'
 	}],
 	['map', {
 		is: is.map,
@@ -291,7 +291,7 @@ const types = new Map<string, Test>([
 		fixtures: [
 			new Map([['one', '1']])
 		],
-		typename: TypeName.Map
+		typename: 'Map'
 	}],
 	['emptyMap', {
 		is: is.emptyMap,
@@ -299,7 +299,7 @@ const types = new Map<string, Test>([
 		fixtures: [
 			new Map()
 		],
-		typename: TypeName.Map,
+		typename: 'Map',
 		typeDescription: AssertionTypeDescription.emptyMap
 	}],
 	['set', {
@@ -308,7 +308,7 @@ const types = new Map<string, Test>([
 		fixtures: [
 			new Set(['one'])
 		],
-		typename: TypeName.Set
+		typename: 'Set'
 	}],
 	['emptySet', {
 		is: is.emptySet,
@@ -316,7 +316,7 @@ const types = new Map<string, Test>([
 		fixtures: [
 			new Set()
 		],
-		typename: TypeName.Set,
+		typename: 'Set',
 		typeDescription: AssertionTypeDescription.emptySet
 	}],
 	['weakSet', {
@@ -325,7 +325,7 @@ const types = new Map<string, Test>([
 		fixtures: [
 			new WeakSet()
 		],
-		typename: TypeName.WeakSet
+		typename: 'WeakSet'
 	}],
 	['weakMap', {
 		is: is.weakMap,
@@ -333,7 +333,7 @@ const types = new Map<string, Test>([
 		fixtures: [
 			new WeakMap()
 		],
-		typename: TypeName.WeakMap
+		typename: 'WeakMap'
 	}],
 	['int8Array', {
 		is: is.int8Array,
@@ -341,7 +341,7 @@ const types = new Map<string, Test>([
 		fixtures: [
 			new Int8Array()
 		],
-		typename: TypeName.Int8Array
+		typename: 'Int8Array'
 	}],
 	['uint8Array', {
 		is: is.uint8Array,
@@ -349,7 +349,7 @@ const types = new Map<string, Test>([
 		fixtures: [
 			new Uint8Array()
 		],
-		typename: TypeName.Uint8Array
+		typename: 'Uint8Array'
 	}],
 	['uint8ClampedArray', {
 		is: is.uint8ClampedArray,
@@ -357,7 +357,7 @@ const types = new Map<string, Test>([
 		fixtures: [
 			new Uint8ClampedArray()
 		],
-		typename: TypeName.Uint8ClampedArray
+		typename: 'Uint8ClampedArray'
 	}],
 	['int16Array', {
 		is: is.int16Array,
@@ -365,7 +365,7 @@ const types = new Map<string, Test>([
 		fixtures: [
 			new Int16Array()
 		],
-		typename: TypeName.Int16Array
+		typename: 'Int16Array'
 	}],
 	['uint16Array', {
 		is: is.uint16Array,
@@ -373,7 +373,7 @@ const types = new Map<string, Test>([
 		fixtures: [
 			new Uint16Array()
 		],
-		typename: TypeName.Uint16Array
+		typename: 'Uint16Array'
 	}],
 	['int32Array', {
 		is: is.int32Array,
@@ -381,7 +381,7 @@ const types = new Map<string, Test>([
 		fixtures: [
 			new Int32Array()
 		],
-		typename: TypeName.Int32Array
+		typename: 'Int32Array'
 	}],
 	['uint32Array', {
 		is: is.uint32Array,
@@ -389,7 +389,7 @@ const types = new Map<string, Test>([
 		fixtures: [
 			new Uint32Array()
 		],
-		typename: TypeName.Uint32Array
+		typename: 'Uint32Array'
 	}],
 	['float32Array', {
 		is: is.float32Array,
@@ -397,7 +397,7 @@ const types = new Map<string, Test>([
 		fixtures: [
 			new Float32Array()
 		],
-		typename: TypeName.Float32Array
+		typename: 'Float32Array'
 	}],
 	['float64Array', {
 		is: is.float64Array,
@@ -405,7 +405,7 @@ const types = new Map<string, Test>([
 		fixtures: [
 			new Float64Array()
 		],
-		typename: TypeName.Float64Array
+		typename: 'Float64Array'
 	}],
 	['bigInt64Array', {
 		is: is.bigInt64Array,
@@ -413,7 +413,7 @@ const types = new Map<string, Test>([
 		fixtures: [
 			new BigInt64Array()
 		],
-		typename: TypeName.BigInt64Array
+		typename: 'BigInt64Array'
 	}],
 	['bigUint64Array', {
 		is: is.bigUint64Array,
@@ -421,7 +421,7 @@ const types = new Map<string, Test>([
 		fixtures: [
 			new BigUint64Array()
 		],
-		typename: TypeName.BigUint64Array
+		typename: 'BigUint64Array'
 	}],
 	['arrayBuffer', {
 		is: is.arrayBuffer,
@@ -429,7 +429,7 @@ const types = new Map<string, Test>([
 		fixtures: [
 			new ArrayBuffer(10)
 		],
-		typename: TypeName.ArrayBuffer
+		typename: 'ArrayBuffer'
 	}],
 	['dataView', {
 		is: is.dataView,
@@ -437,7 +437,7 @@ const types = new Map<string, Test>([
 		fixtures: [
 			new DataView(new ArrayBuffer(10))
 		],
-		typename: TypeName.DataView
+		typename: 'DataView'
 	}],
 	['nan', {
 		is: is.nan,
@@ -446,7 +446,7 @@ const types = new Map<string, Test>([
 			NaN,
 			Number.NaN
 		],
-		typename: TypeName.number,
+		typename: 'number',
 		typeDescription: AssertionTypeDescription.nan
 	}],
 	['nullOrUndefined', {
@@ -466,7 +466,7 @@ const types = new Map<string, Test>([
 			Object.create(null),
 			new Object() // eslint-disable-line no-new-object
 		],
-		typename: TypeName.Object,
+		typename: 'Object',
 		typeDescription: AssertionTypeDescription.plainObject
 	}],
 	['integer', {
@@ -475,7 +475,7 @@ const types = new Map<string, Test>([
 		fixtures: [
 			6
 		],
-		typename: TypeName.number,
+		typename: 'number',
 		typeDescription: AssertionTypeDescription.integer
 	}],
 	['safeInteger', {
@@ -485,7 +485,7 @@ const types = new Map<string, Test>([
 			(2 ** 53) - 1,
 			-(2 ** 53) + 1
 		],
-		typename: TypeName.number,
+		typename: 'number',
 		typeDescription: AssertionTypeDescription.safeInteger
 	}],
 	['domElement', {
@@ -521,7 +521,7 @@ const types = new Map<string, Test>([
 			new Subject(),
 			new ZenObservable(() => {})
 		],
-		typename: TypeName.Observable
+		typename: 'Observable'
 	}],
 	['nodeStream', {
 		is: is.nodeStream,
@@ -537,7 +537,7 @@ const types = new Map<string, Test>([
 			new Stream.Stream(),
 			new Stream.Writable()
 		],
-		typename: TypeName.Object,
+		typename: 'Object',
 		typeDescription: AssertionTypeDescription.nodeStream
 	}],
 	['infinite', {
@@ -547,7 +547,7 @@ const types = new Map<string, Test>([
 			Infinity,
 			-Infinity
 		],
-		typename: TypeName.number,
+		typename: 'number',
 		typeDescription: AssertionTypeDescription.infinite
 	}]
 ]);
@@ -959,7 +959,7 @@ test('is.nullOrUndefined', t => {
 });
 
 test('is.primitive', t => {
-	const primitives = [
+	const primitives: Primitive[] = [
 		undefined,
 		null,
 		'🦄',
@@ -1101,7 +1101,7 @@ test('is.class', t => {
 });
 
 test('is.typedArray', t => {
-	const typedArrays = [
+	const typedArrays: TypedArray[] = [
 		new Int8Array(),
 		new Uint8Array(),
 		new Uint8ClampedArray(),
