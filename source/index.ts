@@ -31,42 +31,62 @@ const objectTypeNames = [
 
 type ObjectTypeName = typeof objectTypeNames[number];
 
-const primitives = {
-	null: null,
-	undefined,
-	string: String(),
-	number: Number(),
-	bigint: BigInt(0),
-	boolean: Boolean(),
-	symbol: Symbol('')
-} as const;
+const primitiveTypeNames = [
+	'null',
+	'undefined',
+	'string',
+	'number',
+	'bigint',
+	'boolean',
+	'symbol'
+] as const;
 
-type PrimitiveTypeName = keyof typeof primitives;
-export type Primitive = typeof primitives[PrimitiveTypeName];
+export type Primitive =
+	| null
+	| undefined
+	| string
+	| number
+	| bigint
+	| boolean
+	| symbol;
 
-function isPrimitiveTypeName(name: string): name is PrimitiveTypeName {
-	return Object.prototype.hasOwnProperty.call(primitives, name);
+type PrimitiveTypeName = typeof primitiveTypeNames[number];
+
+function isPrimitiveTypeName(name: any): name is PrimitiveTypeName {
+	return primitiveTypeNames.includes(name);
 }
 
-const typedArrays = {
-	Int8Array: new Int8Array(),
-	Uint8Array: new Uint8Array(),
-	Uint8ClampedArray: new Uint8ClampedArray(),
-	Int16Array: new Int16Array(),
-	Uint16Array: new Uint16Array(),
-	Int32Array: new Int32Array(),
-	Uint32Array: new Uint32Array(),
-	Float32Array: new Float32Array(),
-	Float64Array: new Float64Array(),
-	BigInt64Array: new BigInt64Array(),
-	BigUint64Array: new BigUint64Array()
-} as const;
+const typedArrayTypeNames = [
+	'Int8Array',
+	'Uint8Array',
+	'Uint8ClampedArray',
+	'Int16Array',
+	'Uint16Array',
+	'Int32Array',
+	'Uint32Array',
+	'Float32Array',
+	'Float64Array',
+	'BigInt64Array',
+	'BigUint64Array'
+] as const;
 
-type TypedArrayTypeName = keyof typeof typedArrays;
-export type TypedArray = typeof typedArrays[TypedArrayTypeName];
+export type TypedArray =
+	| Int8Array
+	| Uint8Array
+	| Uint8ClampedArray
+	| Int16Array
+	| Uint16Array
+	| Int32Array
+	| Uint32Array
+	| Float32Array
+	| Float64Array
+	| BigInt64Array
+	| BigUint64Array;
 
-function isTypedArrayName(value: any): value is TypedArrayTypeName {
-	return Object.prototype.hasOwnProperty.call(typedArrays, value);
+type TypedArrayTypeName = typeof typedArrayTypeNames[number];
+
+function isTypedArrayName(name: any): name is TypedArrayTypeName {
+	return typedArrayTypeNames.includes(name);
 }
 
 export type TypeName = ObjectTypeName | PrimitiveTypeName | TypedArrayTypeName;
