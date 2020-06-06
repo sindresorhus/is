@@ -4,58 +4,6 @@
 
 export type Class<T = unknown> = new (...args: any[]) => T;
 
-const objectTypeNames = [
-	'Function',
-	'Generator',
-	'AsyncGenerator',
-	'GeneratorFunction',
-	'AsyncGeneratorFunction',
-	'AsyncFunction',
-	'Observable',
-	'Array',
-	'Buffer',
-	'Object',
-	'RegExp',
-	'Date',
-	'Error',
-	'Map',
-	'Set',
-	'WeakMap',
-	'WeakSet',
-	'ArrayBuffer',
-	'SharedArrayBuffer',
-	'DataView',
-	'Promise',
-	'URL'
-] as const;
-
-type ObjectTypeName = typeof objectTypeNames[number];
-
-const primitiveTypeNames = [
-	'null',
-	'undefined',
-	'string',
-	'number',
-	'bigint',
-	'boolean',
-	'symbol'
-] as const;
-
-export type Primitive =
-	| null
-	| undefined
-	| string
-	| number
-	| bigint
-	| boolean
-	| symbol;
-
-type PrimitiveTypeName = typeof primitiveTypeNames[number];
-
-function isPrimitiveTypeName(name: any): name is PrimitiveTypeName {
-	return primitiveTypeNames.includes(name);
-}
-
 const typedArrayTypeNames = [
 	'Int8Array',
 	'Uint8Array',
@@ -89,21 +37,79 @@ function isTypedArrayName(name: any): name is TypedArrayTypeName {
 	return typedArrayTypeNames.includes(name);
 }
 
-export type TypeName = ObjectTypeName | PrimitiveTypeName | TypedArrayTypeName;
+const objectTypeNames = [
+	'Function',
+	'Generator',
+	'AsyncGenerator',
+	'GeneratorFunction',
+	'AsyncGeneratorFunction',
+	'AsyncFunction',
+	'Observable',
+	'Array',
+	'Buffer',
+	'Object',
+	'RegExp',
+	'Date',
+	'Error',
+	'Map',
+	'Set',
+	'WeakMap',
+	'WeakSet',
+	'ArrayBuffer',
+	'SharedArrayBuffer',
+	'DataView',
+	'Promise',
+	'URL',
+	...typedArrayTypeNames
+] as const;
+
+type ObjectTypeName = typeof objectTypeNames[number];
+
+function isObjectTypeName(name: any): name is ObjectTypeName {
+	return objectTypeNames.includes(name);
+}
+
+const primitiveTypeNames = [
+	'null',
+	'undefined',
+	'string',
+	'number',
+	'bigint',
+	'boolean',
+	'symbol'
+] as const;
+
+export type Primitive =
+	| null
+	| undefined
+	| string
+	| number
+	| bigint
+	| boolean
+	| symbol;
+
+type PrimitiveTypeName = typeof primitiveTypeNames[number];
+
+function isPrimitiveTypeName(name: any): name is PrimitiveTypeName {
+	return primitiveTypeNames.includes(name);
+}
+
+export type TypeName = ObjectTypeName | PrimitiveTypeName;
 
 const {toString} = Object.prototype;
 const isOfType = <T>(type: string) => (value: unknown): value is T => typeof value === type;
 
-const getObjectType = (value: unknown): TypeName | undefined => {
-	const objectName = toString.call(value).slice(8, -1);
-	if (objectName) {
-		return objectName as TypeName;
+const getObjectType = (value: unknown): ObjectTypeName | undefined => {
+	const objectTypeName = toString.call(value).slice(8, -1);
+
+	if (isObjectTypeName(objectTypeName)) {
+		return objectTypeName;
 	}
 
 	return undefined;
 };
 
-const isObjectOfType = <T>(type: TypeName) => (value: unknown): value is T => getObjectType(value) === type;
+const isObjectOfType = <T>(type: ObjectTypeName) => (value: unknown): value is T => getObjectType(value) === type;
 
 function is(value: unknown): TypeName {
 	switch (value) {
