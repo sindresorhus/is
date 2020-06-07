@@ -98,7 +98,8 @@ function isPrimitiveTypeName(name: any): name is PrimitiveTypeName {
 export type TypeName = ObjectTypeName | PrimitiveTypeName;
 
 const {toString} = Object.prototype;
-const isOfType = <T>(type: string) => (value: unknown): value is T => typeof value === type;
+// eslint-disable-next-line @typescript-eslint/ban-types
+const isOfType = <T extends Function | Primitive>(type: string) => (value: unknown): value is T => typeof value === type;
 
 const getObjectType = (value: unknown): ObjectTypeName | undefined => {
 	const objectTypeName = toString.call(value).slice(8, -1);
@@ -117,13 +118,8 @@ const getObjectType = (value: unknown): ObjectTypeName | undefined => {
 const isObjectOfType = <T>(type: ObjectTypeName) => (value: unknown): value is T => getObjectType(value) === type;
 
 function is(value: unknown): TypeName {
-	switch (value) {
-		case null:
-			return 'null';
-		case true:
-		case false:
-			return 'boolean';
-		default:
+	if (value === null) {
+		return 'null';
 	}
 
 	switch (typeof value) {
@@ -133,15 +129,15 @@ function is(value: unknown): TypeName {
 			return 'string';
 		case 'number':
 			return 'number';
+		case 'boolean':
+			return 'boolean';
+		case 'function':
+			return 'Function';
 		case 'bigint':
 			return 'bigint';
 		case 'symbol':
 			return 'symbol';
 		default:
-	}
-
-	if (is.function_(value)) {
-		return 'Function';
 	}
 
 	if (is.observable(value)) {
