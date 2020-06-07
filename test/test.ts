@@ -591,7 +591,7 @@ const testType = (t: ExecutionContext, type: string, exclude?: string[]) => {
 			}
 
 			if (isTypeUnderTest && typename) {
-				t.is(is(fixture), typename);
+				t.is<TypeName>(is(fixture), typename);
 			}
 		}
 	}
@@ -1275,18 +1275,17 @@ test('is.domElement', t => {
 		assert.domElement({nodeType: 1, nodeName: 'div'});
 	});
 
-	const htmlTagNameToTypeName = {
-		div: 'HTMLDivElement',
-		input: 'HTMLInputElement',
-		span: 'HTMLSpanElement',
-		img: 'HTMLImageElement',
-		canvas: 'HTMLCanvasElement',
-		script: 'HTMLScriptElement'
-	};
+	const tagNames = [
+		'div',
+		'input',
+		'span',
+		'img',
+		'canvas',
+		'script'
+	];
 
-	for (const [tagName, typeName] of Object.entries(htmlTagNameToTypeName)) {
-		const domElement = createDomElement(tagName);
-		t.is(is(domElement), typeName);
+	for (const tagName of tagNames) {
+		t.is<TypeName>(is(createDomElement(tagName)), 'HTMLElement');
 	}
 });
 

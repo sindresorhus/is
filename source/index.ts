@@ -60,6 +60,7 @@ const objectTypeNames = [
 	'DataView',
 	'Promise',
 	'URL',
+	'HTMLElement',
 	...typedArrayTypeNames
 ] as const;
 
@@ -101,6 +102,10 @@ const isOfType = <T>(type: string) => (value: unknown): value is T => typeof val
 
 const getObjectType = (value: unknown): ObjectTypeName | undefined => {
 	const objectTypeName = toString.call(value).slice(8, -1);
+
+	if (/HTML\w+Element/.test(objectTypeName) && is.domElement(value)) {
+		return 'HTMLElement';
+	}
 
 	if (isObjectTypeName(objectTypeName)) {
 		return objectTypeName;
@@ -268,7 +273,7 @@ is.safeInteger = (value: unknown): value is number => Number.isSafeInteger(value
 
 is.plainObject = <Value = unknown>(value: unknown): value is Record<string, Value> => {
 	// From: https://github.com/sindresorhus/is-plain-obj/blob/master/index.js
-	if (getObjectType(value) !== 'Object') {
+	if (toString.call(value) !== '[object Object]') {
 		return false;
 	}
 
@@ -300,7 +305,7 @@ is.inRange = (value: number, range: number | number[]): value is number => {
 };
 
 const NODE_TYPE_ELEMENT = 1;
-const DOM_PROPERTIES_TO_CHECK = [
+const DOM_PROPERTIES_TO_CHECK: Array<(keyof HTMLElement)> = [
 	'innerHTML',
 	'ownerDocument',
 	'style',
@@ -308,8 +313,13 @@ const DOM_PROPERTIES_TO_CHECK = [
 	'nodeValue'
 ];
 
-is.domElement = (value: unknown): value is Element => is.object(value) && (value as Element).nodeType === NODE_TYPE_ELEMENT && is.string((value as Element).nodeName) &&
-	!is.plainObject(value) && DOM_PROPERTIES_TO_CHECK.every(property => property in (value as Element));
+is.domElement = (value: unknown): value is HTMLElement => {
+	return is.object(value) &&
+	(value as HTMLElement).nodeType === NODE_TYPE_ELEMENT &&
+	is.string((value as HTMLElement).nodeName) &&
+	!is.plainObject(value) &&
+	DOM_PROPERTIES_TO_CHECK.every(property => property in value);
+};
 
 export interface ObservableLike {
 	subscribe(observer: (value: unknown) => void): void;
@@ -416,7 +426,7 @@ export const enum AssertionTypeDescription {
 	plainObject = 'plain object',
 	arrayLike = 'array-like',
 	typedArray = 'TypedArray',
-	domElement = 'Element',
+	domElement = 'HTMLElement',
 	nodeStream = 'Node.js Stream',
 	infinite = 'infinite number',
 	emptyArray = 'empty array',
@@ -503,7 +513,7 @@ interface Assert {
 	plainObject: <Value = unknown>(value: unknown) => asserts value is Record<string, Value>;
 	typedArray: (value: unknown) => asserts value is TypedArray;
 	arrayLike: <T = unknown>(value: unknown) => asserts value is ArrayLike<T>;
-	domElement: (value: unknown) => asserts value is Element;
+	domElement: (value: unknown) => asserts value is HTMLElement;
 	observable: (value: unknown) => asserts value is ObservableLike;
 	nodeStream: (value: unknown) => asserts value is NodeStream;
 	infinite: (value: unknown) => asserts value is number;
@@ -593,7 +603,7 @@ export const assert: Assert = {
 	plainObject: <Value = unknown>(value: unknown): asserts value is Record<string, Value> => assertType(is.plainObject(value), AssertionTypeDescription.plainObject, value),
 	typedArray: (value: unknown): asserts value is TypedArray => assertType(is.typedArray(value), AssertionTypeDescription.typedArray, value),
 	arrayLike: <T = unknown>(value: unknown): asserts value is ArrayLike<T> => assertType(is.arrayLike(value), AssertionTypeDescription.arrayLike, value),
-	domElement: (value: unknown): asserts value is Element => assertType(is.domElement(value), AssertionTypeDescription.domElement, value),
+	domElement: (value: unknown): asserts value is HTMLElement => assertType(is.domElement(value), AssertionTypeDescription.domElement, value),
 	observable: (value: unknown): asserts value is ObservableLike => assertType(is.observable(value), 'Observable', value),
 	nodeStream: (value: unknown): asserts value is NodeStream => assertType(is.nodeStream(value), AssertionTypeDescription.nodeStream, value),
 	infinite: (value: unknown): asserts value is number => assertType(is.infinite(value), AssertionTypeDescription.infinite, value),
