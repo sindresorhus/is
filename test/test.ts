@@ -1275,17 +1275,18 @@ test('is.domElement', t => {
 		assert.domElement({nodeType: 1, nodeName: 'div'});
 	});
 
-	const tagNames = [
-		'div',
-		'input',
-		'span',
-		'img',
-		'canvas',
-		'script'
-	];
+	const htmlTagNameToTypeName = {
+		div: 'HTMLDivElement',
+		input: 'HTMLInputElement',
+		span: 'HTMLSpanElement',
+		img: 'HTMLImageElement',
+		canvas: 'HTMLCanvasElement',
+		script: 'HTMLScriptElement'
+	};
 
-	for (const tagName of tagNames) {
-		t.is<TypeName>(is(createDomElement(tagName)), 'HTMLElement');
+	for (const [tagName, typeName] of Object.entries(htmlTagNameToTypeName)) {
+		const domElement = createDomElement(tagName);
+		t.is(is(domElement), typeName);
 	}
 });
 
