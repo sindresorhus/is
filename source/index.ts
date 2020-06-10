@@ -33,8 +33,8 @@ export type TypedArray =
 
 type TypedArrayTypeName = typeof typedArrayTypeNames[number];
 
-function isTypedArrayName(name: any): name is TypedArrayTypeName {
-	return typedArrayTypeNames.includes(name);
+function isTypedArrayName(name: unknown): name is TypedArrayTypeName {
+	return typedArrayTypeNames.includes(name as TypedArrayTypeName);
 }
 
 const objectTypeNames = [
@@ -66,8 +66,8 @@ const objectTypeNames = [
 
 type ObjectTypeName = typeof objectTypeNames[number];
 
-function isObjectTypeName(name: any): name is ObjectTypeName {
-	return objectTypeNames.includes(name);
+function isObjectTypeName(name: unknown): name is ObjectTypeName {
+	return objectTypeNames.includes(name as ObjectTypeName);
 }
 
 const primitiveTypeNames = [
@@ -91,8 +91,8 @@ export type Primitive =
 
 type PrimitiveTypeName = typeof primitiveTypeNames[number];
 
-function isPrimitiveTypeName(name: any): name is PrimitiveTypeName {
-	return primitiveTypeNames.includes(name);
+function isPrimitiveTypeName(name: unknown): name is PrimitiveTypeName {
+	return primitiveTypeNames.includes(name as PrimitiveTypeName);
 }
 
 export type TypeName = ObjectTypeName | PrimitiveTypeName;
