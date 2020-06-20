@@ -1275,19 +1275,19 @@ test('is.domElement', t => {
 		assert.domElement({nodeType: 1, nodeName: 'div'});
 	});
 
-	const htmlTagNameToTypeName = {
-		div: 'HTMLDivElement',
-		input: 'HTMLInputElement',
-		span: 'HTMLSpanElement',
-		img: 'HTMLImageElement',
-		canvas: 'HTMLCanvasElement',
-		script: 'HTMLScriptElement'
-	};
+	const tagNames = [
+		'div',
+		'input',
+		'span',
+		'img',
+		'canvas',
+		'script'
+	];
 
-	for (const [tagName, typeName] of Object.entries(htmlTagNameToTypeName)) {
+	tagNames.forEach(tagName => {
 		const domElement = createDomElement(tagName);
-		t.is(is(domElement), typeName);
-	}
+		t.is(is(domElement), 'HTMLElement');
+	});
 });
 
 test('is.observable', t => {
