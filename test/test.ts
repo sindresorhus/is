@@ -1284,10 +1284,10 @@ test('is.domElement', t => {
 		'script'
 	];
 
-	tagNames.forEach(tagName => {
+	for (const tagName of tagNames) {
 		const domElement = createDomElement(tagName);
 		t.is(is(domElement), 'HTMLElement');
-	});
+	}
 });
 
 test('is.observable', t => {
