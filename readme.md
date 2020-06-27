@@ -13,7 +13,7 @@ For example, `is.string('🦄') //=> true`
 - [Supports type assertions](#type-assertions)
 - [Aware of generic type parameters](#generic-type-parameters) (use with caution)
 - Actively maintained
-- 2 million weekly downloads
+- ![Millions of downloads per week](https://img.shields.io/npm/dw/@sindresorhus/is)
 
 ## Install
 
