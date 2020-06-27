@@ -66,6 +66,10 @@ const objectTypeNames = [
 
 type ObjectTypeName = typeof objectTypeNames[number];
 
+function isObjectTypeName(name: unknown): name is ObjectTypeName {
+	return objectTypeNames.includes(name as ObjectTypeName);
+}
+
 const primitiveTypeNames = [
 	'null',
 	'undefined',
@@ -100,9 +104,14 @@ function isOfType<T extends Primitive | Function>(type: PrimitiveTypeName | 'fun
 
 const {toString} = Object.prototype;
 const getObjectType = (value: unknown): ObjectTypeName | undefined => {
-	const objectName = toString.call(value).slice(8, -1);
-	if (objectName) {
-		return objectName as ObjectTypeName;
+	const objectTypeName = toString.call(value).slice(8, -1);
+
+	if (/HTML\w+Element/.test(objectTypeName) && is.domElement(value)) {
+		return 'HTMLElement';
+	}
+
+	if (isObjectTypeName(objectTypeName)) {
+		return objectTypeName;
 	}
 
 	return undefined;
