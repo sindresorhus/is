@@ -1,6 +1,6 @@
 {
 	"name": "@sindresorhus/is",
-	"version": "2.1.1",
+	"version": "3.0.0",
 	"description": "Type check values",
 	"license": "MIT",
 	"repository": "sindresorhus/is",
