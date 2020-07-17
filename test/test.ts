@@ -641,6 +641,17 @@ test('is.numericString', t => {
 
 test('is.array', t => {
 	testType(t, 'array', ['emptyArray']);
+
+	t.true(is.array<number>([1, 2, 3], is.number));
+	t.false(is.array<number>([1, '2', 3], is.number));
+
+	t.notThrows(() => {
+		assert.array<number>([1, 2], is.number);
+	});
+
+	t.throws(() => {
+	 	assert.array<number>([1, '2'], is.number);
+	});
 });
 
 test('is.function', t => {

@@ -185,7 +185,16 @@ is.symbol = isOfType<symbol>('symbol');
 is.numericString = (value: unknown): value is string =>
 	is.string(value) && !is.emptyStringOrWhitespace(value) && !Number.isNaN(Number(value));
 
-is.array = Array.isArray;
+is.array = <T = unknown>(value: any, assertion?: (value: T) => void): value is T[] =>  {
+	if (!Array.isArray(value)) {
+		return false;
+	}
+	if (!assertion) {
+		return true;
+	}
+	return value.every(assertion);
+};
+
 is.buffer = (value: unknown): value is Buffer => (value as any)?.constructor?.isBuffer?.(value) ?? false;
 
 is.nullOrUndefined = (value: unknown): value is null | undefined => is.null_(value) || is.undefined(value);
@@ -463,7 +472,7 @@ interface Assert {
 	boolean: (value: unknown) => asserts value is boolean;
 	symbol: (value: unknown) => asserts value is symbol;
 	numericString: (value: unknown) => asserts value is string;
-	array: <T = unknown>(value: unknown) => asserts value is T[];
+	array: <T = unknown>(value: unknown, assertion?: (element: unknown) => void) => asserts value is T[];
 	buffer: (value: unknown) => asserts value is Buffer;
 	nullOrUndefined: (value: unknown) => asserts value is null | undefined;
 	object: <Key extends keyof any = string, Value = unknown>(value: unknown) => asserts value is Record<Key, Value>;
@@ -553,7 +562,7 @@ export const assert: Assert = {
 	boolean: (value: unknown): asserts value is boolean => assertType(is.boolean(value), 'boolean', value),
 	symbol: (value: unknown): asserts value is symbol => assertType(is.symbol(value), 'symbol', value),
 	numericString: (value: unknown): asserts value is string => assertType(is.numericString(value), AssertionTypeDescription.numericString, value),
-	array: <T = unknown>(value: unknown): asserts value is T[] => assertType(is.array(value), 'Array', value),
+	array: <T = unknown>(value: unknown, assertion?: (element: unknown) => asserts element is T): asserts value is T[] => assertType(is.array(value, assertion), 'Array', value),
 	buffer: (value: unknown): asserts value is Buffer => assertType(is.buffer(value), 'Buffer', value),
 	nullOrUndefined: (value: unknown): asserts value is null | undefined => assertType(is.nullOrUndefined(value), AssertionTypeDescription.nullOrUndefined, value),
 	object: (value: unknown): asserts value is object => assertType(is.object(value), 'Object', value),
