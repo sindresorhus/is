@@ -185,13 +185,15 @@ is.symbol = isOfType<symbol>('symbol');
 is.numericString = (value: unknown): value is string =>
 	is.string(value) && !is.emptyStringOrWhitespace(value) && !Number.isNaN(Number(value));
 
-is.array = <T = unknown>(value: any, assertion?: (value: T) => void): value is T[] =>  {
+is.array = <T = unknown>(value: any, assertion?: (value: T) => void): value is T[] => {
 	if (!Array.isArray(value)) {
 		return false;
 	}
+
 	if (!assertion) {
 		return true;
 	}
+
 	return value.every(assertion);
 };
 

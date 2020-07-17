@@ -650,7 +650,7 @@ test('is.array', t => {
 	});
 
 	t.throws(() => {
-	 	assert.array<number>([1, '2'], is.number);
+		assert.array<number>([1, '2'], is.number);
 	});
 });
 
