@@ -564,7 +564,14 @@ export const assert: Assert = {
 	boolean: (value: unknown): asserts value is boolean => assertType(is.boolean(value), 'boolean', value),
 	symbol: (value: unknown): asserts value is symbol => assertType(is.symbol(value), 'symbol', value),
 	numericString: (value: unknown): asserts value is string => assertType(is.numericString(value), AssertionTypeDescription.numericString, value),
-	array: <T = unknown>(value: unknown, assertion?: (element: unknown) => asserts element is T): asserts value is T[] => assertType(is.array(value, assertion), 'Array', value),
+	array: <T = unknown>(value: unknown, assertion?: (element: unknown) => asserts element is T): asserts value is T[] => {
+		const assert: (condition: boolean, description: string, value: unknown) => asserts condition = assertType;
+		assert(is.array(value), 'Array', value);
+
+		if (assertion) {
+			value.forEach(assertion);
+		}
+	},
 	buffer: (value: unknown): asserts value is Buffer => assertType(is.buffer(value), 'Buffer', value),
 	nullOrUndefined: (value: unknown): asserts value is null | undefined => assertType(is.nullOrUndefined(value), AssertionTypeDescription.nullOrUndefined, value),
 	object: (value: unknown): asserts value is object => assertType(is.object(value), 'Object', value),

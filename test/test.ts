@@ -646,11 +646,11 @@ test('is.array', t => {
 	t.false(is.array([1, '2', 3], is.number));
 
 	t.notThrows(() => {
-		assert.array([1, 2], is.number);
+		assert.array([1, 2], assert.number);
 	});
 
 	t.throws(() => {
-		assert.array([1, '2'], is.number);
+		assert.array([1, '2'], assert.number);
 	});
 });
 
