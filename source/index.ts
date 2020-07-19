@@ -4,6 +4,8 @@
 
 import {Class, TypedArray, ObservableLike, Primitive} from './types';
 
+export {Class, TypedArray, ObservableLike, Primitive};
+
 const typedArrayTypeNames = [
 	'Int8Array',
 	'Uint8Array',
