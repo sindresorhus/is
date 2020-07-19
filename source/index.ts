@@ -2,7 +2,7 @@
 /// <reference lib="dom"/>
 /// <reference types="node"/>
 
-import {Class, TypedArray, ObservableLike, Primitive} from 'type-fest';
+import {Class, TypedArray, ObservableLike, Primitive} from './types';
 
 const typedArrayTypeNames = [
 	'Int8Array',
