@@ -46,6 +46,9 @@
 		"typeguards",
 		"types"
 	],
+	"dependencies": {
+		"type-fest": "^0.16.0"
+	},
 	"devDependencies": {
 		"@sindresorhus/tsconfig": "^0.7.0",
 		"@types/jsdom": "^16.1.0",

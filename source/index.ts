@@ -2,7 +2,7 @@
 /// <reference lib="dom"/>
 /// <reference types="node"/>
 
-export type Class<T = unknown> = new (...args: any[]) => T;
+import {Class, TypedArray, ObservableLike, Primitive} from 'type-fest';
 
 const typedArrayTypeNames = [
 	'Int8Array',
@@ -17,19 +17,6 @@ const typedArrayTypeNames = [
 	'BigInt64Array',
 	'BigUint64Array'
 ] as const;
-
-export type TypedArray =
-	| Int8Array
-	| Uint8Array
-	| Uint8ClampedArray
-	| Int16Array
-	| Uint16Array
-	| Int32Array
-	| Uint32Array
-	| Float32Array
-	| Float64Array
-	| BigInt64Array
-	| BigUint64Array;
 
 type TypedArrayTypeName = typeof typedArrayTypeNames[number];
 
@@ -79,15 +66,6 @@ const primitiveTypeNames = [
 	'boolean',
 	'symbol'
 ] as const;
-
-export type Primitive =
-	| null
-	| undefined
-	| string
-	| number
-	| bigint
-	| boolean
-	| symbol;
 
 type PrimitiveTypeName = typeof primitiveTypeNames[number];
 
@@ -318,11 +296,6 @@ is.domElement = (value: unknown): value is HTMLElement => {
 	!is.plainObject(value) &&
 	DOM_PROPERTIES_TO_CHECK.every(property => property in value);
 };
-
-export interface ObservableLike {
-	subscribe(observer: (value: unknown) => void): void;
-	[Symbol.observable](): ObservableLike;
-}
 
 is.observable = (value: unknown): value is ObservableLike => {
 	if (!value) {
