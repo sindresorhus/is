@@ -93,9 +93,9 @@ Note: `is.number(NaN)` returns `false`. This intentionally deviates from `typeof
 
 #### Built-in types
 
-##### .array(value, assertion)
+##### .array(value, assertion?)
 
-Returns true if `value` is an array and all of it's items match the assertion.
+Returns true if `value` is an array and all of its items match the assertion (if provided).
 
 ```js
 is.array(value) // validate `value` is an array
