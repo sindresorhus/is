@@ -474,7 +474,7 @@ interface Assert {
 	boolean: (value: unknown) => asserts value is boolean;
 	symbol: (value: unknown) => asserts value is symbol;
 	numericString: (value: unknown) => asserts value is string;
-	array: <T = unknown>(value: unknown, assertion?: (element: unknown) => void) => asserts value is T[];
+	array: <T = unknown>(value: unknown, assertion?: (element: unknown) => asserts element is T) => asserts value is T[];
 	buffer: (value: unknown) => asserts value is Buffer;
 	nullOrUndefined: (value: unknown) => asserts value is null | undefined;
 	object: <Key extends keyof any = string, Value = unknown>(value: unknown) => asserts value is Record<Key, Value>;
