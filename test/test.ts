@@ -652,6 +652,19 @@ test('is.array', t => {
 	t.throws(() => {
 		assert.array([1, '2'], assert.number);
 	});
+
+	t.notThrows(() => {
+		const x: unknown[] = [1, 2, 3];
+		assert.array(x, assert.number);
+		x[0].toFixed(0);
+	});
+
+	t.notThrows(() => {
+		const x: unknown[] = [1, 2, 3];
+		if (is.array<number>(x, is.number)) {
+			x[0].toFixed(0);
+		}
+	});
 });
 
 test('is.function', t => {
