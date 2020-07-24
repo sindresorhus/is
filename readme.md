@@ -98,8 +98,8 @@ Note: `is.number(NaN)` returns `false`. This intentionally deviates from `typeof
 Returns true if `value` is an array and all of its items match the assertion (if provided).
 
 ```js
-is.array(value) // validate `value` is an array
-is.array(value, is.number) // validate `value` is an array and all of it's items are numbers.
+is.array(value); // Validate `value` is an array.
+is.array(value, is.number); // Validate `value` is an array and all of its items are numbers.
 ```
 
 ##### .function(value)
