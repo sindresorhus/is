@@ -641,6 +641,30 @@ test('is.numericString', t => {
 
 test('is.array', t => {
 	testType(t, 'array', ['emptyArray']);
+
+	t.true(is.array([1, 2, 3], is.number));
+	t.false(is.array([1, '2', 3], is.number));
+
+	t.notThrows(() => {
+		assert.array([1, 2], assert.number);
+	});
+
+	t.throws(() => {
+		assert.array([1, '2'], assert.number);
+	});
+
+	t.notThrows(() => {
+		const x: unknown[] = [1, 2, 3];
+		assert.array(x, assert.number);
+		x[0].toFixed(0);
+	});
+
+	t.notThrows(() => {
+		const x: unknown[] = [1, 2, 3];
+		if (is.array<number>(x, is.number)) {
+			x[0].toFixed(0);
+		}
+	});
 });
 
 test('is.function', t => {
