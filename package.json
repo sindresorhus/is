@@ -10,7 +10,7 @@
 		"email": "sindresorhus@gmail.com",
 		"url": "https://sindresorhus.com"
 	},
-	"main": "dist",
+	"main": "dist/index.js",
 	"engines": {
 		"node": ">=10"
 	},
@@ -64,7 +64,7 @@
 		"xo": "^0.26.1",
 		"zen-observable": "^0.8.8"
 	},
-	"types": "dist",
+	"types": "dist/index.d.ts",
 	"sideEffects": false,
 	"ava": {
 		"extensions": [
