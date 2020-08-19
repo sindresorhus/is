@@ -170,7 +170,7 @@ is.array = <T = unknown>(value: unknown, assertion?: (value: T) => value is T): 
 		return false;
 	}
 
-	if (!assertion) {
+	if (!is.function_(assertion)) {
 		return true;
 	}
 
