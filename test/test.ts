@@ -1537,6 +1537,8 @@ test('is.all', t => {
 	t.false(is.all(is.string, '🦄', []));
 	t.false(is.all(is.set, new Map(), {}));
 
+	t.true(is.all(is.array, ...[['1'], ['2']]));
+
 	t.throws(() => {
 		is.all(null as any, true);
 	});
