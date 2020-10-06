@@ -260,7 +260,7 @@ is.primitive = (value: unknown): value is Primitive => is.null_(value) || isPrim
 is.integer = (value: unknown): value is number => Number.isInteger(value as number);
 is.safeInteger = (value: unknown): value is number => Number.isSafeInteger(value as number);
 
-is.plainObject = <Value = unknown>(value: unknown): value is Record<string | number | symbol, Value> => {
+is.plainObject = <Value = unknown, Key extends keyof any = string | number | symbol>(value: unknown): value is Record<Key, Value> => {
 	// From: https://github.com/sindresorhus/is-plain-obj/blob/master/index.js
 	if (toString.call(value) !== '[object Object]') {
 		return false;
