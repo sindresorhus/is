@@ -591,7 +591,7 @@ export const assert: Assert = {
 	primitive: (value: unknown): asserts value is Primitive => assertType(is.primitive(value), AssertionTypeDescription.primitive, value),
 	integer: (value: unknown): asserts value is number => assertType(is.integer(value), AssertionTypeDescription.integer, value),
 	safeInteger: (value: unknown): asserts value is number => assertType(is.safeInteger(value), AssertionTypeDescription.safeInteger, value),
-	plainObject: <Value = unknown>(value: unknown): asserts value is Record<string, Value> => assertType(is.plainObject(value), AssertionTypeDescription.plainObject, value),
+	plainObject: <Value = unknown, Key extends keyof any = string | number | symbol>(value: unknown): asserts value is Record<Key, Value> => assertType(is.plainObject(value), AssertionTypeDescription.plainObject, value),
 	typedArray: (value: unknown): asserts value is TypedArray => assertType(is.typedArray(value), AssertionTypeDescription.typedArray, value),
 	arrayLike: <T = unknown>(value: unknown): asserts value is ArrayLike<T> => assertType(is.arrayLike(value), AssertionTypeDescription.arrayLike, value),
 	domElement: (value: unknown): asserts value is HTMLElement => assertType(is.domElement(value), AssertionTypeDescription.domElement, value),
