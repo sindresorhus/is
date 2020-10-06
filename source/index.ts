@@ -494,7 +494,7 @@ interface Assert {
 	primitive: (value: unknown) => asserts value is Primitive;
 	integer: (value: unknown) => asserts value is number;
 	safeInteger: (value: unknown) => asserts value is number;
-	plainObject: <Value = unknown>(value: unknown) => asserts value is Record<string | number | symbol, Value>;
+	plainObject: <Value = unknown, Key extends keyof any = string | number | symbol>(value: unknown) => asserts value is Record<Key, Value>;
 	typedArray: (value: unknown) => asserts value is TypedArray;
 	arrayLike: <T = unknown>(value: unknown) => asserts value is ArrayLike<T>;
 	domElement: (value: unknown) => asserts value is HTMLElement;
