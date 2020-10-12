@@ -260,7 +260,8 @@ is.primitive = (value: unknown): value is Primitive => is.null_(value) || isPrim
 is.integer = (value: unknown): value is number => Number.isInteger(value as number);
 is.safeInteger = (value: unknown): value is number => Number.isSafeInteger(value as number);
 
-is.plainObject = <Value = unknown>(value: unknown): value is Record<string, Value> => {
+type ObjectKey = string | number | symbol;
+is.plainObject = <Value = unknown>(value: unknown): value is Record<ObjectKey, Value> => {
 	// From: https://github.com/sindresorhus/is-plain-obj/blob/master/index.js
 	if (toString.call(value) !== '[object Object]') {
 		return false;
@@ -494,7 +495,7 @@ interface Assert {
 	primitive: (value: unknown) => asserts value is Primitive;
 	integer: (value: unknown) => asserts value is number;
 	safeInteger: (value: unknown) => asserts value is number;
-	plainObject: <Value = unknown>(value: unknown) => asserts value is Record<string, Value>;
+	plainObject: <Value = unknown>(value: unknown) => asserts value is Record<ObjectKey, Value>;
 	typedArray: (value: unknown) => asserts value is TypedArray;
 	arrayLike: <T = unknown>(value: unknown) => asserts value is ArrayLike<T>;
 	domElement: (value: unknown) => asserts value is HTMLElement;
@@ -591,7 +592,7 @@ export const assert: Assert = {
 	primitive: (value: unknown): asserts value is Primitive => assertType(is.primitive(value), AssertionTypeDescription.primitive, value),
 	integer: (value: unknown): asserts value is number => assertType(is.integer(value), AssertionTypeDescription.integer, value),
 	safeInteger: (value: unknown): asserts value is number => assertType(is.safeInteger(value), AssertionTypeDescription.safeInteger, value),
-	plainObject: <Value = unknown>(value: unknown): asserts value is Record<string, Value> => assertType(is.plainObject(value), AssertionTypeDescription.plainObject, value),
+	plainObject: <Value = unknown>(value: unknown): asserts value is Record<ObjectKey, Value> => assertType(is.plainObject(value), AssertionTypeDescription.plainObject, value),
 	typedArray: (value: unknown): asserts value is TypedArray => assertType(is.typedArray(value), AssertionTypeDescription.typedArray, value),
 	arrayLike: <T = unknown>(value: unknown): asserts value is ArrayLike<T> => assertType(is.arrayLike(value), AssertionTypeDescription.arrayLike, value),
 	domElement: (value: unknown): asserts value is HTMLElement => assertType(is.domElement(value), AssertionTypeDescription.domElement, value),
