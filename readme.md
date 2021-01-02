@@ -1,4 +1,4 @@
-# is [![Build Status](https://travis-ci.org/sindresorhus/is.svg?branch=master)](https://travis-ci.org/sindresorhus/is)
+# is
 
 > Type check values
 
