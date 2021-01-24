@@ -262,7 +262,7 @@ is.safeInteger = (value: unknown): value is number => Number.isSafeInteger(value
 
 type ObjectKey = string | number | symbol;
 is.plainObject = <Value = unknown>(value: unknown): value is Record<ObjectKey, Value> => {
-	// From: https://github.com/sindresorhus/is-plain-obj/blob/master/index.js
+	// From: https://github.com/sindresorhus/is-plain-obj/blob/main/index.js
 	if (toString.call(value) !== '[object Object]') {
 		return false;
 	}
