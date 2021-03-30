@@ -17,7 +17,7 @@
 	"scripts": {
 		"build": "del dist && tsc",
 		"test": "xo && ava",
-		"prepublishOnly": "npm run build"
+		"prepare": "npm run build"
 	},
 	"files": [
 		"dist"
