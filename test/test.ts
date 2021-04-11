@@ -1529,6 +1529,27 @@ test('is.any', t => {
 	t.throws(() => {
 		assert.any(is.string);
 	});
+
+	t.throws(() => {
+		assert.any(is.string, 1, 2, 3);
+	}, {
+		// Removes duplicates:
+		message: /received values of types `number`./
+	});
+
+	t.throws(() => {
+		assert.any(is.string, 1, [4]);
+	}, {
+		// Lists all types:
+		message: /received values of types `number`, `Array`./
+	});
+
+	t.throws(() => {
+		assert.any([is.string, is.nullOrUndefined], 1);
+	}, {
+		// Handles array as first argument:
+		message: /received values of types `number`./
+	});
 });
 
 test('is.all', t => {

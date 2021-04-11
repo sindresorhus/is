@@ -388,9 +388,11 @@ is.any = (predicate: Predicate | Predicate[], ...values: unknown[]): boolean => 
 
 is.all = (predicate: Predicate, ...values: unknown[]): boolean => predicateOnArray(Array.prototype.every, predicate, values);
 
-const assertType = (condition: boolean, description: string, value: unknown): asserts condition => {
+const assertType = (condition: boolean, description: string, value: unknown, options: { getValuesMessage?: () => string } = {}): asserts condition => {
 	if (!condition) {
-		throw new TypeError(`Expected value which is \`${description}\`, received value of type \`${is(value)}\`.`);
+		const {getValuesMessage} = options;
+		const valuesMessage = getValuesMessage ? getValuesMessage() : `received value of type \`${is(value)}\``;
+		throw new TypeError(`Expected value which is \`${description}\`, ${valuesMessage}.`);
 	}
 };
 
@@ -620,7 +622,11 @@ export const assert: Assert = {
 	inRange: (value: number, range: number | number[]): asserts value is number => assertType(is.inRange(value, range), AssertionTypeDescription.inRange, value),
 
 	// Variadic functions.
-	any: (predicate: Predicate | Predicate[], ...values: unknown[]): void | never => assertType(is.any(predicate, ...values), AssertionTypeDescription.any, values),
+	any: (predicate: Predicate | Predicate[], ...values: unknown[]): void | never => {
+		// Remove duplicate value types using Set.
+		const getValuesMessage = () => `received values of types ${[...new Set(values.map(value => `\`${is(value)}\``))].join(', ')}`;
+		return assertType(is.any(predicate, ...values), AssertionTypeDescription.any, values, {getValuesMessage});
+	},
 	all: (predicate: Predicate, ...values: unknown[]): void | never => assertType(is.all(predicate, ...values), AssertionTypeDescription.all, values)
 };
 
