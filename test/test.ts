@@ -1591,6 +1591,20 @@ test('is.all', t => {
 	t.throws(() => {
 		assert.all(is.string);
 	});
+
+	t.throws(() => {
+		assert.all(is.string, 1, 2, 3);
+	}, {
+		// Removes duplicates:
+		message: /received values of types `number`./
+	});
+
+	t.throws(() => {
+		assert.all(is.string, 1, [4]);
+	}, {
+		// Lists all types:
+		message: /received values of types `number`, `Array`./
+	});
 });
 
 test('assert', t => {

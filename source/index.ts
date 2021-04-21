@@ -388,10 +388,17 @@ is.any = (predicate: Predicate | Predicate[], ...values: unknown[]): boolean => 
 
 is.all = (predicate: Predicate, ...values: unknown[]): boolean => predicateOnArray(Array.prototype.every, predicate, values);
 
-const assertType = (condition: boolean, description: string, value: unknown, options: { getValuesMessage?: () => string } = {}): asserts condition => {
+const assertType = (condition: boolean, description: string, value: unknown, options: { multipleValues?: boolean } = {}): asserts condition => {
 	if (!condition) {
-		const {getValuesMessage} = options;
-		const valuesMessage = getValuesMessage ? getValuesMessage() : `received value of type \`${is(value)}\``;
+		const {multipleValues} = options;
+		const valuesMessage = multipleValues ?
+			`received values of types ${[
+				...new Set(
+					(value as any[]).map(singleValue => `\`${is(singleValue)}\``)
+				)
+			].join(', ')}` :
+			`received value of type \`${is(value)}\``;
+
 		throw new TypeError(`Expected value which is \`${description}\`, ${valuesMessage}.`);
 	}
 };
@@ -624,10 +631,9 @@ export const assert: Assert = {
 	// Variadic functions.
 	any: (predicate: Predicate | Predicate[], ...values: unknown[]): void | never => {
 		// Remove duplicate value types using Set.
-		const getValuesMessage = () => `received values of types ${[...new Set(values.map(value => `\`${is(value)}\``))].join(', ')}`;
-		return assertType(is.any(predicate, ...values), AssertionTypeDescription.any, values, {getValuesMessage});
+		return assertType(is.any(predicate, ...values), AssertionTypeDescription.any, values, {multipleValues: true});
 	},
-	all: (predicate: Predicate, ...values: unknown[]): void | never => assertType(is.all(predicate, ...values), AssertionTypeDescription.all, values)
+	all: (predicate: Predicate, ...values: unknown[]): void | never => assertType(is.all(predicate, ...values), AssertionTypeDescription.all, values, {multipleValues: true})
 };
 
 // Some few keywords are reserved, but we'll populate them for Node.js users
