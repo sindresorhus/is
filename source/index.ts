@@ -630,7 +630,6 @@ export const assert: Assert = {
 
 	// Variadic functions.
 	any: (predicate: Predicate | Predicate[], ...values: unknown[]): void | never => {
-		// Remove duplicate value types using Set.
 		return assertType(is.any(predicate, ...values), AssertionTypeDescription.any, values, {multipleValues: true});
 	},
 	all: (predicate: Predicate, ...values: unknown[]): void | never => assertType(is.all(predicate, ...values), AssertionTypeDescription.all, values, {multipleValues: true})
