@@ -388,7 +388,7 @@ is.any = (predicate: Predicate | Predicate[], ...values: unknown[]): boolean => 
 
 is.all = (predicate: Predicate, ...values: unknown[]): boolean => predicateOnArray(Array.prototype.every, predicate, values);
 
-const assertType = (condition: boolean, description: string, value: unknown, options: { multipleValues?: boolean } = {}): asserts condition => {
+const assertType = (condition: boolean, description: string, value: unknown, options: {multipleValues?: boolean} = {}): asserts condition => {
 	if (!condition) {
 		const {multipleValues} = options;
 		const valuesMessage = multipleValues ?
