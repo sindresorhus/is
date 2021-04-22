@@ -388,9 +388,18 @@ is.any = (predicate: Predicate | Predicate[], ...values: unknown[]): boolean => 
 
 is.all = (predicate: Predicate, ...values: unknown[]): boolean => predicateOnArray(Array.prototype.every, predicate, values);
 
-const assertType = (condition: boolean, description: string, value: unknown): asserts condition => {
+const assertType = (condition: boolean, description: string, value: unknown, options: {multipleValues?: boolean} = {}): asserts condition => {
 	if (!condition) {
-		throw new TypeError(`Expected value which is \`${description}\`, received value of type \`${is(value)}\`.`);
+		const {multipleValues} = options;
+		const valuesMessage = multipleValues ?
+			`received values of types ${[
+				...new Set(
+					(value as any[]).map(singleValue => `\`${is(singleValue)}\``)
+				)
+			].join(', ')}` :
+			`received value of type \`${is(value)}\``;
+
+		throw new TypeError(`Expected value which is \`${description}\`, ${valuesMessage}.`);
 	}
 };
 
@@ -620,8 +629,10 @@ export const assert: Assert = {
 	inRange: (value: number, range: number | number[]): asserts value is number => assertType(is.inRange(value, range), AssertionTypeDescription.inRange, value),
 
 	// Variadic functions.
-	any: (predicate: Predicate | Predicate[], ...values: unknown[]): void | never => assertType(is.any(predicate, ...values), AssertionTypeDescription.any, values),
-	all: (predicate: Predicate, ...values: unknown[]): void | never => assertType(is.all(predicate, ...values), AssertionTypeDescription.all, values)
+	any: (predicate: Predicate | Predicate[], ...values: unknown[]): void | never => {
+		return assertType(is.any(predicate, ...values), AssertionTypeDescription.any, values, {multipleValues: true});
+	},
+	all: (predicate: Predicate, ...values: unknown[]): void | never => assertType(is.all(predicate, ...values), AssertionTypeDescription.all, values, {multipleValues: true})
 };
 
 // Some few keywords are reserved, but we'll populate them for Node.js users
