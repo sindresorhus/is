@@ -150,6 +150,8 @@ is.string = isOfType<string>('string');
 const isNumberType = isOfType<number>('number');
 is.number = (value: unknown): value is number => isNumberType(value) && !is.nan(value);
 
+is.propertyKey = (value: unknown): value is PropertyKey => is.any([is.string, is.number, is.symbol], value);
+
 is.bigint = isOfType<bigint>('bigint');
 
 // eslint-disable-next-line @typescript-eslint/ban-types
@@ -448,6 +450,7 @@ interface Assert {
 	undefined: (value: unknown) => asserts value is undefined;
 	string: (value: unknown) => asserts value is string;
 	number: (value: unknown) => asserts value is number;
+	propertyKey: (value: unknown) => asserts value is PropertyKey;
 	bigint: (value: unknown) => asserts value is bigint;
 	// eslint-disable-next-line @typescript-eslint/ban-types
 	function_: (value: unknown) => asserts value is Function;
@@ -538,6 +541,8 @@ export const assert: Assert = {
 	undefined: (value: unknown): asserts value is undefined => assertType(is.undefined(value), 'undefined', value),
 	string: (value: unknown): asserts value is string => assertType(is.string(value), 'string', value),
 	number: (value: unknown): asserts value is number => assertType(is.number(value), 'number', value),
+	// ? Is an AssertionTypeDescription.propertyKey entry necessary?
+	propertyKey: (value: unknown): asserts value is number => assertType(is.propertyKey(value), 'PropertyKey', value),
 	bigint: (value: unknown): asserts value is bigint => assertType(is.bigint(value), 'bigint', value),
 	// eslint-disable-next-line @typescript-eslint/ban-types
 	function_: (value: unknown): asserts value is Function => assertType(is.function_(value), 'Function', value),
