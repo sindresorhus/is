@@ -613,13 +613,6 @@ test('is.number', t => {
 	testType(t, 'number', ['integer', 'safeInteger', 'infinite']);
 });
 
-test('is.propertyKey', t => {
-	// ??? Unsure what is the correct syntax to `testType` multiple types. Also are the exclusion relevant?
-	testType(t, 'string', ['emptyString', 'numericString']);
-	testType(t, 'number', ['nan', 'integer', 'safeInteger', 'infinite']);
-	testType(t, 'symbol');
-});
-
 test('is.bigint', t => {
 	testType(t, 'bigint');
 });
@@ -1495,6 +1488,12 @@ test('is.nonEmptyMap', t => {
 	t.notThrows(() => {
 		assert.nonEmptyMap(tempMap);
 	});
+});
+
+test('is.propertyKey', t => {
+	testType(t, 'string', ['emptyString', 'numericString']);
+	testType(t, 'number', ['nan', 'integer', 'safeInteger', 'infinite']);
+	testType(t, 'symbol');
 });
 
 test('is.any', t => {

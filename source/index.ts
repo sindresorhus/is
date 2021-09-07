@@ -150,8 +150,6 @@ is.string = isOfType<string>('string');
 const isNumberType = isOfType<number>('number');
 is.number = (value: unknown): value is number => isNumberType(value) && !is.nan(value);
 
-is.propertyKey = (value: unknown): value is PropertyKey => is.any([is.string, is.number, is.symbol], value);
-
 is.bigint = isOfType<bigint>('bigint');
 
 // eslint-disable-next-line @typescript-eslint/ban-types
@@ -361,6 +359,7 @@ is.nonEmptySet = <T = unknown>(value: unknown): value is Set<T> => is.set(value)
 
 is.emptyMap = (value: unknown): value is Map<never, never> => is.map(value) && value.size === 0;
 is.nonEmptyMap = <Key = unknown, Value = unknown>(value: unknown): value is Map<Key, Value> => is.map(value) && value.size > 0;
+is.propertyKey = (value: unknown): value is PropertyKey => is.any([is.string, is.number, is.symbol], value);
 
 export type Predicate = (value: unknown) => boolean;
 
@@ -450,7 +449,6 @@ interface Assert {
 	undefined: (value: unknown) => asserts value is undefined;
 	string: (value: unknown) => asserts value is string;
 	number: (value: unknown) => asserts value is number;
-	propertyKey: (value: unknown) => asserts value is PropertyKey;
 	bigint: (value: unknown) => asserts value is bigint;
 	// eslint-disable-next-line @typescript-eslint/ban-types
 	function_: (value: unknown) => asserts value is Function;
@@ -522,6 +520,7 @@ interface Assert {
 	nonEmptySet: <T = unknown>(value: unknown) => asserts value is Set<T>;
 	emptyMap: (value: unknown) => asserts value is Map<never, never>;
 	nonEmptyMap: <Key = unknown, Value = unknown>(value: unknown) => asserts value is Map<Key, Value>;
+	propertyKey: (value: unknown) => asserts value is PropertyKey;
 
 	// Numbers.
 	evenInteger: (value: number) => asserts value is number;
@@ -541,8 +540,6 @@ export const assert: Assert = {
 	undefined: (value: unknown): asserts value is undefined => assertType(is.undefined(value), 'undefined', value),
 	string: (value: unknown): asserts value is string => assertType(is.string(value), 'string', value),
 	number: (value: unknown): asserts value is number => assertType(is.number(value), 'number', value),
-	// ? Is an AssertionTypeDescription.propertyKey entry necessary?
-	propertyKey: (value: unknown): asserts value is number => assertType(is.propertyKey(value), 'PropertyKey', value),
 	bigint: (value: unknown): asserts value is bigint => assertType(is.bigint(value), 'bigint', value),
 	// eslint-disable-next-line @typescript-eslint/ban-types
 	function_: (value: unknown): asserts value is Function => assertType(is.function_(value), 'Function', value),
@@ -621,6 +618,7 @@ export const assert: Assert = {
 	nonEmptySet: <T = unknown>(value: unknown): asserts value is Set<T> => assertType(is.nonEmptySet(value), AssertionTypeDescription.nonEmptySet, value),
 	emptyMap: (value: unknown): asserts value is Map<never, never> => assertType(is.emptyMap(value), AssertionTypeDescription.emptyMap, value),
 	nonEmptyMap: <Key = unknown, Value = unknown>(value: unknown): asserts value is Map<Key, Value> => assertType(is.nonEmptyMap(value), AssertionTypeDescription.nonEmptyMap, value),
+	propertyKey: (value: unknown): asserts value is number => assertType(is.propertyKey(value), 'PropertyKey', value),
 
 	// Numbers.
 	evenInteger: (value: number): asserts value is number => assertType(is.evenInteger(value), AssertionTypeDescription.evenInteger, value),
