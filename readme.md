@@ -430,7 +430,7 @@ Returns `true` if `value` is an odd integer.
 
 ##### .propertyKey(value)
 
-Returns `true` if `value` can be used as an object property key (either `string`, `number` or `symbol`.)
+Returns `true` if `value` can be used as an object property key (either `string`, `number`, or `symbol`.)
 
 ##### .any(predicate | predicate[], ...values)
 
