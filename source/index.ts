@@ -359,7 +359,10 @@ is.nonEmptySet = <T = unknown>(value: unknown): value is Set<T> => is.set(value)
 
 is.emptyMap = (value: unknown): value is Map<never, never> => is.map(value) && value.size === 0;
 is.nonEmptyMap = <Key = unknown, Value = unknown>(value: unknown): value is Map<Key, Value> => is.map(value) && value.size > 0;
-/** Returns `true` if `value` can be used as an object property key (either a `string`, a `number` or a `symbol`.) */
+
+/**
+Returns `true` if `value` can be used as an object property key (either a `string`, a `number` or a `symbol`).
+*/
 is.propertyKey = (value: unknown): value is PropertyKey => is.any([is.string, is.number, is.symbol], value);
 
 export type Predicate = (value: unknown) => boolean;
