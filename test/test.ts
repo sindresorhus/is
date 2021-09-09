@@ -1491,9 +1491,17 @@ test('is.nonEmptyMap', t => {
 });
 
 test('is.propertyKey', t => {
-	testType(t, 'string', ['emptyString', 'numericString']);
-	testType(t, 'number', ['nan', 'integer', 'safeInteger', 'infinite']);
-	testType(t, 'symbol');
+	t.true(is.propertyKey('key'));
+	t.true(is.propertyKey(42));
+	t.true(is.propertyKey(Symbol('')));
+
+	t.false(is.propertyKey(null));
+	t.false(is.propertyKey(undefined));
+	t.false(is.propertyKey(true));
+	t.false(is.propertyKey({}));
+	t.false(is.propertyKey([]));
+	t.false(is.propertyKey(new Map()));
+	t.false(is.propertyKey(new Set()));
 });
 
 test('is.any', t => {
