@@ -1490,6 +1490,20 @@ test('is.nonEmptyMap', t => {
 	});
 });
 
+test('is.propertyKey', t => {
+	t.true(is.propertyKey('key'));
+	t.true(is.propertyKey(42));
+	t.true(is.propertyKey(Symbol('')));
+
+	t.false(is.propertyKey(null));
+	t.false(is.propertyKey(undefined));
+	t.false(is.propertyKey(true));
+	t.false(is.propertyKey({}));
+	t.false(is.propertyKey([]));
+	t.false(is.propertyKey(new Map()));
+	t.false(is.propertyKey(new Set()));
+});
+
 test('is.any', t => {
 	t.true(is.any(is.string, {}, true, '🦄'));
 	t.true(is.any(is.object, false, {}, 'unicorns'));

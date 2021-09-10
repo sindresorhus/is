@@ -360,6 +360,9 @@ is.nonEmptySet = <T = unknown>(value: unknown): value is Set<T> => is.set(value)
 is.emptyMap = (value: unknown): value is Map<never, never> => is.map(value) && value.size === 0;
 is.nonEmptyMap = <Key = unknown, Value = unknown>(value: unknown): value is Map<Key, Value> => is.map(value) && value.size > 0;
 
+// `PropertyKey` is any value that can be used as an object key (string, number, or symbol)
+is.propertyKey = (value: unknown): value is PropertyKey => is.any([is.string, is.number, is.symbol], value);
+
 export type Predicate = (value: unknown) => boolean;
 
 type ArrayMethod = (fn: (value: unknown, index: number, array: unknown[]) => boolean, thisArg?: unknown) => boolean;
@@ -519,6 +522,7 @@ interface Assert {
 	nonEmptySet: <T = unknown>(value: unknown) => asserts value is Set<T>;
 	emptyMap: (value: unknown) => asserts value is Map<never, never>;
 	nonEmptyMap: <Key = unknown, Value = unknown>(value: unknown) => asserts value is Map<Key, Value>;
+	propertyKey: (value: unknown) => asserts value is PropertyKey;
 
 	// Numbers.
 	evenInteger: (value: number) => asserts value is number;
@@ -616,6 +620,7 @@ export const assert: Assert = {
 	nonEmptySet: <T = unknown>(value: unknown): asserts value is Set<T> => assertType(is.nonEmptySet(value), AssertionTypeDescription.nonEmptySet, value),
 	emptyMap: (value: unknown): asserts value is Map<never, never> => assertType(is.emptyMap(value), AssertionTypeDescription.emptyMap, value),
 	nonEmptyMap: <Key = unknown, Value = unknown>(value: unknown): asserts value is Map<Key, Value> => assertType(is.nonEmptyMap(value), AssertionTypeDescription.nonEmptyMap, value),
+	propertyKey: (value: unknown): asserts value is number => assertType(is.propertyKey(value), 'PropertyKey', value),
 
 	// Numbers.
 	evenInteger: (value: number): asserts value is number => assertType(is.evenInteger(value), AssertionTypeDescription.evenInteger, value),

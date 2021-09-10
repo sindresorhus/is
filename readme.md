@@ -428,6 +428,10 @@ Returns `true` if `value` is an even integer.
 
 Returns `true` if `value` is an odd integer.
 
+##### .propertyKey(value)
+
+Returns `true` if `value` can be used as an object property key (either `string`, `number`, or `symbol`).
+
 ##### .any(predicate | predicate[], ...values)
 
 Using a single `predicate` argument, returns `true` if **any** of the input `values` returns true in the `predicate`:
