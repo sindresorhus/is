@@ -443,6 +443,17 @@ is.formData(data);
 //=> true
 ```
 
+##### .urlSearchParams(value)
+
+Returns `true` if `value` is an instance of the [`URLSearchParams` class](https://developer.mozilla.org/en-US/docs/Web/API/URLSearchParams).
+
+```js
+const data = new URLSearchParams();
+
+is.urlSearchParams(data);
+//=> true
+```
+
 ##### .any(predicate | predicate[], ...values)
 
 Using a single `predicate` argument, returns `true` if **any** of the input `values` returns true in the `predicate`:

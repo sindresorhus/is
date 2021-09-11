@@ -48,6 +48,7 @@ const objectTypeNames = [
 	'Promise',
 	'URL',
 	'FormData',
+	'URLSearchParams',
 	'HTMLElement',
 	...typedArrayTypeNames
 ] as const;
@@ -365,6 +366,8 @@ is.nonEmptyMap = <Key = unknown, Value = unknown>(value: unknown): value is Map<
 is.propertyKey = (value: unknown): value is PropertyKey => is.any([is.string, is.number, is.symbol], value);
 is.formData = (value: unknown): value is FormData => isObjectOfType<FormData>('FormData')(value);
 
+is.urlSearchParams = (value: unknown): value is URLSearchParams => isObjectOfType<URLSearchParams>('URLSearchParams')(value);
+
 export type Predicate = (value: unknown) => boolean;
 
 type ArrayMethod = (fn: (value: unknown, index: number, array: unknown[]) => boolean, thisArg?: unknown) => boolean;
@@ -526,6 +529,7 @@ interface Assert {
 	nonEmptyMap: <Key = unknown, Value = unknown>(value: unknown) => asserts value is Map<Key, Value>;
 	propertyKey: (value: unknown) => asserts value is PropertyKey;
 	formData: (value: unknown) => asserts value is FormData;
+	urlSearchParams: (value: unknown) => asserts value is URLSearchParams;
 
 	// Numbers.
 	evenInteger: (value: number) => asserts value is number;
@@ -625,6 +629,7 @@ export const assert: Assert = {
 	nonEmptyMap: <Key = unknown, Value = unknown>(value: unknown): asserts value is Map<Key, Value> => assertType(is.nonEmptyMap(value), AssertionTypeDescription.nonEmptyMap, value),
 	propertyKey: (value: unknown): asserts value is number => assertType(is.propertyKey(value), 'PropertyKey', value),
 	formData: (value: unknown): asserts value is FormData => assertType(is.formData(value), 'FormData', value),
+	urlSearchParams: (value: unknown): asserts value is URLSearchParams => assertType(is.urlSearchParams(value), 'URLSearchParams', value),
 
 	// Numbers.
 	evenInteger: (value: number): asserts value is number => assertType(is.evenInteger(value), AssertionTypeDescription.evenInteger, value),
