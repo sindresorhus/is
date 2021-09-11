@@ -47,6 +47,7 @@ const objectTypeNames = [
 	'DataView',
 	'Promise',
 	'URL',
+	'FormData',
 	'HTMLElement',
 	...typedArrayTypeNames
 ] as const;
@@ -362,6 +363,7 @@ is.nonEmptyMap = <Key = unknown, Value = unknown>(value: unknown): value is Map<
 
 // `PropertyKey` is any value that can be used as an object key (string, number, or symbol)
 is.propertyKey = (value: unknown): value is PropertyKey => is.any([is.string, is.number, is.symbol], value);
+is.formData = (value: unknown): value is FormData => isObjectOfType<FormData>('FormData')(value);
 
 export type Predicate = (value: unknown) => boolean;
 
@@ -523,6 +525,7 @@ interface Assert {
 	emptyMap: (value: unknown) => asserts value is Map<never, never>;
 	nonEmptyMap: <Key = unknown, Value = unknown>(value: unknown) => asserts value is Map<Key, Value>;
 	propertyKey: (value: unknown) => asserts value is PropertyKey;
+	formData: (value: unknown) => asserts value is FormData;
 
 	// Numbers.
 	evenInteger: (value: number) => asserts value is number;
@@ -621,6 +624,7 @@ export const assert: Assert = {
 	emptyMap: (value: unknown): asserts value is Map<never, never> => assertType(is.emptyMap(value), AssertionTypeDescription.emptyMap, value),
 	nonEmptyMap: <Key = unknown, Value = unknown>(value: unknown): asserts value is Map<Key, Value> => assertType(is.nonEmptyMap(value), AssertionTypeDescription.nonEmptyMap, value),
 	propertyKey: (value: unknown): asserts value is number => assertType(is.propertyKey(value), 'PropertyKey', value),
+	formData: (value: unknown): asserts value is FormData => assertType(is.formData(value), 'FormData', value),
 
 	// Numbers.
 	evenInteger: (value: number): asserts value is number => assertType(is.evenInteger(value), AssertionTypeDescription.evenInteger, value),
