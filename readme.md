@@ -432,6 +432,28 @@ Returns `true` if `value` is an odd integer.
 
 Returns `true` if `value` can be used as an object property key (either `string`, `number`, or `symbol`).
 
+##### .formData(value)
+
+Returns `true` if `value` is an instance of the [`FormData` class](https://developer.mozilla.org/en-US/docs/Web/API/FormData).
+
+```js
+const data = new FormData();
+
+is.formData(data);
+//=> true
+```
+
+##### .urlSearchParams(value)
+
+Returns `true` if `value` is an instance of the [`URLSearchParams` class](https://developer.mozilla.org/en-US/docs/Web/API/URLSearchParams).
+
+```js
+const searchParams = new URLSearchParams();
+
+is.urlSearchParams(searchParams);
+//=> true
+```
+
 ##### .any(predicate | predicate[], ...values)
 
 Using a single `predicate` argument, returns `true` if **any** of the input `values` returns true in the `predicate`:

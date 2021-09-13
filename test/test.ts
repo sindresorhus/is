@@ -1621,6 +1621,48 @@ test('is.all', t => {
 	});
 });
 
+test('is.formData', t => {
+	const data = new window.FormData();
+	t.true(is.formData(data));
+	t.false(is.formData({}));
+	t.false(is.formData(undefined));
+	t.false(is.formData(null));
+
+	t.notThrows(() => {
+		assert.formData(data);
+	});
+	t.throws(() => {
+		assert.formData({});
+	});
+	t.throws(() => {
+		assert.formData(undefined);
+	});
+	t.throws(() => {
+		assert.formData(null);
+	});
+});
+
+test('is.urlSearchParams', t => {
+	const searchParams = new URLSearchParams();
+	t.true(is.urlSearchParams(searchParams));
+	t.false(is.urlSearchParams({}));
+	t.false(is.urlSearchParams(undefined));
+	t.false(is.urlSearchParams(null));
+
+	t.notThrows(() => {
+		assert.urlSearchParams(searchParams);
+	});
+	t.throws(() => {
+		assert.urlSearchParams({});
+	});
+	t.throws(() => {
+		assert.urlSearchParams(undefined);
+	});
+	t.throws(() => {
+		assert.urlSearchParams(null);
+	});
+});
+
 test('assert', t => {
 	// Contrived test showing that TypeScript acknowledges the type assertion in `assert.number()`.
 	// Real--world usage includes asserting user input, but here we use a random number/string generator.
