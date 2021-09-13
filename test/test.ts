@@ -1643,14 +1643,14 @@ test('is.formData', t => {
 });
 
 test('is.urlSearchParams', t => {
-	const params = new window.URLSearchParams();
-	t.true(is.urlSearchParams(params));
+	const searchParams = new URLSearchParams();
+	t.true(is.urlSearchParams(searchParams));
 	t.false(is.urlSearchParams({}));
 	t.false(is.urlSearchParams(undefined));
 	t.false(is.urlSearchParams(null));
 
 	t.notThrows(() => {
-		assert.urlSearchParams(params);
+		assert.urlSearchParams(searchParams);
 	});
 	t.throws(() => {
 		assert.urlSearchParams({});

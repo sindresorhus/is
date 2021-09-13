@@ -448,9 +448,9 @@ is.formData(data);
 Returns `true` if `value` is an instance of the [`URLSearchParams` class](https://developer.mozilla.org/en-US/docs/Web/API/URLSearchParams).
 
 ```js
-const data = new URLSearchParams();
+const searchParams = new URLSearchParams();
 
-is.urlSearchParams(data);
+is.urlSearchParams(searchParams);
 //=> true
 ```
 
