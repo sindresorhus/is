@@ -602,6 +602,10 @@ For the ones I found, pick 3 of these.
 
 The most common mistakes I noticed in these modules was using `instanceof` for type checking, forgetting that functions are objects, and omitting `symbol` as a primitive.
 
+### Why not just use `instanceof` instead of this package?
+
+`instanceof` does not work correctly for all types and it does not work across [realms](https://stackoverflow.com/a/49832343/64949). Examples of realms are iframes, windows, web workers, and the `vm` module in Node.js.
+
 ## For enterprise
 
 Available as part of the Tidelift Subscription.
