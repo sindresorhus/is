@@ -181,11 +181,12 @@ is.buffer = (value: unknown): value is Buffer => (value as any)?.constructor?.is
 
 is.nullOrUndefined = (value: unknown): value is null | undefined => is.null_(value) || is.undefined(value);
 is.object = (value: unknown): value is object => !is.null_(value) && (typeof value === 'object' || is.function_(value));
-is.iterable = <T = unknown>(value: unknown): value is IterableIterator<T> => is.function_((value as IterableIterator<T>)?.[Symbol.iterator]);
 
+is.iterable = <T = unknown>(value: unknown): value is Iterable<T> => is.function_((value as Iterable<T>)?.[Symbol.iterator]);
+is.iterableIterator = <T = unknown>(value: unknown): value is IterableIterator<T> => is.iterable(value) && is.function_((value as IterableIterator<T>)?.next) && is.any([is.function_, is.undefined], (value as IterableIterator<T>)?.throw) && is.any([is.function_, is.undefined], (value as IterableIterator<T>)?.return);
 is.asyncIterable = <T = unknown>(value: unknown): value is AsyncIterableIterator<T> => is.function_((value as AsyncIterableIterator<T>)?.[Symbol.asyncIterator]);
 
-is.generator = (value: unknown): value is Generator => is.iterable(value) && is.function_(value.next) && is.function_(value.throw);
+is.generator = (value: unknown): value is Generator => is.iterable(value) && is.function_((value as Generator)?.next) && is.function_((value as Generator)?.throw);
 
 is.asyncGenerator = (value: unknown): value is AsyncGenerator => is.asyncIterable(value) && is.function_(value.next) && is.function_(value.throw);
 
@@ -413,6 +414,7 @@ export const enum AssertionTypeDescription {
 	numericString = 'string with a number',
 	nullOrUndefined = 'null or undefined',
 	iterable = 'Iterable',
+	iterableIterator = 'Iterable Iterator',
 	asyncIterable = 'AsyncIterable',
 	nativePromise = 'native Promise',
 	urlString = 'string with a URL',
@@ -469,6 +471,7 @@ interface Assert {
 	nullOrUndefined: (value: unknown) => asserts value is null | undefined;
 	object: <Key extends keyof any = string, Value = unknown>(value: unknown) => asserts value is Record<Key, Value>;
 	iterable: <T = unknown>(value: unknown) => asserts value is Iterable<T>;
+	iterableIterator: <T = unknown>(value: unknown) => asserts value is IterableIterator<T>;
 	asyncIterable: <T = unknown>(value: unknown) => asserts value is AsyncIterable<T>;
 	generator: (value: unknown) => asserts value is Generator;
 	asyncGenerator: (value: unknown) => asserts value is AsyncGenerator;
@@ -569,6 +572,7 @@ export const assert: Assert = {
 	nullOrUndefined: (value: unknown): asserts value is null | undefined => assertType(is.nullOrUndefined(value), AssertionTypeDescription.nullOrUndefined, value),
 	object: (value: unknown): asserts value is object => assertType(is.object(value), 'Object', value),
 	iterable: <T = unknown>(value: unknown): asserts value is Iterable<T> => assertType(is.iterable(value), AssertionTypeDescription.iterable, value),
+	iterableIterator: <T = unknown>(value: unknown): asserts value is IterableIterator<T> => assertType(is.iterableIterator(value), AssertionTypeDescription.iterableIterator, value),
 	asyncIterable: <T = unknown>(value: unknown): asserts value is AsyncIterable<T> => assertType(is.asyncIterable(value), AssertionTypeDescription.asyncIterable, value),
 	generator: (value: unknown): asserts value is Generator => assertType(is.generator(value), 'Generator', value),
 	asyncGenerator: (value: unknown): asserts value is AsyncGenerator => assertType(is.asyncGenerator(value), 'AsyncGenerator', value),

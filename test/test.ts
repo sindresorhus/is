@@ -1069,6 +1069,66 @@ test('is.iterable', t => {
 	});
 });
 
+test('is.iterableIterator', t => {
+	t.true(is.iterableIterator({
+		[Symbol.iterator]: () => ({[Symbol.iterator]: () => {}}),
+		next: () => {},
+		throws: () => {},
+		returns: () => {}
+	}));
+	t.true(is.iterableIterator({
+		[Symbol.iterator]: () => ({[Symbol.iterator]: () => {}}),
+		next: () => {},
+		throws: undefined,
+		returns: undefined
+	}));
+	t.false(is.iterableIterator(new Map()));
+	t.false(is.iterableIterator([]));
+	t.false(is.iterableIterator(''));
+	t.false(is.iterableIterator(null));
+	t.false(is.iterableIterator(undefined));
+	t.false(is.iterableIterator(0));
+	t.false(is.iterableIterator(NaN));
+	t.false(is.iterableIterator(Infinity));
+	t.false(is.iterableIterator({}));
+
+	t.notThrows(() => {
+		assert.iterableIterator({
+			[Symbol.iterator]: () => ({[Symbol.iterator]: () => {}}),
+			next: () => {},
+			throws: () => {},
+			returns: () => {}
+		});
+	});
+	t.throws(() => {
+		assert.iterableIterator('');
+	});
+	t.throws(() => {
+		assert.iterableIterator([]);
+	});
+	t.throws(() => {
+		assert.iterableIterator(new Map());
+	});
+	t.throws(() => {
+		assert.iterableIterator(null);
+	});
+	t.throws(() => {
+		assert.iterableIterator(undefined);
+	});
+	t.throws(() => {
+		assert.iterableIterator(0);
+	});
+	t.throws(() => {
+		assert.iterableIterator(NaN);
+	});
+	t.throws(() => {
+		assert.iterableIterator(Infinity);
+	});
+	t.throws(() => {
+		assert.iterableIterator({});
+	});
+});
+
 test('is.asyncIterable', t => {
 	t.true(is.asyncIterable({
 		[Symbol.asyncIterator]: () => {}
