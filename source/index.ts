@@ -181,13 +181,13 @@ is.buffer = (value: unknown): value is Buffer => (value as any)?.constructor?.is
 
 is.nullOrUndefined = (value: unknown): value is null | undefined => is.null_(value) || is.undefined(value);
 is.object = (value: unknown): value is object => !is.null_(value) && (typeof value === 'object' || is.function_(value));
-is.iterable = <T = unknown>(value: unknown): value is IterableIterator<T> => is.function_((value as IterableIterator<T>)?.[Symbol.iterator]);
+is.iterable = <T = unknown>(value: unknown): value is Iterable<T> => is.function_((value as Iterable<T>)?.[Symbol.iterator]);
 
-is.asyncIterable = <T = unknown>(value: unknown): value is AsyncIterableIterator<T> => is.function_((value as AsyncIterableIterator<T>)?.[Symbol.asyncIterator]);
+is.asyncIterable = <T = unknown>(value: unknown): value is AsyncIterable<T> => is.function_((value as AsyncIterable<T>)?.[Symbol.asyncIterator]);
 
-is.generator = (value: unknown): value is Generator => is.iterable(value) && is.function_(value.next) && is.function_(value.throw);
+is.generator = (value: unknown): value is Generator => is.iterable(value) && is.function_((value as Generator)?.next) && is.function_((value as Generator)?.throw);
 
-is.asyncGenerator = (value: unknown): value is AsyncGenerator => is.asyncIterable(value) && is.function_(value.next) && is.function_(value.throw);
+is.asyncGenerator = (value: unknown): value is AsyncGenerator => is.asyncIterable(value) && is.function_((value as AsyncGenerator).next) && is.function_((value as AsyncGenerator).throw);
 
 is.nativePromise = <T = unknown>(value: unknown): value is Promise<T> =>
 	isObjectOfType<Promise<T>>('Promise')(value);
