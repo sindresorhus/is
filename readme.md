@@ -213,13 +213,13 @@ is.boundFunction(function () {});
 ##### .dataView(value)
 
 ##### .enumCase(value, enum)
-
+**TypeScript-only**
 Returns `true` if `value` is a member of `enum`.
 
 ```ts
-enum EnumDirection {
-	Asc = 'asc',
-	Desc = 'desc'
+enum Direction {
+	Ascending = 'ascending',
+	Descending = 'descending'
 }
 
 is.enumCase('asc', EnumDirection);
