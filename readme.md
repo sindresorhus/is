@@ -212,6 +212,23 @@ is.boundFunction(function () {});
 ##### .sharedArrayBuffer(value)
 ##### .dataView(value)
 
+##### .enumCase(value, enum)
+
+Returns `true` if `value` is a member of `enum`.
+
+```ts
+enum EnumDirection {
+	Asc = 'asc',
+	Desc = 'desc'
+}
+
+is.enumCase('asc', EnumDirection);
+//=> true
+
+is.enumCase('other', EnumDirection);
+//=> false
+```
+
 #### Emptiness
 
 ##### .emptyString(value)

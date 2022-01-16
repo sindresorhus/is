@@ -832,6 +832,23 @@ test('is.dataView', t => {
 	testType(t, 'dataView');
 });
 
+test('is.enumCase', t => {
+	enum NonNumericalEnum {
+		Key1 = 'key1',
+		Key2 = 'key2',
+	}
+
+	t.true(is.enumCase('key1', NonNumericalEnum));
+	t.notThrows(() => {
+		assert.enumCase('key1', NonNumericalEnum);
+	});
+
+	t.false(is.enumCase('invalid', NonNumericalEnum));
+	t.throws(() => {
+		assert.enumCase('invalid', NonNumericalEnum);
+	});
+});
+
 test('is.directInstanceOf', t => {
 	const error = new Error();
 	const errorSubclass = new ErrorSubclassFixture();
