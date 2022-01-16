@@ -47,3 +47,5 @@ export interface ObservableLike {
 	subscribe(observer: (value: unknown) => void): void;
 	[Symbol.observable](): ObservableLike;
 }
+
+export type Falsy = false | 0 | 0n | '' | null | undefined;
