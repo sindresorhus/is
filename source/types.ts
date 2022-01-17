@@ -47,3 +47,24 @@ export interface ObservableLike {
 	subscribe(observer: (value: unknown) => void): void;
 	[Symbol.observable](): ObservableLike;
 }
+
+/**
+A `number` that is an integer.
+You can't pass a `bigint` as they are already guaranteed to be integers.
+
+Use-case: Validating and documenting parameters.
+
+@example
+```
+import {Integer} from 'type-fest';
+declare function setYear<T extends number>(length: Integer<T>): void;
+```
+
+@see NegativeInteger
+@see NonNegativeInteger
+
+@category Numeric
+*/
+// `${bigint}` is a type that matches a valid bigint literal without the `n` (ex. 1, 0b1, 0o1, 0x1)
+// Because T is a number and not a string we can effectively use this to filter out any numbers containing decimal points
+export type Integer<Type extends number> = `${Type}` extends `${bigint}` ? Type : never;

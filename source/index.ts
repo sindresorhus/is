@@ -2,7 +2,7 @@
 /// <reference lib="dom"/>
 /// <reference types="node"/>
 
-import {Class, TypedArray, ObservableLike, Primitive} from './types';
+import {Class, TypedArray, ObservableLike, Primitive, Integer} from './types';
 
 const typedArrayTypeNames = [
 	'Int8Array',
@@ -258,8 +258,8 @@ is.nan = (value: unknown) => Number.isNaN(value as number);
 
 is.primitive = (value: unknown): value is Primitive => is.null_(value) || isPrimitiveTypeName(typeof value);
 
-is.integer = (value: unknown): value is number => Number.isInteger(value as number);
-is.safeInteger = (value: unknown): value is number => Number.isSafeInteger(value as number);
+is.integer = <T extends number>(value: T): value is Integer<T> => Number.isInteger(value);
+is.safeInteger = <T extends number>(value: T): value is Integer<T> => Number.isSafeInteger(value);
 
 is.plainObject = <Value = unknown>(value: unknown): value is Record<PropertyKey, Value> => {
 	// From: https://github.com/sindresorhus/is-plain-obj/blob/main/index.js
@@ -279,7 +279,7 @@ export interface ArrayLike<T> {
 	readonly length: number;
 }
 
-const isValidLength = (value: unknown): value is number => is.safeInteger(value) && value >= 0;
+const isValidLength = <T extends number>(value: T): value is Integer<T> => is.safeInteger(value) && value >= 0;
 is.arrayLike = <T = unknown>(value: unknown): value is ArrayLike<T> => !is.nullOrUndefined(value) && !is.function_(value) && isValidLength((value as ArrayLike<T>).length);
 
 is.inRange = (value: number, range: number | number[]): value is number => {
@@ -336,7 +336,7 @@ is.nodeStream = (value: unknown): value is NodeStream => is.object(value) && is.
 
 is.infinite = (value: unknown): value is number => value === Infinity || value === -Infinity;
 
-const isAbsoluteMod2 = (remainder: number) => (value: number): value is number => is.integer(value) && Math.abs(value % 2) === remainder;
+const isAbsoluteMod2 = (remainder: number) => <T extends number>(value: T): value is Integer<T> => is.integer(value) && Math.abs(value % 2) === remainder;
 is.evenInteger = isAbsoluteMod2(0);
 is.oddInteger = isAbsoluteMod2(1);
 
@@ -509,8 +509,8 @@ interface Assert {
 	falsy: (value: unknown) => asserts value is unknown;
 	nan: (value: unknown) => asserts value is unknown;
 	primitive: (value: unknown) => asserts value is Primitive;
-	integer: (value: unknown) => asserts value is number;
-	safeInteger: (value: unknown) => asserts value is number;
+	integer: <T extends number>(value: T) => asserts value is Integer<T>;
+	safeInteger: <T extends number>(value: T) => asserts value is Integer<T>;
 	plainObject: <Value = unknown>(value: unknown) => asserts value is Record<PropertyKey, Value>;
 	typedArray: (value: unknown) => asserts value is TypedArray;
 	arrayLike: <T = unknown>(value: unknown) => asserts value is ArrayLike<T>;
@@ -534,8 +534,8 @@ interface Assert {
 	urlSearchParams: (value: unknown) => asserts value is URLSearchParams;
 
 	// Numbers.
-	evenInteger: (value: number) => asserts value is number;
-	oddInteger: (value: number) => asserts value is number;
+	evenInteger: <T extends number>(value: T) => asserts value is Integer<T>;
+	oddInteger: <T extends number>(value: T) => asserts value is Integer<T>;
 
 	// Two arguments.
 	directInstanceOf: <T>(instance: unknown, class_: Class<T>) => asserts instance is T;
@@ -610,8 +610,8 @@ export const assert: Assert = {
 	falsy: (value: unknown): asserts value is unknown => assertType(is.falsy(value), AssertionTypeDescription.falsy, value),
 	nan: (value: unknown): asserts value is unknown => assertType(is.nan(value), AssertionTypeDescription.nan, value),
 	primitive: (value: unknown): asserts value is Primitive => assertType(is.primitive(value), AssertionTypeDescription.primitive, value),
-	integer: (value: unknown): asserts value is number => assertType(is.integer(value), AssertionTypeDescription.integer, value),
-	safeInteger: (value: unknown): asserts value is number => assertType(is.safeInteger(value), AssertionTypeDescription.safeInteger, value),
+	integer: <T extends number>(value: T): asserts value is Integer<T> => assertType(is.integer(value), AssertionTypeDescription.integer, value),
+	safeInteger: <T extends number>(value: T): asserts value is Integer<T> => assertType(is.safeInteger(value), AssertionTypeDescription.safeInteger, value),
 	plainObject: <Value = unknown>(value: unknown): asserts value is Record<PropertyKey, Value> => assertType(is.plainObject(value), AssertionTypeDescription.plainObject, value),
 	typedArray: (value: unknown): asserts value is TypedArray => assertType(is.typedArray(value), AssertionTypeDescription.typedArray, value),
 	arrayLike: <T = unknown>(value: unknown): asserts value is ArrayLike<T> => assertType(is.arrayLike(value), AssertionTypeDescription.arrayLike, value),
@@ -635,8 +635,8 @@ export const assert: Assert = {
 	urlSearchParams: (value: unknown): asserts value is URLSearchParams => assertType(is.urlSearchParams(value), 'URLSearchParams', value),
 
 	// Numbers.
-	evenInteger: (value: number): asserts value is number => assertType(is.evenInteger(value), AssertionTypeDescription.evenInteger, value),
-	oddInteger: (value: number): asserts value is number => assertType(is.oddInteger(value), AssertionTypeDescription.oddInteger, value),
+	evenInteger: <T extends number>(value: T): asserts value is Integer<T> => assertType(is.evenInteger(value), AssertionTypeDescription.evenInteger, value),
+	oddInteger: <T extends number>(value: T): asserts value is Integer<T> => assertType(is.oddInteger(value), AssertionTypeDescription.oddInteger, value),
 
 	// Two arguments.
 	directInstanceOf: <T>(instance: unknown, class_: Class<T>): asserts instance is T => assertType(is.directInstanceOf(instance, class_), AssertionTypeDescription.directInstanceOf, instance),
