@@ -68,3 +68,21 @@ declare function setYear<T extends number>(length: Integer<T>): void;
 // `${bigint}` is a type that matches a valid bigint literal without the `n` (ex. 1, 0b1, 0o1, 0x1)
 // Because T is a number and not a string we can effectively use this to filter out any numbers containing decimal points
 export type Integer<Type extends number> = `${Type}` extends `${bigint}` ? Type : never;
+
+/**
+Matches the hidden `Infinity` type.
+Please upvote [this issue](https://github.com/microsoft/TypeScript/issues/32277) if you want to have this type as a built-in in TypeScript.
+@see NegativeInfinity
+@category Numeric
+*/
+// See https://github.com/microsoft/TypeScript/issues/31752
+export type PositiveInfinity = 1e999;
+
+/**
+Matches the hidden `-Infinity` type.
+Please upvote [this issue](https://github.com/microsoft/TypeScript/issues/32277) if you want to have this type as a built-in in TypeScript.
+@see PositiveInfinity
+@category Numeric
+*/
+// See https://github.com/microsoft/TypeScript/issues/31752
+export type NegativeInfinity = -1e999;

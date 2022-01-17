@@ -2,7 +2,7 @@
 /// <reference lib="dom"/>
 /// <reference types="node"/>
 
-import {Class, TypedArray, ObservableLike, Primitive, Integer} from './types';
+import {Class, TypedArray, ObservableLike, Primitive, Integer, PositiveInfinity, NegativeInfinity} from './types';
 
 const typedArrayTypeNames = [
 	'Int8Array',
@@ -334,7 +334,7 @@ export interface NodeStream extends NodeJS.EventEmitter {
 
 is.nodeStream = (value: unknown): value is NodeStream => is.object(value) && is.function_((value as NodeStream).pipe) && !is.observable(value);
 
-is.infinite = (value: unknown): value is number => value === Infinity || value === -Infinity;
+is.infinite = (value: unknown): value is NegativeInfinity | PositiveInfinity => value === Infinity || value === -Infinity;
 
 const isAbsoluteMod2 = (remainder: number) => <T extends number>(value: T): value is Integer<T> => is.integer(value) && Math.abs(value % 2) === remainder;
 is.evenInteger = isAbsoluteMod2(0);
@@ -517,7 +517,7 @@ interface Assert {
 	domElement: (value: unknown) => asserts value is HTMLElement;
 	observable: (value: unknown) => asserts value is ObservableLike;
 	nodeStream: (value: unknown) => asserts value is NodeStream;
-	infinite: (value: unknown) => asserts value is number;
+	infinite: (value: unknown) => asserts value is NegativeInfinity | PositiveInfinity;
 	emptyArray: (value: unknown) => asserts value is never[];
 	nonEmptyArray: (value: unknown) => asserts value is unknown[];
 	emptyString: (value: unknown) => asserts value is '';
@@ -618,7 +618,7 @@ export const assert: Assert = {
 	domElement: (value: unknown): asserts value is HTMLElement => assertType(is.domElement(value), AssertionTypeDescription.domElement, value),
 	observable: (value: unknown): asserts value is ObservableLike => assertType(is.observable(value), 'Observable', value),
 	nodeStream: (value: unknown): asserts value is NodeStream => assertType(is.nodeStream(value), AssertionTypeDescription.nodeStream, value),
-	infinite: (value: unknown): asserts value is number => assertType(is.infinite(value), AssertionTypeDescription.infinite, value),
+	infinite: (value: unknown): asserts value is NegativeInfinity | PositiveInfinity => assertType(is.infinite(value), AssertionTypeDescription.infinite, value),
 	emptyArray: (value: unknown): asserts value is never[] => assertType(is.emptyArray(value), AssertionTypeDescription.emptyArray, value),
 	nonEmptyArray: (value: unknown): asserts value is unknown[] => assertType(is.nonEmptyArray(value), AssertionTypeDescription.nonEmptyArray, value),
 	emptyString: (value: unknown): asserts value is '' => assertType(is.emptyString(value), AssertionTypeDescription.emptyString, value),
