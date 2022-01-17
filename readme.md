@@ -212,6 +212,25 @@ is.boundFunction(function () {});
 ##### .sharedArrayBuffer(value)
 ##### .dataView(value)
 
+##### .enumCase(value, enum)
+
+**TypeScript-only**
+
+Returns `true` if `value` is a member of `enum`.
+
+```ts
+enum Direction {
+	Ascending = 'ascending',
+	Descending = 'descending'
+}
+
+is.enumCase('ascending', Direction);
+//=> true
+
+is.enumCase('other', Direction);
+//=> false
+```
+
 #### Emptiness
 
 ##### .emptyString(value)

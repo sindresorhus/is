@@ -230,6 +230,7 @@ is.bigUint64Array = isObjectOfType<BigUint64Array>('BigUint64Array');
 is.arrayBuffer = isObjectOfType<ArrayBuffer>('ArrayBuffer');
 is.sharedArrayBuffer = isObjectOfType<SharedArrayBuffer>('SharedArrayBuffer');
 is.dataView = isObjectOfType<DataView>('DataView');
+is.enumCase = <T = unknown>(value: unknown, targetEnum: T) => Object.values(targetEnum).includes(value as string);
 
 is.directInstanceOf = <T>(instance: unknown, class_: Class<T>): instance is T => Object.getPrototypeOf(instance) === class_.prototype;
 is.urlInstance = (value: unknown): value is URL => isObjectOfType<URL>('URL')(value);
@@ -501,6 +502,7 @@ interface Assert {
 	arrayBuffer: (value: unknown) => asserts value is ArrayBuffer;
 	sharedArrayBuffer: (value: unknown) => asserts value is SharedArrayBuffer;
 	dataView: (value: unknown) => asserts value is DataView;
+	enumCase: <T = unknown>(value: unknown, targetEnum: T) => asserts value is T[keyof T];
 	urlInstance: (value: unknown) => asserts value is URL;
 	urlString: (value: unknown) => asserts value is string;
 	truthy: (value: unknown) => asserts value is unknown;
@@ -601,6 +603,7 @@ export const assert: Assert = {
 	arrayBuffer: (value: unknown): asserts value is ArrayBuffer => assertType(is.arrayBuffer(value), 'ArrayBuffer', value),
 	sharedArrayBuffer: (value: unknown): asserts value is SharedArrayBuffer => assertType(is.sharedArrayBuffer(value), 'SharedArrayBuffer', value),
 	dataView: (value: unknown): asserts value is DataView => assertType(is.dataView(value), 'DataView', value),
+	enumCase: <T = unknown>(value: unknown, targetEnum: T): asserts value is T[keyof T] => assertType(is.enumCase(value, targetEnum), 'EnumCase', value),
 	urlInstance: (value: unknown): asserts value is URL => assertType(is.urlInstance(value), 'URL', value),
 	urlString: (value: unknown): asserts value is string => assertType(is.urlString(value), AssertionTypeDescription.urlString, value),
 	truthy: (value: unknown): asserts value is unknown => assertType(is.truthy(value), AssertionTypeDescription.truthy, value),
