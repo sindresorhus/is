@@ -214,9 +214,7 @@ is.boundFunction(function () {});
 
 ##### .enumCase(value, enum)
 
-**TypeScript-only**
-
-Returns `true` if `value` is a member of `enum`.
+TypeScript-only. Returns `true` if `value` is a member of `enum`.
 
 ```ts
 enum Direction {
