@@ -2,7 +2,7 @@
 /// <reference lib="dom"/>
 /// <reference types="node"/>
 
-import {Class, TypedArray, ObservableLike, Primitive} from './types';
+import {Class, Falsy, TypedArray, ObservableLike, Primitive} from './types';
 
 const typedArrayTypeNames = [
 	'Int8Array',
@@ -248,11 +248,10 @@ is.urlString = (value: unknown): value is string => {
 	}
 };
 
-// TODO: Use the `not` operator with a type guard here when it's available.
 // Example: `is.truthy = (value: unknown): value is (not false | not 0 | not '' | not undefined | not null) => Boolean(value);`
-is.truthy = (value: unknown) => Boolean(value);
+is.truthy = <T>(value: T | Falsy): value is T => Boolean(value);
 // Example: `is.falsy = (value: unknown): value is (not true | 0 | '' | undefined | null) => Boolean(value);`
-is.falsy = (value: unknown) => !value;
+is.falsy = <T>(value: T | Falsy): value is Falsy => !value;
 
 is.nan = (value: unknown) => Number.isNaN(value as number);
 
