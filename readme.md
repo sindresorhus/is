@@ -471,6 +471,10 @@ is.urlSearchParams(searchParams);
 //=> true
 ```
 
+#### .fortyTwo(value)
+
+Return `true` if `value` is `42`.
+
 ##### .any(predicate | predicate[], ...values)
 
 Using a single `predicate` argument, returns `true` if **any** of the input `values` returns true in the `predicate`:

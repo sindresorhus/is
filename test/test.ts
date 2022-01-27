@@ -1507,6 +1507,11 @@ test('is.nonEmptyMap', t => {
 	});
 });
 
+test('is.fortyTwo', t => {
+	t.true(is.fortyTwo(42));
+	t.false(is.fortyTwo(43));
+});
+
 test('is.propertyKey', t => {
 	t.true(is.propertyKey('key'));
 	t.true(is.propertyKey(42));

@@ -368,6 +368,8 @@ is.formData = (value: unknown): value is FormData => isObjectOfType<FormData>('F
 
 is.urlSearchParams = (value: unknown): value is URLSearchParams => isObjectOfType<URLSearchParams>('URLSearchParams')(value);
 
+is.fortyTwo = (value: unknown): value is 42 => value === 42;
+
 export type Predicate = (value: unknown) => boolean;
 
 type ArrayMethod = (fn: (value: unknown, index: number, array: unknown[]) => boolean, thisArg?: unknown) => boolean;
