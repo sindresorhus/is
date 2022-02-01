@@ -17,8 +17,8 @@ For example, `is.string('🦄') //=> true`
 
 ## Install
 
-```
-$ npm install @sindresorhus/is
+```sh
+npm install @sindresorhus/is
 ```
 
 ## Usage
@@ -82,6 +82,9 @@ All the below methods accept a value and returns a boolean for whether the value
 
 ##### .undefined(value)
 ##### .null(value)
+
+**Note:** TypeScript users must use `.null_()` because of a TypeScript naming limitation.
+
 ##### .string(value)
 ##### .number(value)
 
@@ -103,6 +106,9 @@ is.array(value, is.number); // Validate `value` is an array and all of its items
 ```
 
 ##### .function(value)
+
+**Note:** TypeScript users must use `.function_()` because of a TypeScript naming limitation.
+
 ##### .buffer(value)
 ##### .object(value)
 
@@ -371,6 +377,8 @@ An object is plain if it's created by either `{}`, `new Object()`, or `Object.cr
 ##### .class(value)
 
 Returns `true` for instances created by a class.
+
+**Note:** TypeScript users must use `.class_()` because of a TypeScript naming limitation.
 
 ##### .typedArray(value)
 
