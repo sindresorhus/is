@@ -250,7 +250,7 @@ Returns `true` if the value is a `string` and the `.length` is more than 0.
 Returns `true` if `is.string(value)` and if it's a `string` that is not a whitespace.
 
 ```js
-const values = ['property1', '', null, 'property2', '    ', undefined, , ,]
+const values = ['property1', '', null, 'property2', '    ', undefined]
 
 values.filter(is.nonEmptyStringAndNotWhitespace)
 //=> ['property1', 'property2']
