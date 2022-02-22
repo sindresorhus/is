@@ -253,7 +253,7 @@ Returns `true` if `is.string(value)` and if it's a `string` that is not a whites
 const values = ['property1', '', null, 'property2', '    ', undefined, , ,]
 
 values.filter(is.nonEmptyStringAndNotWhitespace)
-//=> (2) ['property1', 'property2']
+//=> ['property1', 'property2']
 ```
 
 ##### .emptyStringOrWhitespace(value)
