@@ -1438,7 +1438,6 @@ test('is.emptyStringOrWhitespace', t => {
 
 test('is.nonEmptyStringAndNotWhitespace', t => {
 	t.false(is.nonEmptyStringAndNotWhitespace(' '));
-	t.false(is.nonEmptyStringAndNotWhitespace('test'));
 	t.false(is.nonEmptyStringAndNotWhitespace(String()));
 	t.true(is.nonEmptyStringAndNotWhitespace('🦄'));
 
