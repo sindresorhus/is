@@ -344,11 +344,11 @@ is.nonEmptyArray = (value: unknown): value is unknown[] => is.array(value) && va
 
 is.emptyString = (value: unknown): value is '' => is.string(value) && value.length === 0;
 
-// TODO: Use `not ''` when the `not` operator is available.
-is.nonEmptyString = (value: unknown): value is string => is.string(value) && value.length > 0;
-
 const isWhiteSpaceString = (value: unknown): value is string => is.string(value) && !/\S/.test(value);
 is.emptyStringOrWhitespace = (value: unknown): value is string => is.emptyString(value) || isWhiteSpaceString(value);
+
+// TODO: Use `not ''` when the `not` operator is available.
+is.nonEmptyString = (value: unknown): value is string => is.string(value) && value.length > 0;
 
 // TODO: Use `not ''` when the `not` operator is available.
 is.nonEmptyStringAndNotWhitespace = (value: unknown): value is string => is.string(value) && !is.emptyStringOrWhitespace(value);
@@ -434,8 +434,8 @@ export const enum AssertionTypeDescription {
 	emptyArray = 'empty array',
 	nonEmptyArray = 'non-empty array',
 	emptyString = 'empty string',
-	nonEmptyString = 'non-empty string',
 	emptyStringOrWhitespace = 'empty string or whitespace',
+	nonEmptyString = 'non-empty string',
 	nonEmptyStringAndNotWhitespace = 'non-empty string and not whitespace',
 	emptyObject = 'empty object',
 	nonEmptyObject = 'non-empty object',
@@ -524,8 +524,8 @@ interface Assert {
 	emptyArray: (value: unknown) => asserts value is never[];
 	nonEmptyArray: (value: unknown) => asserts value is unknown[];
 	emptyString: (value: unknown) => asserts value is '';
-	nonEmptyString: (value: unknown) => asserts value is string;
 	emptyStringOrWhitespace: (value: unknown) => asserts value is string;
+	nonEmptyString: (value: unknown) => asserts value is string;
 	nonEmptyStringAndNotWhitespace: (value: unknown) => asserts value is string;
 	emptyObject: <Key extends keyof any = string>(value: unknown) => asserts value is Record<Key, never>;
 	nonEmptyObject: <Key extends keyof any = string, Value = unknown>(value: unknown) => asserts value is Record<Key, Value>;
@@ -626,8 +626,8 @@ export const assert: Assert = {
 	emptyArray: (value: unknown): asserts value is never[] => assertType(is.emptyArray(value), AssertionTypeDescription.emptyArray, value),
 	nonEmptyArray: (value: unknown): asserts value is unknown[] => assertType(is.nonEmptyArray(value), AssertionTypeDescription.nonEmptyArray, value),
 	emptyString: (value: unknown): asserts value is '' => assertType(is.emptyString(value), AssertionTypeDescription.emptyString, value),
-	nonEmptyString: (value: unknown): asserts value is string => assertType(is.nonEmptyString(value), AssertionTypeDescription.nonEmptyString, value),
 	emptyStringOrWhitespace: (value: unknown): asserts value is string => assertType(is.emptyStringOrWhitespace(value), AssertionTypeDescription.emptyStringOrWhitespace, value),
+	nonEmptyString: (value: unknown): asserts value is string => assertType(is.nonEmptyString(value), AssertionTypeDescription.nonEmptyString, value),
 	nonEmptyStringAndNotWhitespace: (value: unknown): asserts value is string => assertType(is.nonEmptyStringAndNotWhitespace(value), AssertionTypeDescription.nonEmptyStringAndNotWhitespace, value),
 	emptyObject: <Key extends keyof any = string>(value: unknown): asserts value is Record<Key, never> => assertType(is.emptyObject(value), AssertionTypeDescription.emptyObject, value),
 	nonEmptyObject: <Key extends keyof any = string, Value = unknown>(value: unknown): asserts value is Record<Key, Value> => assertType(is.nonEmptyObject(value), AssertionTypeDescription.nonEmptyObject, value),

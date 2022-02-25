@@ -1403,22 +1403,6 @@ test('is.emptyString', t => {
 	});
 });
 
-test('is.nonEmptyString', t => {
-	t.false(is.nonEmptyString(''));
-	t.false(is.nonEmptyString(String()));
-	t.true(is.nonEmptyString('🦄'));
-
-	t.throws(() => {
-		assert.nonEmptyString('');
-	});
-	t.throws(() => {
-		assert.nonEmptyString(String());
-	});
-	t.notThrows(() => {
-		assert.nonEmptyString('🦄');
-	});
-});
-
 test('is.emptyStringOrWhitespace', t => {
 	testType(t, 'emptyString', ['string']);
 	t.true(is.emptyStringOrWhitespace('  '));
@@ -1433,6 +1417,22 @@ test('is.emptyStringOrWhitespace', t => {
 	});
 	t.throws(() => {
 		assert.emptyStringOrWhitespace('unicorn');
+	});
+});
+
+test('is.nonEmptyString', t => {
+	t.false(is.nonEmptyString(''));
+	t.false(is.nonEmptyString(String()));
+	t.true(is.nonEmptyString('🦄'));
+
+	t.throws(() => {
+		assert.nonEmptyString('');
+	});
+	t.throws(() => {
+		assert.nonEmptyString(String());
+	});
+	t.notThrows(() => {
+		assert.nonEmptyString('🦄');
 	});
 });
 

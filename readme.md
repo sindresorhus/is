@@ -241,6 +241,10 @@ is.enumCase('other', Direction);
 
 Returns `true` if the value is a `string` and the `.length` is 0.
 
+##### .emptyStringOrWhitespace(value)
+
+Returns `true` if `is.emptyString(value)` or if it's a `string` that is all whitespace.
+
 ##### .nonEmptyString(value)
 
 Returns `true` if the value is a `string` and the `.length` is more than 0.
@@ -255,10 +259,6 @@ const values = ['property1', '', null, 'property2', '    ', undefined];
 values.filter(is.nonEmptyStringAndNotWhitespace);
 //=> ['property1', 'property2']
 ```
-
-##### .emptyStringOrWhitespace(value)
-
-Returns `true` if `is.emptyString(value)` or if it's a `string` that is all whitespace.
 
 ##### .emptyArray(value)
 
