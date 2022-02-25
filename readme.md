@@ -247,12 +247,12 @@ Returns `true` if the value is a `string` and the `.length` is more than 0.
 
 ##### .nonEmptyStringAndNotWhitespace(value)
 
-Returns `true` if `is.string(value)` and if it's a `string` that is non-empty and not a whitespace.
+Returns `true` if the value is a `string` that is not empty and not whitespace.
 
 ```js
-const values = ['property1', '', null, 'property2', '    ', undefined]
+const values = ['property1', '', null, 'property2', '    ', undefined];
 
-values.filter(is.nonEmptyStringAndNotWhitespace)
+values.filter(is.nonEmptyStringAndNotWhitespace);
 //=> ['property1', 'property2']
 ```
 
