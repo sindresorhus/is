@@ -1436,6 +1436,27 @@ test('is.emptyStringOrWhitespace', t => {
 	});
 });
 
+test('is.nonEmptyStringAndNotWhitespace', t => {
+	t.false(is.nonEmptyStringAndNotWhitespace(' '));
+	t.true(is.nonEmptyStringAndNotWhitespace('🦄'));
+
+	for (const value of [null, undefined, 5, NaN, {}, []]) {
+		t.false(is.nonEmptyStringAndNotWhitespace(value));
+
+		t.throws(() => {
+			assert.nonEmptyStringAndNotWhitespace(value);
+		});
+	}
+
+	t.throws(() => {
+		assert.nonEmptyStringAndNotWhitespace('');
+	});
+
+	t.notThrows(() => {
+		assert.nonEmptyStringAndNotWhitespace('🦄');
+	});
+});
+
 test('is.emptyObject', t => {
 	t.true(is.emptyObject({}));
 	t.true(is.emptyObject(new Object())); // eslint-disable-line no-new-object

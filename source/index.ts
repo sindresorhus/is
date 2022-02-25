@@ -350,6 +350,9 @@ is.nonEmptyString = (value: unknown): value is string => is.string(value) && val
 const isWhiteSpaceString = (value: unknown): value is string => is.string(value) && !/\S/.test(value);
 is.emptyStringOrWhitespace = (value: unknown): value is string => is.emptyString(value) || isWhiteSpaceString(value);
 
+// TODO: Use `not ''` when the `not` operator is available.
+is.nonEmptyStringAndNotWhitespace = (value: unknown): value is string => is.string(value) && !is.emptyStringOrWhitespace(value);
+
 is.emptyObject = <Key extends keyof any = string>(value: unknown): value is Record<Key, never> => is.object(value) && !is.map(value) && !is.set(value) && Object.keys(value).length === 0;
 
 // TODO: Use `not` operator here to remove `Map` and `Set` from type guard:
@@ -433,6 +436,7 @@ export const enum AssertionTypeDescription {
 	emptyString = 'empty string',
 	nonEmptyString = 'non-empty string',
 	emptyStringOrWhitespace = 'empty string or whitespace',
+	nonEmptyStringAndNotWhitespace = 'non-empty string and not whitespace',
 	emptyObject = 'empty object',
 	nonEmptyObject = 'non-empty object',
 	emptySet = 'empty set',
@@ -522,6 +526,7 @@ interface Assert {
 	emptyString: (value: unknown) => asserts value is '';
 	nonEmptyString: (value: unknown) => asserts value is string;
 	emptyStringOrWhitespace: (value: unknown) => asserts value is string;
+	nonEmptyStringAndNotWhitespace: (value: unknown) => asserts value is string;
 	emptyObject: <Key extends keyof any = string>(value: unknown) => asserts value is Record<Key, never>;
 	nonEmptyObject: <Key extends keyof any = string, Value = unknown>(value: unknown) => asserts value is Record<Key, Value>;
 	emptySet: (value: unknown) => asserts value is Set<never>;
@@ -623,6 +628,7 @@ export const assert: Assert = {
 	emptyString: (value: unknown): asserts value is '' => assertType(is.emptyString(value), AssertionTypeDescription.emptyString, value),
 	nonEmptyString: (value: unknown): asserts value is string => assertType(is.nonEmptyString(value), AssertionTypeDescription.nonEmptyString, value),
 	emptyStringOrWhitespace: (value: unknown): asserts value is string => assertType(is.emptyStringOrWhitespace(value), AssertionTypeDescription.emptyStringOrWhitespace, value),
+	nonEmptyStringAndNotWhitespace: (value: unknown): asserts value is string => assertType(is.nonEmptyStringAndNotWhitespace(value), AssertionTypeDescription.nonEmptyStringAndNotWhitespace, value),
 	emptyObject: <Key extends keyof any = string>(value: unknown): asserts value is Record<Key, never> => assertType(is.emptyObject(value), AssertionTypeDescription.emptyObject, value),
 	nonEmptyObject: <Key extends keyof any = string, Value = unknown>(value: unknown): asserts value is Record<Key, Value> => assertType(is.nonEmptyObject(value), AssertionTypeDescription.nonEmptyObject, value),
 	emptySet: (value: unknown): asserts value is Set<never> => assertType(is.emptySet(value), AssertionTypeDescription.emptySet, value),

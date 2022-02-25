@@ -245,6 +245,17 @@ Returns `true` if the value is a `string` and the `.length` is 0.
 
 Returns `true` if the value is a `string` and the `.length` is more than 0.
 
+##### .nonEmptyStringAndNotWhitespace(value)
+
+Returns `true` if the value is a `string` that is not empty and not whitespace.
+
+```js
+const values = ['property1', '', null, 'property2', '    ', undefined];
+
+values.filter(is.nonEmptyStringAndNotWhitespace);
+//=> ['property1', 'property2']
+```
+
 ##### .emptyStringOrWhitespace(value)
 
 Returns `true` if `is.emptyString(value)` or if it's a `string` that is all whitespace.
