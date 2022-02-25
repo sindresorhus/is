@@ -34,6 +34,7 @@ const objectTypeNames = [
 	'Observable',
 	'Array',
 	'Buffer',
+	'Blob',
 	'Object',
 	'RegExp',
 	'Date',
@@ -178,6 +179,7 @@ is.array = <T = unknown>(value: unknown, assertion?: (value: T) => value is T): 
 };
 
 is.buffer = (value: unknown): value is Buffer => (value as any)?.constructor?.isBuffer?.(value) ?? false;
+is.blob = (value: unknown): value is Blob => isObjectOfType<Blob>('Blob')(value);
 
 is.nullOrUndefined = (value: unknown): value is null | undefined => is.null_(value) || is.undefined(value);
 is.object = (value: unknown): value is object => !is.null_(value) && (typeof value === 'object' || is.function_(value));
@@ -470,6 +472,7 @@ interface Assert {
 	numericString: (value: unknown) => asserts value is string;
 	array: <T = unknown>(value: unknown, assertion?: (element: unknown) => asserts element is T) => asserts value is T[];
 	buffer: (value: unknown) => asserts value is Buffer;
+	blob: (value: unknown) => asserts value is Blob;
 	nullOrUndefined: (value: unknown) => asserts value is null | undefined;
 	object: <Key extends keyof any = string, Value = unknown>(value: unknown) => asserts value is Record<Key, Value>;
 	iterable: <T = unknown>(value: unknown) => asserts value is Iterable<T>;
@@ -572,6 +575,7 @@ export const assert: Assert = {
 		}
 	},
 	buffer: (value: unknown): asserts value is Buffer => assertType(is.buffer(value), 'Buffer', value),
+	blob: (value: unknown): asserts value is Blob => assertType(is.blob(value), 'Blob', value),
 	nullOrUndefined: (value: unknown): asserts value is null | undefined => assertType(is.nullOrUndefined(value), AssertionTypeDescription.nullOrUndefined, value),
 	object: (value: unknown): asserts value is object => assertType(is.object(value), 'Object', value),
 	iterable: <T = unknown>(value: unknown): asserts value is Iterable<T> => assertType(is.iterable(value), AssertionTypeDescription.iterable, value),
