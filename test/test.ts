@@ -1440,6 +1440,13 @@ test('is.nonEmptyStringAndNotWhitespace', t => {
 	t.false(is.nonEmptyStringAndNotWhitespace(' '));
 	t.true(is.nonEmptyStringAndNotWhitespace('🦄'));
 
+	for (const el of [null, undefined, 5, NaN, {}, []]) {
+		t.false(is.nonEmptyStringAndNotWhitespace(el));
+		t.throws(() => {
+			assert.nonEmptyStringAndNotWhitespace(el);
+		});
+	}
+
 	t.throws(() => {
 		assert.nonEmptyStringAndNotWhitespace('');
 	});
