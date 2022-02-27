@@ -170,6 +170,14 @@ const types = new Map<string, Test>([
 		],
 		typename: 'Buffer'
 	}],
+	['blob', {
+		is: is.blob,
+		assert: assert.blob,
+		fixtures: [
+			new window.Blob()
+		],
+		typename: 'Blob'
+	}],
 	['object', {
 		is: is.object,
 		assert: assert.object,
@@ -681,6 +689,10 @@ test('is.boundFunction', t => {
 
 test('is.buffer', t => {
 	testType(t, 'buffer');
+});
+
+test('is.blob', t => {
+	testType(t, 'blob');
 });
 
 test('is.object', t => {
