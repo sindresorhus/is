@@ -110,7 +110,7 @@ is.array(value, is.number); // Validate `value` is an array and all of its items
 **Note:** TypeScript users must use `.function_()` because of a TypeScript naming limitation.
 
 ##### .buffer(value)
-####  .blob(value)
+#### .blob(value)
 ##### .object(value)
 
 Keep in mind that [functions are objects too](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Functions).
