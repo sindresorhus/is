@@ -4,11 +4,11 @@
 		"outDir": "dist",
 		"target": "es2018",
 		"lib": [
-			"es2018",
+		  	"ESNext",
 			"dom"
-		]
+		],
 	},
-	"include": [
+  "include": [
 		"source"
 	]
 }

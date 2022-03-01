@@ -198,6 +198,7 @@ is.boundFunction(function () {});
 ##### .set(value)
 ##### .weakMap(value)
 ##### .weakSet(value)
+##### .weakRef(value)
 
 #### Typed arrays
 
