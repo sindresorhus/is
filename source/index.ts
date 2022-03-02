@@ -43,6 +43,7 @@ const objectTypeNames = [
 	'Set',
 	'WeakMap',
 	'WeakSet',
+	'WeakRef',
 	'ArrayBuffer',
 	'SharedArrayBuffer',
 	'DataView',
@@ -216,6 +217,7 @@ is.map = <Key = unknown, Value = unknown>(value: unknown): value is Map<Key, Val
 is.set = <T = unknown>(value: unknown): value is Set<T> => isObjectOfType<Set<T>>('Set')(value);
 is.weakMap = <Key extends object = object, Value = unknown>(value: unknown): value is WeakMap<Key, Value> => isObjectOfType<WeakMap<Key, Value>>('WeakMap')(value);
 is.weakSet = (value: unknown): value is WeakSet<object> => isObjectOfType<WeakSet<object>>('WeakSet')(value);
+is.weakRef = (value: unknown): value is WeakRef<object> => isObjectOfType<WeakRef<object>>('WeakRef')(value);
 
 is.int8Array = isObjectOfType<Int8Array>('Int8Array');
 is.uint8Array = isObjectOfType<Uint8Array>('Uint8Array');
@@ -494,6 +496,7 @@ interface Assert {
 	set: <T = unknown>(value: unknown) => asserts value is Set<T>;
 	weakMap: <Key extends object = object, Value = unknown>(value: unknown) => asserts value is WeakMap<Key, Value>;
 	weakSet: <T extends object = object>(value: unknown) => asserts value is WeakSet<T>;
+	weakRef: <T extends object = object>(value: unknown) => asserts value is WeakRef<T>;
 	int8Array: (value: unknown) => asserts value is Int8Array;
 	uint8Array: (value: unknown) => asserts value is Uint8Array;
 	uint8ClampedArray: (value: unknown) => asserts value is Uint8ClampedArray;
@@ -597,6 +600,7 @@ export const assert: Assert = {
 	set: <T = unknown>(value: unknown): asserts value is Set<T> => assertType(is.set(value), 'Set', value),
 	weakMap: <Key extends object = object, Value = unknown>(value: unknown): asserts value is WeakMap<Key, Value> => assertType(is.weakMap(value), 'WeakMap', value),
 	weakSet: <T extends object = object>(value: unknown): asserts value is WeakSet<T> => assertType(is.weakSet(value), 'WeakSet', value),
+	weakRef: <T extends object = object>(value: unknown): asserts value is WeakRef<T> => assertType(is.weakRef(value), 'WeakRef', value),
 	int8Array: (value: unknown): asserts value is Int8Array => assertType(is.int8Array(value), 'Int8Array', value),
 	uint8Array: (value: unknown): asserts value is Uint8Array => assertType(is.uint8Array(value), 'Uint8Array', value),
 	uint8ClampedArray: (value: unknown): asserts value is Uint8ClampedArray => assertType(is.uint8ClampedArray(value), 'Uint8ClampedArray', value),
