@@ -7,6 +7,7 @@ import {JSDOM} from 'jsdom';
 import {Subject, Observable} from 'rxjs';
 import tempy = require('tempy');
 import ZenObservable = require('zen-observable');
+import {WeakRef} from '@ungap/weakrefs'
 import is, {assert, AssertionTypeDescription, Primitive, TypedArray, TypeName} from '../source';
 
 class PromiseSubclassFixture<T> extends Promise<T> {}
@@ -339,7 +340,7 @@ const types = new Map<string, Test>([
 		is: is.weakRef,
 		assert: assert.weakRef,
 		fixtures: [
-			new window.WeakRef({})
+			window.WeakRef ? new window.WeakRef({}) : new WeakRef({})
 		],
 		typename: 'WeakRef'
 	}],
