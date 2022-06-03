@@ -69,6 +69,8 @@
 	"sideEffects": false,
 	"ava": {
 		"timeout": "1m",
+		"workerThreads": false,
+		"serial": true,
 		"extensions": {
 			"ts": "module"
 		},
