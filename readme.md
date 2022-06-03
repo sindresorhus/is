@@ -24,7 +24,7 @@ npm install @sindresorhus/is
 ## Usage
 
 ```js
-const is = require('@sindresorhus/is');
+import is from '@sindresorhus/is';
 
 is('🦄');
 //=> 'string'
@@ -39,7 +39,7 @@ is.number(6);
 [Assertions](#type-assertions) perform the same type checks, but throw an error if the type does not match.
 
 ```js
-const {assert} = require('@sindresorhus/is');
+import {assert} from '@sindresorhus/is';
 
 assert.string(2);
 //=> Error: Expected value which is `string`, received value of type `number`.

@@ -1,13 +1,14 @@
-import fs = require('fs');
-import net = require('net');
-import Stream = require('stream');
-import {inspect} from 'util';
+import {Buffer} from 'node:buffer';
+import fs from 'node:fs';
+import net from 'node:net';
+import Stream from 'node:stream';
+import {inspect} from 'node:util';
 import test, {ExecutionContext} from 'ava';
 import {JSDOM} from 'jsdom';
 import {Subject, Observable} from 'rxjs';
-import tempy = require('tempy');
-import ZenObservable = require('zen-observable');
-import is, {assert, AssertionTypeDescription, Primitive, TypedArray, TypeName} from '../source';
+import {temporaryFile} from 'tempy';
+import ZenObservable from 'zen-observable';
+import is, {assert, AssertionTypeDescription, Primitive, TypedArray, TypeName} from '../source/index.js';
 
 class PromiseSubclassFixture<T> extends Promise<T> {}
 class ErrorSubclassFixture extends Error {}
@@ -29,7 +30,7 @@ const invertAssertThrow = (description: string, fn: () => void | never, value: u
 
 	try {
 		fn();
-	} catch (error) {
+	} catch (error: unknown) {
 		if (error instanceof TypeError && error.message.includes(expectedAssertErrorMessage)) {
 			return;
 		}
@@ -45,17 +46,17 @@ const types = new Map<string, Test>([
 		is: is.undefined,
 		assert: assert.undefined,
 		fixtures: [
-			undefined
+			undefined,
 		],
-		typename: 'undefined'
+		typename: 'undefined',
 	}],
 	['null', {
 		is: is.null_,
 		assert: assert.null_,
 		fixtures: [
-			null
+			null,
 		],
-		typename: 'null'
+		typename: 'null',
 	}],
 	['string', {
 		is: is.string,
@@ -63,19 +64,19 @@ const types = new Map<string, Test>([
 		fixtures: [
 			'🦄',
 			'hello world',
-			''
+			'',
 		],
-		typename: 'string'
+		typename: 'string',
 	}],
 	['emptyString', {
 		is: is.emptyString,
 		assert: assert.emptyString,
 		fixtures: [
 			'',
-			String()
+			String(),
 		],
 		typename: 'string',
-		typeDescription: AssertionTypeDescription.emptyString
+		typeDescription: AssertionTypeDescription.emptyString,
 	}],
 	['number', {
 		is: is.number,
@@ -85,10 +86,10 @@ const types = new Map<string, Test>([
 			1.4,
 			0,
 			-0,
-			Infinity,
-			-Infinity
+			Number.POSITIVE_INFINITY,
+			Number.NEGATIVE_INFINITY,
 		],
-		typename: 'number'
+		typename: 'number',
 	}],
 	['bigint', {
 		is: is.bigint,
@@ -98,25 +99,25 @@ const types = new Map<string, Test>([
 			// 1n,
 			// 0n,
 			// -0n,
-			BigInt('1234')
+			BigInt('1234'),
 		],
-		typename: 'bigint'
+		typename: 'bigint',
 	}],
 	['boolean', {
 		is: is.boolean,
 		assert: assert.boolean,
 		fixtures: [
-			true, false
+			true, false,
 		],
-		typename: 'boolean'
+		typename: 'boolean',
 	}],
 	['symbol', {
 		is: is.symbol,
 		assert: assert.symbol,
 		fixtures: [
-			Symbol('🦄')
+			Symbol('🦄'),
 		],
-		typename: 'symbol'
+		typename: 'symbol',
 	}],
 	['numericString', {
 		is: is.numericString,
@@ -125,29 +126,29 @@ const types = new Map<string, Test>([
 			'5',
 			'-3.2',
 			'Infinity',
-			'0x56'
+			'0x56',
 		],
 		typename: 'string',
-		typeDescription: AssertionTypeDescription.numericString
+		typeDescription: AssertionTypeDescription.numericString,
 	}],
 	['array', {
 		is: is.array,
 		assert: assert.array,
 		fixtures: [
 			[1, 2],
-			new Array(2)
+			Array.from({length: 2}),
 		],
-		typename: 'Array'
+		typename: 'Array',
 	}],
 	['emptyArray', {
 		is: is.emptyArray,
 		assert: assert.emptyArray,
 		fixtures: [
 			[],
-			new Array() // eslint-disable-line @typescript-eslint/no-array-constructor
+			new Array(), // eslint-disable-line @typescript-eslint/no-array-constructor
 		],
 		typename: 'Array',
-		typeDescription: AssertionTypeDescription.emptyArray
+		typeDescription: AssertionTypeDescription.emptyArray,
 	}],
 	['function', {
 		is: is.function_,
@@ -158,79 +159,79 @@ const types = new Map<string, Test>([
 			() => {},
 			async function () {},
 			function * (): unknown {},
-			async function * (): unknown {}
+			async function * (): unknown {},
 		],
-		typename: 'Function'
+		typename: 'Function',
 	}],
 	['buffer', {
 		is: is.buffer,
 		assert: assert.buffer,
 		fixtures: [
-			Buffer.from('🦄')
+			Buffer.from('🦄'),
 		],
-		typename: 'Buffer'
+		typename: 'Buffer',
 	}],
 	['blob', {
 		is: is.blob,
 		assert: assert.blob,
 		fixtures: [
-			new window.Blob()
+			new window.Blob(),
 		],
-		typename: 'Blob'
+		typename: 'Blob',
 	}],
 	['object', {
 		is: is.object,
 		assert: assert.object,
 		fixtures: [
 			{x: 1},
-			Object.create({x: 1})
+			Object.create({x: 1}),
 		],
-		typename: 'Object'
+		typename: 'Object',
 	}],
 	['regExp', {
 		is: is.regExp,
 		assert: assert.regExp,
 		fixtures: [
 			/\w/,
-			new RegExp('\\w') // eslint-disable-line prefer-regex-literals
+			new RegExp('\\w'), // eslint-disable-line prefer-regex-literals
 		],
-		typename: 'RegExp'
+		typename: 'RegExp',
 	}],
 	['date', {
 		is: is.date,
 		assert: assert.date,
 		fixtures: [
-			new Date()
+			new Date(),
 		],
-		typename: 'Date'
+		typename: 'Date',
 	}],
 	['error', {
 		is: is.error,
 		assert: assert.error,
 		fixtures: [
 			new Error('🦄'),
-			new ErrorSubclassFixture()
+			new ErrorSubclassFixture(),
 		],
-		typename: 'Error'
+		typename: 'Error',
 	}],
 	['nativePromise', {
 		is: is.nativePromise,
 		assert: assert.nativePromise,
 		fixtures: [
 			Promise.resolve(),
-			PromiseSubclassFixture.resolve()
+			PromiseSubclassFixture.resolve(),
 		],
 		typename: 'Promise',
-		typeDescription: AssertionTypeDescription.nativePromise
+		typeDescription: AssertionTypeDescription.nativePromise,
 	}],
 	['promise', {
 		is: is.promise,
 		assert: assert.promise,
 		fixtures: [
-			{then() {}, catch() {}}
+			{then() {}, catch() {}}, // eslint-disable-line unicorn/no-thenable
 		],
 		typename: 'Object',
-		typeDescription: 'Promise'
+		typeDescription: 'Promise',
 	}],
 	['generator', {
 		is: is.generator,
@@ -238,9 +239,9 @@ const types = new Map<string, Test>([
 		fixtures: [
 			(function * () {
 				yield 4;
-			})()
+			})(),
 		],
-		typename: 'Generator'
+		typename: 'Generator',
 	}],
 	['asyncGenerator', {
 		is: is.asyncGenerator,
@@ -248,9 +249,9 @@ const types = new Map<string, Test>([
 		fixtures: [
 			(async function * () {
 				yield 4;
-			})()
+			})(),
 		],
-		typename: 'AsyncGenerator'
+		typename: 'AsyncGenerator',
 	}],
 	['generatorFunction', {
 		is: is.generatorFunction,
@@ -258,10 +259,10 @@ const types = new Map<string, Test>([
 		fixtures: [
 			function * () {
 				yield 4;
-			}
+			},
 		],
 		typename: 'Function',
-		typeDescription: 'GeneratorFunction'
+		typeDescription: 'GeneratorFunction',
 	}],
 	['asyncGeneratorFunction', {
 		is: is.asyncGeneratorFunction,
@@ -269,202 +270,202 @@ const types = new Map<string, Test>([
 		fixtures: [
 			async function * () {
 				yield 4;
-			}
+			},
 		],
 		typename: 'Function',
-		typeDescription: 'AsyncGeneratorFunction'
+		typeDescription: 'AsyncGeneratorFunction',
 	}],
 	['asyncFunction', {
 		is: is.asyncFunction,
 		assert: assert.asyncFunction,
 		fixtures: [
 			async function () {},
-			async () => {}
+			async () => {},
 		],
 		typename: 'Function',
-		typeDescription: 'AsyncFunction'
+		typeDescription: 'AsyncFunction',
 	}],
 	['boundFunction', {
 		is: is.boundFunction,
 		assert: assert.boundFunction,
 		fixtures: [
 			() => {},
-			function () {}.bind(null) // eslint-disable-line no-extra-bind
+			function () {}.bind(null), // eslint-disable-line no-extra-bind
 		],
-		typename: 'Function'
+		typename: 'Function',
 	}],
 	['map', {
 		is: is.map,
 		assert: assert.map,
 		fixtures: [
-			new Map([['one', '1']])
+			new Map([['one', '1']]),
 		],
-		typename: 'Map'
+		typename: 'Map',
 	}],
 	['emptyMap', {
 		is: is.emptyMap,
 		assert: assert.emptyMap,
 		fixtures: [
-			new Map()
+			new Map(),
 		],
 		typename: 'Map',
-		typeDescription: AssertionTypeDescription.emptyMap
+		typeDescription: AssertionTypeDescription.emptyMap,
 	}],
 	['set', {
 		is: is.set,
 		assert: assert.set,
 		fixtures: [
-			new Set(['one'])
+			new Set(['one']),
 		],
-		typename: 'Set'
+		typename: 'Set',
 	}],
 	['emptySet', {
 		is: is.emptySet,
 		assert: assert.emptySet,
 		fixtures: [
-			new Set()
+			new Set(),
 		],
 		typename: 'Set',
-		typeDescription: AssertionTypeDescription.emptySet
+		typeDescription: AssertionTypeDescription.emptySet,
 	}],
 	['weakSet', {
 		is: is.weakSet,
 		assert: assert.weakSet,
 		fixtures: [
-			new WeakSet()
+			new WeakSet(),
 		],
-		typename: 'WeakSet'
+		typename: 'WeakSet',
 	}],
 	['weakMap', {
 		is: is.weakMap,
 		assert: assert.weakMap,
 		fixtures: [
-			new WeakMap()
+			new WeakMap(),
 		],
-		typename: 'WeakMap'
+		typename: 'WeakMap',
 	}],
 	['int8Array', {
 		is: is.int8Array,
 		assert: assert.int8Array,
 		fixtures: [
-			new Int8Array()
+			new Int8Array(),
 		],
-		typename: 'Int8Array'
+		typename: 'Int8Array',
 	}],
 	['uint8Array', {
 		is: is.uint8Array,
 		assert: assert.uint8Array,
 		fixtures: [
-			new Uint8Array()
+			new Uint8Array(),
 		],
-		typename: 'Uint8Array'
+		typename: 'Uint8Array',
 	}],
 	['uint8ClampedArray', {
 		is: is.uint8ClampedArray,
 		assert: assert.uint8ClampedArray,
 		fixtures: [
-			new Uint8ClampedArray()
+			new Uint8ClampedArray(),
 		],
-		typename: 'Uint8ClampedArray'
+		typename: 'Uint8ClampedArray',
 	}],
 	['int16Array', {
 		is: is.int16Array,
 		assert: assert.int16Array,
 		fixtures: [
-			new Int16Array()
+			new Int16Array(),
 		],
-		typename: 'Int16Array'
+		typename: 'Int16Array',
 	}],
 	['uint16Array', {
 		is: is.uint16Array,
 		assert: assert.uint16Array,
 		fixtures: [
-			new Uint16Array()
+			new Uint16Array(),
 		],
-		typename: 'Uint16Array'
+		typename: 'Uint16Array',
 	}],
 	['int32Array', {
 		is: is.int32Array,
 		assert: assert.int32Array,
 		fixtures: [
-			new Int32Array()
+			new Int32Array(),
 		],
-		typename: 'Int32Array'
+		typename: 'Int32Array',
 	}],
 	['uint32Array', {
 		is: is.uint32Array,
 		assert: assert.uint32Array,
 		fixtures: [
-			new Uint32Array()
+			new Uint32Array(),
 		],
-		typename: 'Uint32Array'
+		typename: 'Uint32Array',
 	}],
 	['float32Array', {
 		is: is.float32Array,
 		assert: assert.float32Array,
 		fixtures: [
-			new Float32Array()
+			new Float32Array(),
 		],
-		typename: 'Float32Array'
+		typename: 'Float32Array',
 	}],
 	['float64Array', {
 		is: is.float64Array,
 		assert: assert.float64Array,
 		fixtures: [
-			new Float64Array()
+			new Float64Array(),
 		],
-		typename: 'Float64Array'
+		typename: 'Float64Array',
 	}],
 	['bigInt64Array', {
 		is: is.bigInt64Array,
 		assert: assert.bigInt64Array,
 		fixtures: [
-			new BigInt64Array()
+			new BigInt64Array(),
 		],
-		typename: 'BigInt64Array'
+		typename: 'BigInt64Array',
 	}],
 	['bigUint64Array', {
 		is: is.bigUint64Array,
 		assert: assert.bigUint64Array,
 		fixtures: [
-			new BigUint64Array()
+			new BigUint64Array(),
 		],
-		typename: 'BigUint64Array'
+		typename: 'BigUint64Array',
 	}],
 	['arrayBuffer', {
 		is: is.arrayBuffer,
 		assert: assert.arrayBuffer,
 		fixtures: [
-			new ArrayBuffer(10)
+			new ArrayBuffer(10),
 		],
-		typename: 'ArrayBuffer'
+		typename: 'ArrayBuffer',
 	}],
 	['dataView', {
 		is: is.dataView,
 		assert: assert.dataView,
 		fixtures: [
-			new DataView(new ArrayBuffer(10))
+			new DataView(new ArrayBuffer(10)),
 		],
-		typename: 'DataView'
+		typename: 'DataView',
 	}],
 	['nan', {
 		is: is.nan,
 		assert: assert.nan,
 		fixtures: [
-			NaN,
-			Number.NaN
+			NaN, // eslint-disable-line unicorn/prefer-number-properties
+			Number.NaN,
 		],
 		typename: 'number',
-		typeDescription: AssertionTypeDescription.nan
+		typeDescription: AssertionTypeDescription.nan,
 	}],
 	['nullOrUndefined', {
 		is: is.nullOrUndefined,
 		assert: assert.nullOrUndefined,
 		fixtures: [
 			null,
-			undefined
+			undefined,
 		],
-		typeDescription: AssertionTypeDescription.nullOrUndefined
+		typeDescription: AssertionTypeDescription.nullOrUndefined,
 	}],
 	['plainObject', {
 		is: is.plainObject,
@@ -472,29 +473,29 @@ const types = new Map<string, Test>([
 		fixtures: [
 			{x: 1},
 			Object.create(null),
-			new Object() // eslint-disable-line no-new-object
+			new Object(), // eslint-disable-line no-new-object
 		],
 		typename: 'Object',
-		typeDescription: AssertionTypeDescription.plainObject
+		typeDescription: AssertionTypeDescription.plainObject,
 	}],
 	['integer', {
 		is: is.integer,
 		assert: assert.integer,
 		fixtures: [
-			6
+			6,
 		],
 		typename: 'number',
-		typeDescription: AssertionTypeDescription.integer
+		typeDescription: AssertionTypeDescription.integer,
 	}],
 	['safeInteger', {
 		is: is.safeInteger,
 		assert: assert.safeInteger,
 		fixtures: [
 			(2 ** 53) - 1,
-			-(2 ** 53) + 1
+			-(2 ** 53) + 1,
 		],
 		typename: 'number',
-		typeDescription: AssertionTypeDescription.safeInteger
+		typeDescription: AssertionTypeDescription.safeInteger,
 	}],
 	['domElement', {
 		is: is.domElement,
@@ -505,21 +506,26 @@ const types = new Map<string, Test>([
 			'span',
 			'img',
 			'canvas',
-			'script'
-		].map(createDomElement),
-		typeDescription: AssertionTypeDescription.domElement
+			'script',
+		]
+			.map(fixture => createDomElement(fixture)),
+		typeDescription: AssertionTypeDescription.domElement,
 	}],
 	['non-domElements', {
 		is: value => !is.domElement(value),
-		assert: (value: unknown) => invertAssertThrow(AssertionTypeDescription.domElement, () => assert.domElement(value), value),
+		assert(value: unknown) {
+			invertAssertThrow(AssertionTypeDescription.domElement, () => {
+				assert.domElement(value);
+			}, value);
+		},
 		fixtures: [
 			document.createTextNode('data'),
 			document.createProcessingInstruction('xml-stylesheet', 'href="mycss.css" type="text/css"'),
 			document.createComment('This is a comment'),
 			document,
 			document.implementation.createDocumentType('svg:svg', '-//W3C//DTD SVG 1.1//EN', 'https://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd'),
-			document.createDocumentFragment()
-		]
+			document.createDocumentFragment(),
+		],
 	}],
 	['observable', {
 		is: is.observable,
@@ -527,37 +533,37 @@ const types = new Map<string, Test>([
 		fixtures: [
 			new Observable(),
 			new Subject(),
-			new ZenObservable(() => {})
+			new ZenObservable(() => {}),
 		],
-		typename: 'Observable'
+		typename: 'Observable',
 	}],
 	['nodeStream', {
 		is: is.nodeStream,
 		assert: assert.nodeStream,
 		fixtures: [
 			fs.createReadStream('readme.md'),
-			fs.createWriteStream(tempy.file()),
+			fs.createWriteStream(temporaryFile()),
 			new net.Socket(),
 			new Stream.Duplex(),
 			new Stream.PassThrough(),
 			new Stream.Readable(),
 			new Stream.Transform(),
 			new Stream.Stream(),
-			new Stream.Writable()
+			new Stream.Writable(),
 		],
 		typename: 'Object',
-		typeDescription: AssertionTypeDescription.nodeStream
+		typeDescription: AssertionTypeDescription.nodeStream,
 	}],
 	['infinite', {
 		is: is.infinite,
 		assert: assert.infinite,
 		fixtures: [
-			Infinity,
-			-Infinity
+			Number.POSITIVE_INFINITY,
+			Number.NEGATIVE_INFINITY,
 		],
 		typename: 'number',
-		typeDescription: AssertionTypeDescription.infinite
-	}]
+		typeDescription: AssertionTypeDescription.infinite,
+	}],
 ]);
 
 // This ensures a certain method matches only the types it's supposed to and none of the other methods' types
@@ -594,7 +600,7 @@ const testType = (t: ExecutionContext, type: string, exclude?: string[]) => {
 				t.throws(() => {
 					testAssert(fixture);
 				}, {
-					message: `Expected value which is \`${valueType!}\`, received value of type \`${is(fixture)}\`.`
+					message: `Expected value which is \`${valueType as string}\`, received value of type \`${is(fixture)}\`.`,
 				});
 			}
 
@@ -704,9 +710,11 @@ test('is.object', t => {
 		return;
 	}
 
-	for (const el of testData.fixtures) {
-		t.true(is.object(el));
-		t.notThrows(() => assert.object(el));
+	for (const element of testData.fixtures) {
+		t.true(is.object(element));
+		t.notThrows(() => {
+			assert.object(element);
+		});
 	}
 });
 
@@ -735,11 +743,9 @@ test('is.asyncFunction', t => {
 
 	const fixture = async () => {};
 	if (is.asyncFunction(fixture)) {
-		// eslint-disable-next-line promise/prefer-await-to-then
 		t.true(is.function_(fixture().then));
 
 		t.notThrows(() => {
-			// eslint-disable-next-line promise/prefer-await-to-then
 			assert.function_(fixture().then);
 		});
 	}
@@ -862,7 +868,7 @@ test('is.enumCase', t => {
 });
 
 test('is.directInstanceOf', t => {
-	const error = new Error();
+	const error = new Error('fixture');
 	const errorSubclass = new ErrorSubclassFixture();
 
 	t.true(is.directInstanceOf(error, Error));
@@ -944,24 +950,31 @@ test('is.truthy', t => {
 	t.notThrows(() => {
 		assert.truthy('unicorn');
 	});
+
 	t.notThrows(() => {
 		assert.truthy('🦄');
 	});
+
 	t.notThrows(() => {
 		assert.truthy(new Set());
 	});
+
 	t.notThrows(() => {
 		assert.truthy(Symbol('🦄'));
 	});
+
 	t.notThrows(() => {
 		assert.truthy(true);
 	});
+
 	t.notThrows(() => {
 		assert.truthy(1);
 	});
 
-	// TODO: Disabled until TS supports it for an ESnnnn target.
-	// t.notThrows(() => assert.truthy(1n));
+	t.notThrows(() => {
+		assert.truthy(1n);
+	});
+
 	t.notThrows(() => {
 		assert.truthy(BigInt(1));
 	});
@@ -973,31 +986,38 @@ test('is.falsy', t => {
 	t.true(is.falsy(''));
 	t.true(is.falsy(null));
 	t.true(is.falsy(undefined));
-	t.true(is.falsy(NaN));
-	// TODO: Disabled until TS supports it for an ESnnnn target.
-	// t.true(is.falsy(0n));
+	t.true(is.falsy(Number.NaN));
+	t.true(is.falsy(0n));
 	t.true(is.falsy(BigInt(0)));
 
 	t.notThrows(() => {
 		assert.falsy(false);
 	});
+
 	t.notThrows(() => {
 		assert.falsy(0);
 	});
+
 	t.notThrows(() => {
 		assert.falsy('');
 	});
+
 	t.notThrows(() => {
 		assert.falsy(null);
 	});
+
 	t.notThrows(() => {
 		assert.falsy(undefined);
 	});
+
 	t.notThrows(() => {
-		assert.falsy(NaN);
+		assert.falsy(Number.NaN);
 	});
-	// TODO: Disabled until TS supports it for an ESnnnn target.
-	// t.notThrows(() => assert.falsy(0n));
+
+	t.notThrows(() => {
+		assert.falsy(0n);
+	});
+
 	t.notThrows(() => {
 		assert.falsy(BigInt(0));
 	});
@@ -1017,11 +1037,11 @@ test('is.primitive', t => {
 		null,
 		'🦄',
 		6,
-		Infinity,
-		-Infinity,
+		Number.POSITIVE_INFINITY,
+		Number.NEGATIVE_INFINITY,
 		true,
 		false,
-		Symbol('🦄')
+		Symbol('🦄'),
 		// Disabled until TS supports it for an ESnnnn target.
 		// 6n
 	];
@@ -1065,8 +1085,8 @@ test('is.iterable', t => {
 	t.false(is.iterable(null));
 	t.false(is.iterable(undefined));
 	t.false(is.iterable(0));
-	t.false(is.iterable(NaN));
-	t.false(is.iterable(Infinity));
+	t.false(is.iterable(Number.NaN));
+	t.false(is.iterable(Number.POSITIVE_INFINITY));
 	t.false(is.iterable({}));
 
 	t.notThrows(() => {
@@ -1088,10 +1108,10 @@ test('is.iterable', t => {
 		assert.iterable(0);
 	});
 	t.throws(() => {
-		assert.iterable(NaN);
+		assert.iterable(Number.NaN);
 	});
 	t.throws(() => {
-		assert.iterable(Infinity);
+		assert.iterable(Number.POSITIVE_INFINITY);
 	});
 	t.throws(() => {
 		assert.iterable({});
@@ -1100,19 +1120,19 @@ test('is.iterable', t => {
 
 test('is.asyncIterable', t => {
 	t.true(is.asyncIterable({
-		[Symbol.asyncIterator]: () => {}
+		[Symbol.asyncIterator]() {},
 	}));
 
 	t.false(is.asyncIterable(null));
 	t.false(is.asyncIterable(undefined));
 	t.false(is.asyncIterable(0));
-	t.false(is.asyncIterable(NaN));
-	t.false(is.asyncIterable(Infinity));
+	t.false(is.asyncIterable(Number.NaN));
+	t.false(is.asyncIterable(Number.POSITIVE_INFINITY));
 	t.false(is.asyncIterable({}));
 
 	t.notThrows(() => {
 		assert.asyncIterable({
-			[Symbol.asyncIterator]: () => { }
+			[Symbol.asyncIterator]() {},
 		});
 	});
 
@@ -1126,10 +1146,10 @@ test('is.asyncIterable', t => {
 		assert.asyncIterable(0);
 	});
 	t.throws(() => {
-		assert.asyncIterable(NaN);
+		assert.asyncIterable(Number.NaN);
 	});
 	t.throws(() => {
-		assert.asyncIterable(Infinity);
+		assert.asyncIterable(Number.POSITIVE_INFINITY);
 	});
 	t.throws(() => {
 		assert.asyncIterable({});
@@ -1141,7 +1161,7 @@ test('is.class', t => {
 
 	const classDeclarations = [
 		Foo,
-		class Bar extends Foo {}
+		class Bar extends Foo {},
 	];
 
 	for (const classDeclaration of classDeclarations) {
@@ -1164,7 +1184,7 @@ test('is.typedArray', t => {
 		new Float32Array(),
 		new Float64Array(),
 		new BigInt64Array(),
-		new BigUint64Array()
+		new BigUint64Array(),
 	];
 
 	for (const item of typedArrays) {
@@ -1334,7 +1354,7 @@ test('is.domElement', t => {
 		'span',
 		'img',
 		'canvas',
-		'script'
+		'script',
 	];
 
 	for (const tagName of tagNames) {
@@ -1356,33 +1376,33 @@ test('is.infinite', t => {
 });
 
 test('is.evenInteger', t => {
-	for (const el of [-6, 2, 4]) {
-		t.true(is.evenInteger(el));
+	for (const element of [-6, 2, 4]) {
+		t.true(is.evenInteger(element));
 		t.notThrows(() => {
-			assert.evenInteger(el);
+			assert.evenInteger(element);
 		});
 	}
 
-	for (const el of [-3, 1, 5]) {
-		t.false(is.evenInteger(el));
+	for (const element of [-3, 1, 5]) {
+		t.false(is.evenInteger(element));
 		t.throws(() => {
-			assert.evenInteger(el);
+			assert.evenInteger(element);
 		});
 	}
 });
 
 test('is.oddInteger', t => {
-	for (const el of [-5, 7, 13]) {
-		t.true(is.oddInteger(el));
+	for (const element of [-5, 7, 13]) {
+		t.true(is.oddInteger(element));
 		t.notThrows(() => {
-			assert.oddInteger(el);
+			assert.oddInteger(element);
 		});
 	}
 
-	for (const el of [-8, 8, 10]) {
-		t.false(is.oddInteger(el));
+	for (const element of [-8, 8, 10]) {
+		t.false(is.oddInteger(element));
 		t.throws(() => {
-			assert.oddInteger(el);
+			assert.oddInteger(element);
 		});
 	}
 });
@@ -1452,7 +1472,7 @@ test('is.nonEmptyStringAndNotWhitespace', t => {
 	t.false(is.nonEmptyStringAndNotWhitespace(' '));
 	t.true(is.nonEmptyStringAndNotWhitespace('🦄'));
 
-	for (const value of [null, undefined, 5, NaN, {}, []]) {
+	for (const value of [null, undefined, 5, Number.NaN, {}, []]) {
 		t.false(is.nonEmptyStringAndNotWhitespace(value));
 
 		t.throws(() => {
@@ -1509,16 +1529,16 @@ test('is.emptySet', t => {
 });
 
 test('is.nonEmptySet', t => {
-	const tempSet = new Set();
-	t.false(is.nonEmptySet(tempSet));
+	const temporarySet = new Set();
+	t.false(is.nonEmptySet(temporarySet));
 	t.throws(() => {
-		assert.nonEmptySet(tempSet);
+		assert.nonEmptySet(temporarySet);
 	});
 
-	tempSet.add(1);
-	t.true(is.nonEmptySet(tempSet));
+	temporarySet.add(1);
+	t.true(is.nonEmptySet(temporarySet));
 	t.notThrows(() => {
-		assert.nonEmptySet(tempSet);
+		assert.nonEmptySet(temporarySet);
 	});
 });
 
@@ -1527,16 +1547,16 @@ test('is.emptyMap', t => {
 });
 
 test('is.nonEmptyMap', t => {
-	const tempMap = new Map();
-	t.false(is.nonEmptyMap(tempMap));
+	const temporaryMap = new Map();
+	t.false(is.nonEmptyMap(temporaryMap));
 	t.throws(() => {
-		assert.nonEmptyMap(tempMap);
+		assert.nonEmptyMap(temporaryMap);
 	});
 
-	tempMap.set('unicorn', '🦄');
-	t.true(is.nonEmptyMap(tempMap));
+	temporaryMap.set('unicorn', '🦄');
+	t.true(is.nonEmptyMap(temporaryMap));
 	t.notThrows(() => {
-		assert.nonEmptyMap(tempMap);
+		assert.nonEmptyMap(temporaryMap);
 	});
 });
 
@@ -1598,21 +1618,21 @@ test('is.any', t => {
 		assert.any(is.string, 1, 2, 3);
 	}, {
 		// Removes duplicates:
-		message: /received values of types `number`./
+		message: /received values of types `number`./,
 	});
 
 	t.throws(() => {
 		assert.any(is.string, 1, [4]);
 	}, {
 		// Lists all types:
-		message: /received values of types `number`, `Array`./
+		message: /received values of types `number`, `Array`./,
 	});
 
 	t.throws(() => {
 		assert.any([is.string, is.nullOrUndefined], 1);
 	}, {
 		// Handles array as first argument:
-		message: /received values of types `number`./
+		message: /received values of types `number`./,
 	});
 });
 
@@ -1622,7 +1642,7 @@ test('is.all', t => {
 	t.false(is.all(is.string, '🦄', []));
 	t.false(is.all(is.set, new Map(), {}));
 
-	t.true(is.all(is.array, ...[['1'], ['2']]));
+	t.true(is.all(is.array, ['1'], ['2']));
 
 	t.throws(() => {
 		is.all(null as any, true);
@@ -1660,14 +1680,14 @@ test('is.all', t => {
 		assert.all(is.string, 1, 2, 3);
 	}, {
 		// Removes duplicates:
-		message: /received values of types `number`./
+		message: /received values of types `number`./,
 	});
 
 	t.throws(() => {
 		assert.all(is.string, 1, [4]);
 	}, {
 		// Lists all types:
-		message: /received values of types `number`, `Array`./
+		message: /received values of types `number`, `Array`./,
 	});
 });
 
@@ -1693,14 +1713,14 @@ test('is.formData', t => {
 });
 
 test('is.urlSearchParams', t => {
-	const searchParams = new URLSearchParams();
-	t.true(is.urlSearchParams(searchParams));
+	const searchParameters = new URLSearchParams();
+	t.true(is.urlSearchParams(searchParameters));
 	t.false(is.urlSearchParams({}));
 	t.false(is.urlSearchParams(undefined));
 	t.false(is.urlSearchParams(null));
 
 	t.notThrows(() => {
-		assert.urlSearchParams(searchParams);
+		assert.urlSearchParams(searchParameters);
 	});
 	t.throws(() => {
 		assert.urlSearchParams({});
