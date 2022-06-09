@@ -53,7 +53,6 @@
 		"@types/zen-observable": "^0.8.0",
 		"@typescript-eslint/eslint-plugin": "^2.20.0",
 		"@typescript-eslint/parser": "^2.20.0",
-		"@ungap/weakrefs": "^0.2.0",
 		"ava": "^3.3.0",
 		"del-cli": "^2.0.0",
 		"eslint-config-xo-typescript": "^0.26.0",
