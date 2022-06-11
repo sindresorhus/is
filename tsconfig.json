@@ -7,6 +7,7 @@
 		"source"
 	],
 	"ts-node": {
+		"transpileOnly": true,
 		"files": true,
 		"experimentalResolver": true
 	}
