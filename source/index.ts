@@ -49,6 +49,7 @@ const objectTypeNames = [
 	'URLSearchParams',
 	'HTMLElement',
 	'NaN',
+	...typedArrayTypeNames,
 ] as const;
 
 type ObjectTypeName = typeof objectTypeNames[number];

@@ -456,7 +456,7 @@ const types = new Map<string, Test>([
 			Number.NaN,
 		],
 		typename: 'NaN',
-		typeDescription: AssertionTypeDescription.nan
+		typeDescription: AssertionTypeDescription.nan,
 	}],
 	['nullOrUndefined', {
 		is: is.nullOrUndefined,
