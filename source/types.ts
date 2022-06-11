@@ -4,7 +4,7 @@
 Matches any [primitive value](https://developer.mozilla.org/en-US/docs/Glossary/Primitive).
 */
 export type Primitive =
-	| null
+	| null // eslint-disable-line @typescript-eslint/ban-types
 	| undefined
 	| string
 	| number
@@ -12,7 +12,6 @@ export type Primitive =
 	| symbol
 	| bigint;
 
-// TODO: Remove the `= unknown` sometime  in the future when most users are on TS 3.5 as it's now the default
 /**
 Matches a [`class` constructor](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Classes).
 */
@@ -48,4 +47,5 @@ export interface ObservableLike {
 	[Symbol.observable](): ObservableLike;
 }
 
+// eslint-disable-next-line @typescript-eslint/ban-types
 export type Falsy = false | 0 | 0n | '' | null | undefined;
