@@ -48,7 +48,7 @@ const objectTypeNames = [
 	'FormData',
 	'URLSearchParams',
 	'HTMLElement',
-	...typedArrayTypeNames,
+	'NaN',
 ] as const;
 
 type ObjectTypeName = typeof objectTypeNames[number];
@@ -108,7 +108,7 @@ function is(value: unknown): TypeName {
 		case 'string':
 			return 'string';
 		case 'number':
-			return 'number';
+			return Number.isNaN(value) ? 'NaN' : 'number';
 		case 'boolean':
 			return 'boolean';
 		case 'function':

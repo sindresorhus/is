@@ -455,8 +455,8 @@ const types = new Map<string, Test>([
 			NaN, // eslint-disable-line unicorn/prefer-number-properties
 			Number.NaN,
 		],
-		typename: 'number',
-		typeDescription: AssertionTypeDescription.nan,
+		typename: 'NaN',
+		typeDescription: AssertionTypeDescription.nan
 	}],
 	['nullOrUndefined', {
 		is: is.nullOrUndefined,
