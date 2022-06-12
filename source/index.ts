@@ -612,8 +612,8 @@ export const assert: Assert = {
 	},
 	buffer: (value: unknown): asserts value is Buffer => assertType(is.buffer(value), 'Buffer', value),
 	blob: (value: unknown): asserts value is Blob => assertType(is.blob(value), 'Blob', value),
-	nullOrUndefined: (value: unknown): asserts value is null | undefined => assertType(is.nullOrUndefined(value), AssertionTypeDescription.nullOrUndefined, value),
-	object: (value: unknown): asserts value is object => assertType(is.object(value), 'Object', value),
+	nullOrUndefined: (value: unknown): asserts value is null | undefined => assertType(is.nullOrUndefined(value), AssertionTypeDescription.nullOrUndefined, value), // eslint-disable-line @typescript-eslint/ban-types
+	object: (value: unknown): asserts value is object => assertType(is.object(value), 'Object', value), // eslint-disable-line @typescript-eslint/ban-types
 	iterable: <T = unknown>(value: unknown): asserts value is Iterable<T> => assertType(is.iterable(value), AssertionTypeDescription.iterable, value),
 	asyncIterable: <T = unknown>(value: unknown): asserts value is AsyncIterable<T> => assertType(is.asyncIterable(value), AssertionTypeDescription.asyncIterable, value),
 	generator: (value: unknown): asserts value is Generator => assertType(is.generator(value), 'Generator', value),

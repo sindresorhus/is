@@ -50,7 +50,7 @@ export interface ObservableLike {
 // eslint-disable-next-line @typescript-eslint/ban-types
 export type Falsy = false | 0 | 0n | '' | null | undefined;
 
-export interface WeakRef<T extends object> {
+export interface WeakRef<T extends object> { // eslint-disable-line @typescript-eslint/ban-types
 	readonly [Symbol.toStringTag]: 'WeakRef';
 
 	/**
