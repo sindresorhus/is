@@ -340,7 +340,7 @@ const types = new Map<string, Test>([
 		is: is.weakRef,
 		assert: assert.weakRef,
 		fixtures: window.WeakRef ? [new window.WeakRef({})] : [],
-		typename: 'WeakRef'
+		typename: 'WeakRef',
 	}],
 	['weakMap', {
 		is: is.weakMap,
