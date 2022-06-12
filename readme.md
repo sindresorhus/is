@@ -24,7 +24,7 @@ npm install @sindresorhus/is
 ## Usage
 
 ```js
-const is = require('@sindresorhus/is');
+import is from '@sindresorhus/is';
 
 is('🦄');
 //=> 'string'
@@ -39,7 +39,7 @@ is.number(6);
 [Assertions](#type-assertions) perform the same type checks, but throw an error if the type does not match.
 
 ```js
-const {assert} = require('@sindresorhus/is');
+import {assert} from '@sindresorhus/is';
 
 assert.string(2);
 //=> Error: Expected value which is `string`, received value of type `number`.
@@ -437,7 +437,7 @@ Returns `true` if `value` is a DOM Element.
 Returns `true` if `value` is a Node.js [stream](https://nodejs.org/api/stream.html).
 
 ```js
-const fs = require('fs');
+import fs from 'node:fs';
 
 is.nodeStream(fs.createReadStream('unicorn.png'));
 //=> true
@@ -448,7 +448,7 @@ is.nodeStream(fs.createReadStream('unicorn.png'));
 Returns `true` if `value` is an `Observable`.
 
 ```js
-const {Observable} = require('rxjs');
+import {Observable} from 'rxjs';
 
 is.observable(new Observable());
 //=> true

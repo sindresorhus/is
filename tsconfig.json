@@ -1,15 +1,14 @@
 {
 	"extends": "@sindresorhus/tsconfig",
 	"compilerOptions": {
-		"outDir": "dist",
-		"target": "ES2018",
-		"lib": [
-		  	"ES2018",
-			"ESNext",
-			"dom"
-		]
+		"outDir": "dist"
 	},
 	"include": [
 		"source"
-	]
+	],
+	"ts-node": {
+		"transpileOnly": true,
+		"files": true,
+		"experimentalResolver": true
+	}
 }
