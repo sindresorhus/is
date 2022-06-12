@@ -51,7 +51,7 @@ export interface ObservableLike {
 export type Falsy = false | 0 | 0n | '' | null | undefined;
 
 export interface WeakRef<T extends object> {
-	readonly [Symbol.toStringTag]: "WeakRef";
+	readonly [Symbol.toStringTag]: 'WeakRef';
 
 	/**
 	 * Returns the WeakRef instance's target object, or undefined if the target object has been
