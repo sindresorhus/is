@@ -231,7 +231,7 @@ is.weakMap = <Key extends object = object, Value = unknown>(value: unknown): val
 
 is.weakSet = (value: unknown): value is WeakSet<object> => isObjectOfType<WeakSet<object>>('WeakSet')(value); // eslint-disable-line @typescript-eslint/ban-types
 
-is.weakRef = (value: unknown): value is WeakRef<object> => isObjectOfType<WeakRef<object>>('WeakRef')(value);
+is.weakRef = (value: unknown): value is WeakRef<object> => isObjectOfType<WeakRef<object>>('WeakRef')(value); // eslint-disable-line @typescript-eslint/ban-types
 
 is.int8Array = isObjectOfType<Int8Array>('Int8Array');
 is.uint8Array = isObjectOfType<Uint8Array>('Uint8Array');
@@ -527,7 +527,7 @@ interface Assert {
 	set: <T = unknown>(value: unknown) => asserts value is Set<T>;
 	weakMap: <Key extends object = object, Value = unknown>(value: unknown) => asserts value is WeakMap<Key, Value>; // eslint-disable-line @typescript-eslint/ban-types
 	weakSet: <T extends object = object>(value: unknown) => asserts value is WeakSet<T>; // eslint-disable-line @typescript-eslint/ban-types
-	weakRef: <T extends object = object>(value: unknown) => asserts value is WeakRef<T>;
+	weakRef: <T extends object = object>(value: unknown) => asserts value is WeakRef<T>; // eslint-disable-line @typescript-eslint/ban-types
 	int8Array: (value: unknown) => asserts value is Int8Array;
 	uint8Array: (value: unknown) => asserts value is Uint8Array;
 	uint8ClampedArray: (value: unknown) => asserts value is Uint8ClampedArray;
@@ -612,8 +612,8 @@ export const assert: Assert = {
 	},
 	buffer: (value: unknown): asserts value is Buffer => assertType(is.buffer(value), 'Buffer', value),
 	blob: (value: unknown): asserts value is Blob => assertType(is.blob(value), 'Blob', value),
-	nullOrUndefined: (value: unknown): asserts value is null | undefined => assertType(is.nullOrUndefined(value), AssertionTypeDescription.nullOrUndefined, value),
-	object: (value: unknown): asserts value is object => assertType(is.object(value), 'Object', value),
+	nullOrUndefined: /* eslint-disable-line @typescript-eslint/ban-types */ (value: unknown): asserts value is null | undefined => assertType(is.nullOrUndefined(value), AssertionTypeDescription.nullOrUndefined, value),
+	object: (value: unknown): asserts value is Record<string, unknown> => assertType(is.object(value), 'Object', value),
 	iterable: <T = unknown>(value: unknown): asserts value is Iterable<T> => assertType(is.iterable(value), AssertionTypeDescription.iterable, value),
 	asyncIterable: <T = unknown>(value: unknown): asserts value is AsyncIterable<T> => assertType(is.asyncIterable(value), AssertionTypeDescription.asyncIterable, value),
 	generator: (value: unknown): asserts value is Generator => assertType(is.generator(value), 'Generator', value),
@@ -633,7 +633,7 @@ export const assert: Assert = {
 	set: <T = unknown>(value: unknown): asserts value is Set<T> => assertType(is.set(value), 'Set', value),
 	weakMap: <Key extends object = object, Value = unknown>(value: unknown): asserts value is WeakMap<Key, Value> => assertType(is.weakMap(value), 'WeakMap', value), // eslint-disable-line @typescript-eslint/ban-types
 	weakSet: <T extends object = object>(value: unknown): asserts value is WeakSet<T> => assertType(is.weakSet(value), 'WeakSet', value), // eslint-disable-line @typescript-eslint/ban-types
-	weakRef: <T extends object = object>(value: unknown): asserts value is WeakRef<T> => assertType(is.weakRef(value), 'WeakRef', value),
+	weakRef: <T extends object = object>(value: unknown): asserts value is WeakRef<T> => assertType(is.weakRef(value), 'WeakRef', value), // eslint-disable-line @typescript-eslint/ban-types
 	int8Array: (value: unknown): asserts value is Int8Array => assertType(is.int8Array(value), 'Int8Array', value),
 	uint8Array: (value: unknown): asserts value is Uint8Array => assertType(is.uint8Array(value), 'Uint8Array', value),
 	uint8ClampedArray: (value: unknown): asserts value is Uint8ClampedArray => assertType(is.uint8ClampedArray(value), 'Uint8ClampedArray', value),
