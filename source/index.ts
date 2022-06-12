@@ -1,5 +1,5 @@
 import type {Buffer} from 'node:buffer';
-import type {Class, Falsy, TypedArray, ObservableLike, Primitive} from './types.js';
+import type {Class, Falsy, TypedArray, ObservableLike, Primitive, WeakRef} from './types.js';
 
 const typedArrayTypeNames = [
 	'Int8Array',
