@@ -52,10 +52,5 @@ export type Falsy = false | 0 | 0n | '' | null | undefined;
 
 export interface WeakRef<T extends object> { // eslint-disable-line @typescript-eslint/ban-types
 	readonly [Symbol.toStringTag]: 'WeakRef';
-
-	/**
-	 * Returns the WeakRef instance's target object, or undefined if the target object has been
-	 * reclaimed.
-	 */
 	deref(): T | undefined;
 }
