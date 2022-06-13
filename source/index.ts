@@ -1,5 +1,5 @@
 import type {Buffer} from 'node:buffer';
-import type {Class, Falsy, TypedArray, ObservableLike, Primitive} from './types.js';
+import type {Class, Falsy, TypedArray, ObservableLike, Primitive, WeakRef} from './types.js';
 
 const typedArrayTypeNames = [
 	'Int8Array',
@@ -40,6 +40,7 @@ const objectTypeNames = [
 	'Set',
 	'WeakMap',
 	'WeakSet',
+	'WeakRef',
 	'ArrayBuffer',
 	'SharedArrayBuffer',
 	'DataView',
@@ -229,6 +230,8 @@ is.set = <T = unknown>(value: unknown): value is Set<T> => isObjectOfType<Set<T>
 is.weakMap = <Key extends object = object, Value = unknown>(value: unknown): value is WeakMap<Key, Value> => isObjectOfType<WeakMap<Key, Value>>('WeakMap')(value); // eslint-disable-line @typescript-eslint/ban-types
 
 is.weakSet = (value: unknown): value is WeakSet<object> => isObjectOfType<WeakSet<object>>('WeakSet')(value); // eslint-disable-line @typescript-eslint/ban-types
+
+is.weakRef = (value: unknown): value is WeakRef<object> => isObjectOfType<WeakRef<object>>('WeakRef')(value); // eslint-disable-line @typescript-eslint/ban-types
 
 is.int8Array = isObjectOfType<Int8Array>('Int8Array');
 is.uint8Array = isObjectOfType<Uint8Array>('Uint8Array');
@@ -524,6 +527,7 @@ interface Assert {
 	set: <T = unknown>(value: unknown) => asserts value is Set<T>;
 	weakMap: <Key extends object = object, Value = unknown>(value: unknown) => asserts value is WeakMap<Key, Value>; // eslint-disable-line @typescript-eslint/ban-types
 	weakSet: <T extends object = object>(value: unknown) => asserts value is WeakSet<T>; // eslint-disable-line @typescript-eslint/ban-types
+	weakRef: <T extends object = object>(value: unknown) => asserts value is WeakRef<T>; // eslint-disable-line @typescript-eslint/ban-types
 	int8Array: (value: unknown) => asserts value is Int8Array;
 	uint8Array: (value: unknown) => asserts value is Uint8Array;
 	uint8ClampedArray: (value: unknown) => asserts value is Uint8ClampedArray;
@@ -629,6 +633,7 @@ export const assert: Assert = {
 	set: <T = unknown>(value: unknown): asserts value is Set<T> => assertType(is.set(value), 'Set', value),
 	weakMap: <Key extends object = object, Value = unknown>(value: unknown): asserts value is WeakMap<Key, Value> => assertType(is.weakMap(value), 'WeakMap', value), // eslint-disable-line @typescript-eslint/ban-types
 	weakSet: <T extends object = object>(value: unknown): asserts value is WeakSet<T> => assertType(is.weakSet(value), 'WeakSet', value), // eslint-disable-line @typescript-eslint/ban-types
+	weakRef: <T extends object = object>(value: unknown): asserts value is WeakRef<T> => assertType(is.weakRef(value), 'WeakRef', value), // eslint-disable-line @typescript-eslint/ban-types
 	int8Array: (value: unknown): asserts value is Int8Array => assertType(is.int8Array(value), 'Int8Array', value),
 	uint8Array: (value: unknown): asserts value is Uint8Array => assertType(is.uint8Array(value), 'Uint8Array', value),
 	uint8ClampedArray: (value: unknown): asserts value is Uint8ClampedArray => assertType(is.uint8ClampedArray(value), 'Uint8ClampedArray', value),

@@ -336,6 +336,12 @@ const types = new Map<string, Test>([
 		],
 		typename: 'WeakSet',
 	}],
+	['weakRef', {
+		is: is.weakRef,
+		assert: assert.weakRef,
+		fixtures: window.WeakRef ? [new window.WeakRef({})] : [],
+		typename: 'WeakRef',
+	}],
 	['weakMap', {
 		is: is.weakMap,
 		assert: assert.weakMap,
@@ -798,6 +804,10 @@ test('is.weakSet', t => {
 	testType(t, 'weakSet');
 });
 
+test('is.weakRef', t => {
+	testType(t, 'weakRef');
+});
+
 test('is.int8Array', t => {
 	testType(t, 'int8Array');
 });
@@ -1223,7 +1233,7 @@ test('is.arrayLike', t => {
 	t.false(is.arrayLike(new Map()));
 
 	(function () {
-		t.notThrows(() => {
+		t.notThrows(function () {
 			assert.arrayLike(arguments); // eslint-disable-line prefer-rest-params
 		});
 	})();
