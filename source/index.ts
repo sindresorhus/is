@@ -286,14 +286,14 @@ is.safeInteger = (value: unknown): value is number => Number.isSafeInteger(value
 
 is.plainObject = <Value = unknown>(value: unknown): value is Record<PropertyKey, Value> => {
 	// From: https://github.com/sindresorhus/is-plain-obj/blob/main/index.js
-	if (toString.call(value) !== '[object Object]') {
+	if (typeof value !== 'object' || value === null) {
 		return false;
 	}
 
 	// eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
 	const prototype = Object.getPrototypeOf(value);
 
-	return prototype === null || prototype === Object.getPrototypeOf({});
+	return (prototype === null || prototype === Object.prototype || Object.getPrototypeOf(prototype) === null) && !(Symbol.toStringTag in value) && !(Symbol.iterator in value);
 };
 
 is.typedArray = (value: unknown): value is TypedArray => isTypedArrayName(getObjectType(value));
