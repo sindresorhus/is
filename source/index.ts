@@ -251,7 +251,7 @@ is.sharedArrayBuffer = isObjectOfType<SharedArrayBuffer>('SharedArrayBuffer');
 
 is.dataView = isObjectOfType<DataView>('DataView');
 
-is.enumCase = <T = unknown>(value: unknown, targetEnum: T) => Object.values(targetEnum).includes(value as string);
+is.enumCase = <T = unknown>(value: unknown, targetEnum: T): boolean => Object.values(targetEnum as any).includes(value as string);
 
 is.directInstanceOf = <T>(instance: unknown, class_: Class<T>): instance is T => Object.getPrototypeOf(instance) === class_.prototype;
 
@@ -298,10 +298,10 @@ is.plainObject = <Value = unknown>(value: unknown): value is Record<PropertyKey,
 
 is.typedArray = (value: unknown): value is TypedArray => isTypedArrayName(getObjectType(value));
 
-export interface ArrayLike<T> {
+export type ArrayLike<T> = {
 	readonly [index: number]: T;
 	readonly length: number;
-}
+};
 
 const isValidLength = (value: unknown): value is number => is.safeInteger(value) && value >= 0;
 is.arrayLike = <T = unknown>(value: unknown): value is ArrayLike<T> => !is.nullOrUndefined(value) && !is.function_(value) && isValidLength((value as ArrayLike<T>).length);
@@ -354,9 +354,9 @@ is.observable = (value: unknown): value is ObservableLike => {
 	return false;
 };
 
-export interface NodeStream extends NodeJS.EventEmitter {
+export type NodeStream = {
 	pipe<T extends NodeJS.WritableStream>(destination: T, options?: {end?: boolean}): T;
-}
+} & NodeJS.EventEmitter;
 
 is.nodeStream = (value: unknown): value is NodeStream => is.object(value) && is.function_((value as NodeStream).pipe) && !is.observable(value);
 
@@ -490,7 +490,7 @@ export const enum AssertionTypeDescription {
 }
 
 // Type assertions have to be declared with an explicit type.
-interface Assert {
+type Assert = {
 	// Unknowns.
 	undefined: (value: unknown) => asserts value is undefined;
 	string: (value: unknown) => asserts value is string;
@@ -585,7 +585,7 @@ interface Assert {
 	// Variadic functions.
 	any: (predicate: Predicate | Predicate[], ...values: unknown[]) => void | never;
 	all: (predicate: Predicate, ...values: unknown[]) => void | never;
-}
+};
 
 /* eslint-disable @typescript-eslint/no-confusing-void-expression */
 export const assert: Assert = {
