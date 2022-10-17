@@ -1435,6 +1435,17 @@ test('is.nonEmptyArray', t => {
 	t.throws(() => {
 		assert.nonEmptyArray(new Array()); // eslint-disable-line @typescript-eslint/no-array-constructor
 	});
+
+	// https://github.com/sindresorhus/is/issues/174
+	// {
+	// 	const strings = ['foo', 'bar']
+	// 	const function_ = (value: string) => value;
+
+	// 	if (is.nonEmptyArray(strings)) {
+	// 		const value = strings[0]
+	// 		function_(value);
+	// 	}
+	// }
 });
 
 test('is.emptyString', t => {
