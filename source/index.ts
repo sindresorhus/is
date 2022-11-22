@@ -431,8 +431,12 @@ is.any = (predicate: Predicate | Predicate[], ...values: unknown[]): boolean => 
 
 is.all = (predicate: Predicate, ...values: unknown[]): boolean => predicateOnArray(Array.prototype.every, predicate, values);
 
-const assertType = (condition: boolean, description: string, value: unknown, options: {multipleValues?: boolean} = {}): asserts condition => {
+const assertType = (condition: boolean, description: string, value: unknown, customMessage?: string, options: {multipleValues?: boolean} = {}): asserts condition => {
 	if (!condition) {
+		if (customMessage) {
+			throw new Error(customMessage);
+		}
+
 		const {multipleValues} = options;
 		const valuesMessage = multipleValues
 			? `received values of types ${[
@@ -492,95 +496,95 @@ export const enum AssertionTypeDescription {
 // Type assertions have to be declared with an explicit type.
 type Assert = {
 	// Unknowns.
-	undefined: (value: unknown) => asserts value is undefined;
-	string: (value: unknown) => asserts value is string;
-	number: (value: unknown) => asserts value is number;
-	bigint: (value: unknown) => asserts value is bigint;
+	undefined: (value: unknown, customMessage?: string) => asserts value is undefined;
+	string: (value: unknown, customMessage?: string) => asserts value is string;
+	number: (value: unknown, customMessage?: string) => asserts value is number;
+	bigint: (value: unknown, customMessage?: string) => asserts value is bigint;
 	// eslint-disable-next-line @typescript-eslint/ban-types
-	function_: (value: unknown) => asserts value is Function;
-	null_: (value: unknown) => asserts value is null; // eslint-disable-line @typescript-eslint/ban-types
-	class_: (value: unknown) => asserts value is Class;
-	boolean: (value: unknown) => asserts value is boolean;
-	symbol: (value: unknown) => asserts value is symbol;
-	numericString: (value: unknown) => asserts value is string;
-	array: <T = unknown>(value: unknown, assertion?: (element: unknown) => asserts element is T) => asserts value is T[];
-	buffer: (value: unknown) => asserts value is Buffer;
-	blob: (value: unknown) => asserts value is Blob;
-	nullOrUndefined: (value: unknown) => asserts value is null | undefined; // eslint-disable-line @typescript-eslint/ban-types
-	object: <Key extends keyof any = string, Value = unknown>(value: unknown) => asserts value is Record<Key, Value>;
-	iterable: <T = unknown>(value: unknown) => asserts value is Iterable<T>;
-	asyncIterable: <T = unknown>(value: unknown) => asserts value is AsyncIterable<T>;
-	generator: (value: unknown) => asserts value is Generator;
-	asyncGenerator: (value: unknown) => asserts value is AsyncGenerator;
-	nativePromise: <T = unknown>(value: unknown) => asserts value is Promise<T>;
-	promise: <T = unknown>(value: unknown) => asserts value is Promise<T>;
-	generatorFunction: (value: unknown) => asserts value is GeneratorFunction;
-	asyncGeneratorFunction: (value: unknown) => asserts value is AsyncGeneratorFunction;
+	function_: (value: unknown, customMessage?: string) => asserts value is Function;
+	null_: (value: unknown, customMessage?: string) => asserts value is null; // eslint-disable-line @typescript-eslint/ban-types
+	class_: (value: unknown, customMessage?: string) => asserts value is Class;
+	boolean: (value: unknown, customMessage?: string) => asserts value is boolean;
+	symbol: (value: unknown, customMessage?: string) => asserts value is symbol;
+	numericString: (value: unknown, customMessage?: string) => asserts value is string;
+	array: <T = unknown>(value: unknown, assertion?: (element: unknown) => asserts element is T, customMessage?: string) => asserts value is T[];
+	buffer: (value: unknown, customMessage?: string) => asserts value is Buffer;
+	blob: (value: unknown, customMessage?: string) => asserts value is Blob;
+	nullOrUndefined: (value: unknown, customMessage?: string) => asserts value is null | undefined; // eslint-disable-line @typescript-eslint/ban-types
+	object: <Key extends keyof any = string, Value = unknown>(value: unknown, customMessage?: string) => asserts value is Record<Key, Value>;
+	iterable: <T = unknown>(value: unknown, customMessage?: string) => asserts value is Iterable<T>;
+	asyncIterable: <T = unknown>(value: unknown, customMessage?: string) => asserts value is AsyncIterable<T>;
+	generator: (value: unknown, customMessage?: string) => asserts value is Generator;
+	asyncGenerator: (value: unknown, customMessage?: string) => asserts value is AsyncGenerator;
+	nativePromise: <T = unknown>(value: unknown, customMessage?: string) => asserts value is Promise<T>;
+	promise: <T = unknown>(value: unknown, customMessage?: string) => asserts value is Promise<T>;
+	generatorFunction: (value: unknown, customMessage?: string) => asserts value is GeneratorFunction;
+	asyncGeneratorFunction: (value: unknown, customMessage?: string) => asserts value is AsyncGeneratorFunction;
 	// eslint-disable-next-line @typescript-eslint/ban-types
-	asyncFunction: (value: unknown) => asserts value is Function;
+	asyncFunction: (value: unknown, customMessage?: string) => asserts value is Function;
 	// eslint-disable-next-line @typescript-eslint/ban-types
-	boundFunction: (value: unknown) => asserts value is Function;
-	regExp: (value: unknown) => asserts value is RegExp;
-	date: (value: unknown) => asserts value is Date;
-	error: (value: unknown) => asserts value is Error;
-	map: <Key = unknown, Value = unknown>(value: unknown) => asserts value is Map<Key, Value>;
-	set: <T = unknown>(value: unknown) => asserts value is Set<T>;
-	weakMap: <Key extends object = object, Value = unknown>(value: unknown) => asserts value is WeakMap<Key, Value>; // eslint-disable-line @typescript-eslint/ban-types
-	weakSet: <T extends object = object>(value: unknown) => asserts value is WeakSet<T>; // eslint-disable-line @typescript-eslint/ban-types
-	weakRef: <T extends object = object>(value: unknown) => asserts value is WeakRef<T>; // eslint-disable-line @typescript-eslint/ban-types
-	int8Array: (value: unknown) => asserts value is Int8Array;
-	uint8Array: (value: unknown) => asserts value is Uint8Array;
-	uint8ClampedArray: (value: unknown) => asserts value is Uint8ClampedArray;
-	int16Array: (value: unknown) => asserts value is Int16Array;
-	uint16Array: (value: unknown) => asserts value is Uint16Array;
-	int32Array: (value: unknown) => asserts value is Int32Array;
-	uint32Array: (value: unknown) => asserts value is Uint32Array;
-	float32Array: (value: unknown) => asserts value is Float32Array;
-	float64Array: (value: unknown) => asserts value is Float64Array;
-	bigInt64Array: (value: unknown) => asserts value is BigInt64Array;
-	bigUint64Array: (value: unknown) => asserts value is BigUint64Array;
-	arrayBuffer: (value: unknown) => asserts value is ArrayBuffer;
-	sharedArrayBuffer: (value: unknown) => asserts value is SharedArrayBuffer;
-	dataView: (value: unknown) => asserts value is DataView;
-	enumCase: <T = unknown>(value: unknown, targetEnum: T) => asserts value is T[keyof T];
-	urlInstance: (value: unknown) => asserts value is URL;
-	urlString: (value: unknown) => asserts value is string;
-	truthy: (value: unknown) => asserts value is unknown;
-	falsy: (value: unknown) => asserts value is unknown;
-	nan: (value: unknown) => asserts value is unknown;
-	primitive: (value: unknown) => asserts value is Primitive;
-	integer: (value: unknown) => asserts value is number;
-	safeInteger: (value: unknown) => asserts value is number;
-	plainObject: <Value = unknown>(value: unknown) => asserts value is Record<PropertyKey, Value>;
-	typedArray: (value: unknown) => asserts value is TypedArray;
-	arrayLike: <T = unknown>(value: unknown) => asserts value is ArrayLike<T>;
-	domElement: (value: unknown) => asserts value is HTMLElement;
-	observable: (value: unknown) => asserts value is ObservableLike;
-	nodeStream: (value: unknown) => asserts value is NodeStream;
-	infinite: (value: unknown) => asserts value is number;
-	emptyArray: (value: unknown) => asserts value is never[];
-	nonEmptyArray: (value: unknown) => asserts value is [unknown, ...unknown[]];
-	emptyString: (value: unknown) => asserts value is '';
-	emptyStringOrWhitespace: (value: unknown) => asserts value is string;
-	nonEmptyString: (value: unknown) => asserts value is string;
-	nonEmptyStringAndNotWhitespace: (value: unknown) => asserts value is string;
-	emptyObject: <Key extends keyof any = string>(value: unknown) => asserts value is Record<Key, never>;
-	nonEmptyObject: <Key extends keyof any = string, Value = unknown>(value: unknown) => asserts value is Record<Key, Value>;
-	emptySet: (value: unknown) => asserts value is Set<never>;
-	nonEmptySet: <T = unknown>(value: unknown) => asserts value is Set<T>;
-	emptyMap: (value: unknown) => asserts value is Map<never, never>;
-	nonEmptyMap: <Key = unknown, Value = unknown>(value: unknown) => asserts value is Map<Key, Value>;
-	propertyKey: (value: unknown) => asserts value is PropertyKey;
-	formData: (value: unknown) => asserts value is FormData;
-	urlSearchParams: (value: unknown) => asserts value is URLSearchParams;
+	boundFunction: (value: unknown, customMessage?: string) => asserts value is Function;
+	regExp: (value: unknown, customMessage?: string) => asserts value is RegExp;
+	date: (value: unknown, customMessage?: string) => asserts value is Date;
+	error: (value: unknown, customMessage?: string) => asserts value is Error;
+	map: <Key = unknown, Value = unknown>(value: unknown, customMessage?: string) => asserts value is Map<Key, Value>;
+	set: <T = unknown>(value: unknown, customMessage?: string) => asserts value is Set<T>;
+	weakMap: <Key extends object = object, Value = unknown>(value: unknown, customMessage?: string) => asserts value is WeakMap<Key, Value>; // eslint-disable-line @typescript-eslint/ban-types
+	weakSet: <T extends object = object>(value: unknown, customMessage?: string) => asserts value is WeakSet<T>; // eslint-disable-line @typescript-eslint/ban-types
+	weakRef: <T extends object = object>(value: unknown, customMessage?: string) => asserts value is WeakRef<T>; // eslint-disable-line @typescript-eslint/ban-types
+	int8Array: (value: unknown, customMessage?: string) => asserts value is Int8Array;
+	uint8Array: (value: unknown, customMessage?: string) => asserts value is Uint8Array;
+	uint8ClampedArray: (value: unknown, customMessage?: string) => asserts value is Uint8ClampedArray;
+	int16Array: (value: unknown, customMessage?: string) => asserts value is Int16Array;
+	uint16Array: (value: unknown, customMessage?: string) => asserts value is Uint16Array;
+	int32Array: (value: unknown, customMessage?: string) => asserts value is Int32Array;
+	uint32Array: (value: unknown, customMessage?: string) => asserts value is Uint32Array;
+	float32Array: (value: unknown, customMessage?: string) => asserts value is Float32Array;
+	float64Array: (value: unknown, customMessage?: string) => asserts value is Float64Array;
+	bigInt64Array: (value: unknown, customMessage?: string) => asserts value is BigInt64Array;
+	bigUint64Array: (value: unknown, customMessage?: string) => asserts value is BigUint64Array;
+	arrayBuffer: (value: unknown, customMessage?: string) => asserts value is ArrayBuffer;
+	sharedArrayBuffer: (value: unknown, customMessage?: string) => asserts value is SharedArrayBuffer;
+	dataView: (value: unknown, customMessage?: string) => asserts value is DataView;
+	enumCase: <T = unknown>(value: unknown, targetEnum: T, customMessage?: string) => asserts value is T[keyof T];
+	urlInstance: (value: unknown, customMessage?: string) => asserts value is URL;
+	urlString: (value: unknown, customMessage?: string) => asserts value is string;
+	truthy: (value: unknown, customMessage?: string) => asserts value is unknown;
+	falsy: (value: unknown, customMessage?: string) => asserts value is unknown;
+	nan: (value: unknown, customMessage?: string) => asserts value is unknown;
+	primitive: (value: unknown, customMessage?: string) => asserts value is Primitive;
+	integer: (value: unknown, customMessage?: string) => asserts value is number;
+	safeInteger: (value: unknown, customMessage?: string) => asserts value is number;
+	plainObject: <Value = unknown>(value: unknown, customMessage?: string) => asserts value is Record<PropertyKey, Value>;
+	typedArray: (value: unknown, customMessage?: string) => asserts value is TypedArray;
+	arrayLike: <T = unknown>(value: unknown, customMessage?: string) => asserts value is ArrayLike<T>;
+	domElement: (value: unknown, customMessage?: string) => asserts value is HTMLElement;
+	observable: (value: unknown, customMessage?: string) => asserts value is ObservableLike;
+	nodeStream: (value: unknown, customMessage?: string) => asserts value is NodeStream;
+	infinite: (value: unknown, customMessage?: string) => asserts value is number;
+	emptyArray: (value: unknown, customMessage?: string) => asserts value is never[];
+	nonEmptyArray: (value: unknown, customMessage?: string) => asserts value is [unknown, ...unknown[]];
+	emptyString: (value: unknown, customMessage?: string) => asserts value is '';
+	emptyStringOrWhitespace: (value: unknown, customMessage?: string) => asserts value is string;
+	nonEmptyString: (value: unknown, customMessage?: string) => asserts value is string;
+	nonEmptyStringAndNotWhitespace: (value: unknown, customMessage?: string) => asserts value is string;
+	emptyObject: <Key extends keyof any = string>(value: unknown, customMessage?: string) => asserts value is Record<Key, never>;
+	nonEmptyObject: <Key extends keyof any = string, Value = unknown>(value: unknown, customMessage?: string) => asserts value is Record<Key, Value>;
+	emptySet: (value: unknown, customMessage?: string) => asserts value is Set<never>;
+	nonEmptySet: <T = unknown>(value: unknown, customMessage?: string) => asserts value is Set<T>;
+	emptyMap: (value: unknown, customMessage?: string) => asserts value is Map<never, never>;
+	nonEmptyMap: <Key = unknown, Value = unknown>(value: unknown, customMessage?: string) => asserts value is Map<Key, Value>;
+	propertyKey: (value: unknown, customMessage?: string) => asserts value is PropertyKey;
+	formData: (value: unknown, customMessage?: string) => asserts value is FormData;
+	urlSearchParams: (value: unknown, customMessage?: string) => asserts value is URLSearchParams;
 
 	// Numbers.
-	evenInteger: (value: number) => asserts value is number;
-	oddInteger: (value: number) => asserts value is number;
+	evenInteger: (value: number, customMessage?: string) => asserts value is number;
+	oddInteger: (value: number, customMessage?: string) => asserts value is number;
 
 	// Two arguments.
-	directInstanceOf: <T>(instance: unknown, class_: Class<T>) => asserts instance is T;
-	inRange: (value: number, range: number | number[]) => asserts value is number;
+	directInstanceOf: <T>(instance: unknown, class_: Class<T>, customMessage?: string) => asserts instance is T;
+	inRange: (value: number, range: number | number[], customMessage?: string) => asserts value is number;
 
 	// Variadic functions.
 	any: (predicate: Predicate | Predicate[], ...values: unknown[]) => void | never;
@@ -590,107 +594,107 @@ type Assert = {
 /* eslint-disable @typescript-eslint/no-confusing-void-expression */
 export const assert: Assert = {
 	// Unknowns.
-	undefined: (value: unknown): asserts value is undefined => assertType(is.undefined(value), 'undefined', value),
-	string: (value: unknown): asserts value is string => assertType(is.string(value), 'string', value),
-	number: (value: unknown): asserts value is number => assertType(is.number(value), 'number', value),
-	bigint: (value: unknown): asserts value is bigint => assertType(is.bigint(value), 'bigint', value),
+	undefined: (value: unknown, customMessage?: string): asserts value is undefined => assertType(is.undefined(value), 'undefined', value, customMessage),
+	string: (value: unknown, customMessage?: string): asserts value is string => assertType(is.string(value), 'string', value, customMessage),
+	number: (value: unknown, customMessage?: string): asserts value is number => assertType(is.number(value), 'number', value, customMessage),
+	bigint: (value: unknown, customMessage?: string): asserts value is bigint => assertType(is.bigint(value), 'bigint', value, customMessage),
 	// eslint-disable-next-line @typescript-eslint/ban-types
-	function_: (value: unknown): asserts value is Function => assertType(is.function_(value), 'Function', value),
-	null_: (value: unknown): asserts value is null => assertType(is.null_(value), 'null', value), // eslint-disable-line @typescript-eslint/ban-types
-	class_: (value: unknown): asserts value is Class => assertType(is.class_(value), AssertionTypeDescription.class_, value),
-	boolean: (value: unknown): asserts value is boolean => assertType(is.boolean(value), 'boolean', value),
-	symbol: (value: unknown): asserts value is symbol => assertType(is.symbol(value), 'symbol', value),
-	numericString: (value: unknown): asserts value is string => assertType(is.numericString(value), AssertionTypeDescription.numericString, value),
-	array: <T = unknown>(value: unknown, assertion?: (element: unknown) => asserts element is T): asserts value is T[] => { // eslint-disable-line object-shorthand
-		const assert: (condition: boolean, description: string, value: unknown) => asserts condition = assertType;
-		assert(is.array(value), 'Array', value);
+	function_: (value: unknown, customMessage?: string): asserts value is Function => assertType(is.function_(value), 'Function', value, customMessage),
+	null_: (value: unknown, customMessage?: string): asserts value is null => assertType(is.null_(value), 'null', value, customMessage), // eslint-disable-line @typescript-eslint/ban-types
+	class_: (value: unknown, customMessage?: string): asserts value is Class => assertType(is.class_(value), AssertionTypeDescription.class_, value, customMessage),
+	boolean: (value: unknown, customMessage?: string): asserts value is boolean => assertType(is.boolean(value), 'boolean', value, customMessage),
+	symbol: (value: unknown, customMessage?: string): asserts value is symbol => assertType(is.symbol(value), 'symbol', value, customMessage),
+	numericString: (value: unknown, customMessage?: string): asserts value is string => assertType(is.numericString(value), AssertionTypeDescription.numericString, value, customMessage),
+	array: <T = unknown>(value: unknown, assertion?: (element: unknown) => asserts element is T, customMessage?: string): asserts value is T[] => { // eslint-disable-line object-shorthand
+		const assert: (condition: boolean, description: string, value: unknown, customMessage?: string) => asserts condition = assertType;
+		assert(is.array(value), 'Array', value, customMessage);
 
 		if (assertion) {
 			// eslint-disable-next-line unicorn/no-array-for-each, unicorn/no-array-callback-reference
 			value.forEach(assertion);
 		}
 	},
-	buffer: (value: unknown): asserts value is Buffer => assertType(is.buffer(value), 'Buffer', value),
-	blob: (value: unknown): asserts value is Blob => assertType(is.blob(value), 'Blob', value),
-	nullOrUndefined: (value: unknown): asserts value is null | undefined => assertType(is.nullOrUndefined(value), AssertionTypeDescription.nullOrUndefined, value), // eslint-disable-line @typescript-eslint/ban-types
-	object: (value: unknown): asserts value is object => assertType(is.object(value), 'Object', value), // eslint-disable-line @typescript-eslint/ban-types
-	iterable: <T = unknown>(value: unknown): asserts value is Iterable<T> => assertType(is.iterable(value), AssertionTypeDescription.iterable, value),
-	asyncIterable: <T = unknown>(value: unknown): asserts value is AsyncIterable<T> => assertType(is.asyncIterable(value), AssertionTypeDescription.asyncIterable, value),
-	generator: (value: unknown): asserts value is Generator => assertType(is.generator(value), 'Generator', value),
-	asyncGenerator: (value: unknown): asserts value is AsyncGenerator => assertType(is.asyncGenerator(value), 'AsyncGenerator', value),
-	nativePromise: <T = unknown>(value: unknown): asserts value is Promise<T> => assertType(is.nativePromise(value), AssertionTypeDescription.nativePromise, value),
-	promise: <T = unknown>(value: unknown): asserts value is Promise<T> => assertType(is.promise(value), 'Promise', value),
-	generatorFunction: (value: unknown): asserts value is GeneratorFunction => assertType(is.generatorFunction(value), 'GeneratorFunction', value),
-	asyncGeneratorFunction: (value: unknown): asserts value is AsyncGeneratorFunction => assertType(is.asyncGeneratorFunction(value), 'AsyncGeneratorFunction', value),
+	buffer: (value: unknown, customMessage?: string): asserts value is Buffer => assertType(is.buffer(value), 'Buffer', value, customMessage),
+	blob: (value: unknown, customMessage?: string): asserts value is Blob => assertType(is.blob(value), 'Blob', value, customMessage),
+	nullOrUndefined: (value: unknown, customMessage?: string): asserts value is null | undefined => assertType(is.nullOrUndefined(value), AssertionTypeDescription.nullOrUndefined, value, customMessage), // eslint-disable-line @typescript-eslint/ban-types
+	object: (value: unknown, customMessage?: string): asserts value is object => assertType(is.object(value), 'Object', value, customMessage), // eslint-disable-line @typescript-eslint/ban-types
+	iterable: <T = unknown>(value: unknown, customMessage?: string): asserts value is Iterable<T> => assertType(is.iterable(value), AssertionTypeDescription.iterable, value, customMessage),
+	asyncIterable: <T = unknown>(value: unknown, customMessage?: string): asserts value is AsyncIterable<T> => assertType(is.asyncIterable(value), AssertionTypeDescription.asyncIterable, value, customMessage),
+	generator: (value: unknown, customMessage?: string): asserts value is Generator => assertType(is.generator(value), 'Generator', value, customMessage),
+	asyncGenerator: (value: unknown, customMessage?: string): asserts value is AsyncGenerator => assertType(is.asyncGenerator(value), 'AsyncGenerator', value, customMessage),
+	nativePromise: <T = unknown>(value: unknown, customMessage?: string): asserts value is Promise<T> => assertType(is.nativePromise(value), AssertionTypeDescription.nativePromise, value, customMessage),
+	promise: <T = unknown>(value: unknown, customMessage?: string): asserts value is Promise<T> => assertType(is.promise(value), 'Promise', value, customMessage),
+	generatorFunction: (value: unknown, customMessage?: string): asserts value is GeneratorFunction => assertType(is.generatorFunction(value), 'GeneratorFunction', value, customMessage),
+	asyncGeneratorFunction: (value: unknown, customMessage?: string): asserts value is AsyncGeneratorFunction => assertType(is.asyncGeneratorFunction(value), 'AsyncGeneratorFunction', value, customMessage),
 	// eslint-disable-next-line @typescript-eslint/ban-types
-	asyncFunction: (value: unknown): asserts value is Function => assertType(is.asyncFunction(value), 'AsyncFunction', value),
+	asyncFunction: (value: unknown, customMessage?: string): asserts value is Function => assertType(is.asyncFunction(value), 'AsyncFunction', value, customMessage),
 	// eslint-disable-next-line @typescript-eslint/ban-types
-	boundFunction: (value: unknown): asserts value is Function => assertType(is.boundFunction(value), 'Function', value),
-	regExp: (value: unknown): asserts value is RegExp => assertType(is.regExp(value), 'RegExp', value),
-	date: (value: unknown): asserts value is Date => assertType(is.date(value), 'Date', value),
-	error: (value: unknown): asserts value is Error => assertType(is.error(value), 'Error', value),
-	map: <Key = unknown, Value = unknown>(value: unknown): asserts value is Map<Key, Value> => assertType(is.map(value), 'Map', value), // eslint-disable-line unicorn/no-array-callback-reference
-	set: <T = unknown>(value: unknown): asserts value is Set<T> => assertType(is.set(value), 'Set', value),
-	weakMap: <Key extends object = object, Value = unknown>(value: unknown): asserts value is WeakMap<Key, Value> => assertType(is.weakMap(value), 'WeakMap', value), // eslint-disable-line @typescript-eslint/ban-types
-	weakSet: <T extends object = object>(value: unknown): asserts value is WeakSet<T> => assertType(is.weakSet(value), 'WeakSet', value), // eslint-disable-line @typescript-eslint/ban-types
-	weakRef: <T extends object = object>(value: unknown): asserts value is WeakRef<T> => assertType(is.weakRef(value), 'WeakRef', value), // eslint-disable-line @typescript-eslint/ban-types
-	int8Array: (value: unknown): asserts value is Int8Array => assertType(is.int8Array(value), 'Int8Array', value),
-	uint8Array: (value: unknown): asserts value is Uint8Array => assertType(is.uint8Array(value), 'Uint8Array', value),
-	uint8ClampedArray: (value: unknown): asserts value is Uint8ClampedArray => assertType(is.uint8ClampedArray(value), 'Uint8ClampedArray', value),
-	int16Array: (value: unknown): asserts value is Int16Array => assertType(is.int16Array(value), 'Int16Array', value),
-	uint16Array: (value: unknown): asserts value is Uint16Array => assertType(is.uint16Array(value), 'Uint16Array', value),
-	int32Array: (value: unknown): asserts value is Int32Array => assertType(is.int32Array(value), 'Int32Array', value),
-	uint32Array: (value: unknown): asserts value is Uint32Array => assertType(is.uint32Array(value), 'Uint32Array', value),
-	float32Array: (value: unknown): asserts value is Float32Array => assertType(is.float32Array(value), 'Float32Array', value),
-	float64Array: (value: unknown): asserts value is Float64Array => assertType(is.float64Array(value), 'Float64Array', value),
-	bigInt64Array: (value: unknown): asserts value is BigInt64Array => assertType(is.bigInt64Array(value), 'BigInt64Array', value),
-	bigUint64Array: (value: unknown): asserts value is BigUint64Array => assertType(is.bigUint64Array(value), 'BigUint64Array', value),
-	arrayBuffer: (value: unknown): asserts value is ArrayBuffer => assertType(is.arrayBuffer(value), 'ArrayBuffer', value),
-	sharedArrayBuffer: (value: unknown): asserts value is SharedArrayBuffer => assertType(is.sharedArrayBuffer(value), 'SharedArrayBuffer', value),
-	dataView: (value: unknown): asserts value is DataView => assertType(is.dataView(value), 'DataView', value),
-	enumCase: <T = unknown>(value: unknown, targetEnum: T): asserts value is T[keyof T] => assertType(is.enumCase(value, targetEnum), 'EnumCase', value),
-	urlInstance: (value: unknown): asserts value is URL => assertType(is.urlInstance(value), 'URL', value),
-	urlString: (value: unknown): asserts value is string => assertType(is.urlString(value), AssertionTypeDescription.urlString, value),
-	truthy: (value: unknown): asserts value is unknown => assertType(is.truthy(value), AssertionTypeDescription.truthy, value),
-	falsy: (value: unknown): asserts value is unknown => assertType(is.falsy(value), AssertionTypeDescription.falsy, value),
-	nan: (value: unknown): asserts value is unknown => assertType(is.nan(value), AssertionTypeDescription.nan, value),
-	primitive: (value: unknown): asserts value is Primitive => assertType(is.primitive(value), AssertionTypeDescription.primitive, value),
-	integer: (value: unknown): asserts value is number => assertType(is.integer(value), AssertionTypeDescription.integer, value),
-	safeInteger: (value: unknown): asserts value is number => assertType(is.safeInteger(value), AssertionTypeDescription.safeInteger, value),
-	plainObject: <Value = unknown>(value: unknown): asserts value is Record<PropertyKey, Value> => assertType(is.plainObject(value), AssertionTypeDescription.plainObject, value),
-	typedArray: (value: unknown): asserts value is TypedArray => assertType(is.typedArray(value), AssertionTypeDescription.typedArray, value),
-	arrayLike: <T = unknown>(value: unknown): asserts value is ArrayLike<T> => assertType(is.arrayLike(value), AssertionTypeDescription.arrayLike, value),
-	domElement: (value: unknown): asserts value is HTMLElement => assertType(is.domElement(value), AssertionTypeDescription.domElement, value),
-	observable: (value: unknown): asserts value is ObservableLike => assertType(is.observable(value), 'Observable', value),
-	nodeStream: (value: unknown): asserts value is NodeStream => assertType(is.nodeStream(value), AssertionTypeDescription.nodeStream, value),
-	infinite: (value: unknown): asserts value is number => assertType(is.infinite(value), AssertionTypeDescription.infinite, value),
-	emptyArray: (value: unknown): asserts value is never[] => assertType(is.emptyArray(value), AssertionTypeDescription.emptyArray, value),
-	nonEmptyArray: (value: unknown): asserts value is [unknown, ...unknown[]] => assertType(is.nonEmptyArray(value), AssertionTypeDescription.nonEmptyArray, value),
-	emptyString: (value: unknown): asserts value is '' => assertType(is.emptyString(value), AssertionTypeDescription.emptyString, value),
-	emptyStringOrWhitespace: (value: unknown): asserts value is string => assertType(is.emptyStringOrWhitespace(value), AssertionTypeDescription.emptyStringOrWhitespace, value),
-	nonEmptyString: (value: unknown): asserts value is string => assertType(is.nonEmptyString(value), AssertionTypeDescription.nonEmptyString, value),
-	nonEmptyStringAndNotWhitespace: (value: unknown): asserts value is string => assertType(is.nonEmptyStringAndNotWhitespace(value), AssertionTypeDescription.nonEmptyStringAndNotWhitespace, value),
-	emptyObject: <Key extends keyof any = string>(value: unknown): asserts value is Record<Key, never> => assertType(is.emptyObject(value), AssertionTypeDescription.emptyObject, value),
-	nonEmptyObject: <Key extends keyof any = string, Value = unknown>(value: unknown): asserts value is Record<Key, Value> => assertType(is.nonEmptyObject(value), AssertionTypeDescription.nonEmptyObject, value),
-	emptySet: (value: unknown): asserts value is Set<never> => assertType(is.emptySet(value), AssertionTypeDescription.emptySet, value),
-	nonEmptySet: <T = unknown>(value: unknown): asserts value is Set<T> => assertType(is.nonEmptySet(value), AssertionTypeDescription.nonEmptySet, value),
-	emptyMap: (value: unknown): asserts value is Map<never, never> => assertType(is.emptyMap(value), AssertionTypeDescription.emptyMap, value),
-	nonEmptyMap: <Key = unknown, Value = unknown>(value: unknown): asserts value is Map<Key, Value> => assertType(is.nonEmptyMap(value), AssertionTypeDescription.nonEmptyMap, value),
-	propertyKey: (value: unknown): asserts value is number => assertType(is.propertyKey(value), 'PropertyKey', value),
-	formData: (value: unknown): asserts value is FormData => assertType(is.formData(value), 'FormData', value),
-	urlSearchParams: (value: unknown): asserts value is URLSearchParams => assertType(is.urlSearchParams(value), 'URLSearchParams', value),
+	boundFunction: (value: unknown, customMessage?: string): asserts value is Function => assertType(is.boundFunction(value), 'Function', value, customMessage),
+	regExp: (value: unknown, customMessage?: string): asserts value is RegExp => assertType(is.regExp(value), 'RegExp', value, customMessage),
+	date: (value: unknown, customMessage?: string): asserts value is Date => assertType(is.date(value), 'Date', value, customMessage),
+	error: (value: unknown, customMessage?: string): asserts value is Error => assertType(is.error(value), 'Error', value, customMessage),
+	map: <Key = unknown, Value = unknown>(value: unknown, customMessage?: string): asserts value is Map<Key, Value> => assertType(is.map(value), 'Map', value, customMessage), // eslint-disable-line unicorn/no-array-callback-reference
+	set: <T = unknown>(value: unknown, customMessage?: string): asserts value is Set<T> => assertType(is.set(value), 'Set', value, customMessage),
+	weakMap: <Key extends object = object, Value = unknown>(value: unknown, customMessage?: string): asserts value is WeakMap<Key, Value> => assertType(is.weakMap(value), 'WeakMap', value, customMessage), // eslint-disable-line @typescript-eslint/ban-types
+	weakSet: <T extends object = object>(value: unknown, customMessage?: string): asserts value is WeakSet<T> => assertType(is.weakSet(value), 'WeakSet', value, customMessage), // eslint-disable-line @typescript-eslint/ban-types
+	weakRef: <T extends object = object>(value: unknown, customMessage?: string): asserts value is WeakRef<T> => assertType(is.weakRef(value), 'WeakRef', value, customMessage), // eslint-disable-line @typescript-eslint/ban-types
+	int8Array: (value: unknown, customMessage?: string): asserts value is Int8Array => assertType(is.int8Array(value), 'Int8Array', value, customMessage),
+	uint8Array: (value: unknown, customMessage?: string): asserts value is Uint8Array => assertType(is.uint8Array(value), 'Uint8Array', value, customMessage),
+	uint8ClampedArray: (value: unknown, customMessage?: string): asserts value is Uint8ClampedArray => assertType(is.uint8ClampedArray(value), 'Uint8ClampedArray', value, customMessage),
+	int16Array: (value: unknown, customMessage?: string): asserts value is Int16Array => assertType(is.int16Array(value), 'Int16Array', value, customMessage),
+	uint16Array: (value: unknown, customMessage?: string): asserts value is Uint16Array => assertType(is.uint16Array(value), 'Uint16Array', value, customMessage),
+	int32Array: (value: unknown, customMessage?: string): asserts value is Int32Array => assertType(is.int32Array(value), 'Int32Array', value, customMessage),
+	uint32Array: (value: unknown, customMessage?: string): asserts value is Uint32Array => assertType(is.uint32Array(value), 'Uint32Array', value, customMessage),
+	float32Array: (value: unknown, customMessage?: string): asserts value is Float32Array => assertType(is.float32Array(value), 'Float32Array', value, customMessage),
+	float64Array: (value: unknown, customMessage?: string): asserts value is Float64Array => assertType(is.float64Array(value), 'Float64Array', value, customMessage),
+	bigInt64Array: (value: unknown, customMessage?: string): asserts value is BigInt64Array => assertType(is.bigInt64Array(value), 'BigInt64Array', value, customMessage),
+	bigUint64Array: (value: unknown, customMessage?: string): asserts value is BigUint64Array => assertType(is.bigUint64Array(value), 'BigUint64Array', value, customMessage),
+	arrayBuffer: (value: unknown, customMessage?: string): asserts value is ArrayBuffer => assertType(is.arrayBuffer(value), 'ArrayBuffer', value, customMessage),
+	sharedArrayBuffer: (value: unknown, customMessage?: string): asserts value is SharedArrayBuffer => assertType(is.sharedArrayBuffer(value), 'SharedArrayBuffer', value, customMessage),
+	dataView: (value: unknown, customMessage?: string): asserts value is DataView => assertType(is.dataView(value), 'DataView', value, customMessage),
+	enumCase: <T = unknown>(value: unknown, targetEnum: T, customMessage?: string): asserts value is T[keyof T] => assertType(is.enumCase(value, targetEnum), 'EnumCase', value, customMessage),
+	urlInstance: (value: unknown, customMessage?: string): asserts value is URL => assertType(is.urlInstance(value), 'URL', value, customMessage),
+	urlString: (value: unknown, customMessage?: string): asserts value is string => assertType(is.urlString(value), AssertionTypeDescription.urlString, value, customMessage),
+	truthy: (value: unknown, customMessage?: string): asserts value is unknown => assertType(is.truthy(value), AssertionTypeDescription.truthy, value, customMessage),
+	falsy: (value: unknown, customMessage?: string): asserts value is unknown => assertType(is.falsy(value), AssertionTypeDescription.falsy, value, customMessage),
+	nan: (value: unknown, customMessage?: string): asserts value is unknown => assertType(is.nan(value), AssertionTypeDescription.nan, value, customMessage),
+	primitive: (value: unknown, customMessage?: string): asserts value is Primitive => assertType(is.primitive(value), AssertionTypeDescription.primitive, value, customMessage),
+	integer: (value: unknown, customMessage?: string): asserts value is number => assertType(is.integer(value), AssertionTypeDescription.integer, value, customMessage),
+	safeInteger: (value: unknown, customMessage?: string): asserts value is number => assertType(is.safeInteger(value), AssertionTypeDescription.safeInteger, value, customMessage),
+	plainObject: <Value = unknown>(value: unknown, customMessage?: string): asserts value is Record<PropertyKey, Value> => assertType(is.plainObject(value), AssertionTypeDescription.plainObject, value, customMessage),
+	typedArray: (value: unknown, customMessage?: string): asserts value is TypedArray => assertType(is.typedArray(value), AssertionTypeDescription.typedArray, value, customMessage),
+	arrayLike: <T = unknown>(value: unknown, customMessage?: string): asserts value is ArrayLike<T> => assertType(is.arrayLike(value), AssertionTypeDescription.arrayLike, value, customMessage),
+	domElement: (value: unknown, customMessage?: string): asserts value is HTMLElement => assertType(is.domElement(value), AssertionTypeDescription.domElement, value, customMessage),
+	observable: (value: unknown, customMessage?: string): asserts value is ObservableLike => assertType(is.observable(value), 'Observable', value, customMessage),
+	nodeStream: (value: unknown, customMessage?: string): asserts value is NodeStream => assertType(is.nodeStream(value), AssertionTypeDescription.nodeStream, value, customMessage),
+	infinite: (value: unknown, customMessage?: string): asserts value is number => assertType(is.infinite(value), AssertionTypeDescription.infinite, value, customMessage),
+	emptyArray: (value: unknown, customMessage?: string): asserts value is never[] => assertType(is.emptyArray(value), AssertionTypeDescription.emptyArray, value, customMessage),
+	nonEmptyArray: (value: unknown, customMessage?: string): asserts value is [unknown, ...unknown[]] => assertType(is.nonEmptyArray(value), AssertionTypeDescription.nonEmptyArray, value, customMessage),
+	emptyString: (value: unknown, customMessage?: string): asserts value is '' => assertType(is.emptyString(value), AssertionTypeDescription.emptyString, value, customMessage),
+	emptyStringOrWhitespace: (value: unknown, customMessage?: string): asserts value is string => assertType(is.emptyStringOrWhitespace(value), AssertionTypeDescription.emptyStringOrWhitespace, value, customMessage),
+	nonEmptyString: (value: unknown, customMessage?: string): asserts value is string => assertType(is.nonEmptyString(value), AssertionTypeDescription.nonEmptyString, value, customMessage),
+	nonEmptyStringAndNotWhitespace: (value: unknown, customMessage?: string): asserts value is string => assertType(is.nonEmptyStringAndNotWhitespace(value), AssertionTypeDescription.nonEmptyStringAndNotWhitespace, value, customMessage),
+	emptyObject: <Key extends keyof any = string>(value: unknown, customMessage?: string): asserts value is Record<Key, never> => assertType(is.emptyObject(value), AssertionTypeDescription.emptyObject, value, customMessage),
+	nonEmptyObject: <Key extends keyof any = string, Value = unknown>(value: unknown, customMessage?: string): asserts value is Record<Key, Value> => assertType(is.nonEmptyObject(value), AssertionTypeDescription.nonEmptyObject, value, customMessage),
+	emptySet: (value: unknown, customMessage?: string): asserts value is Set<never> => assertType(is.emptySet(value), AssertionTypeDescription.emptySet, value, customMessage),
+	nonEmptySet: <T = unknown>(value: unknown, customMessage?: string): asserts value is Set<T> => assertType(is.nonEmptySet(value), AssertionTypeDescription.nonEmptySet, value, customMessage),
+	emptyMap: (value: unknown, customMessage?: string): asserts value is Map<never, never> => assertType(is.emptyMap(value), AssertionTypeDescription.emptyMap, value, customMessage),
+	nonEmptyMap: <Key = unknown, Value = unknown>(value: unknown, customMessage?: string): asserts value is Map<Key, Value> => assertType(is.nonEmptyMap(value), AssertionTypeDescription.nonEmptyMap, value, customMessage),
+	propertyKey: (value: unknown, customMessage?: string): asserts value is number => assertType(is.propertyKey(value), 'PropertyKey', value, customMessage),
+	formData: (value: unknown, customMessage?: string): asserts value is FormData => assertType(is.formData(value), 'FormData', value, customMessage),
+	urlSearchParams: (value: unknown, customMessage?: string): asserts value is URLSearchParams => assertType(is.urlSearchParams(value), 'URLSearchParams', value, customMessage),
 
 	// Numbers.
-	evenInteger: (value: number): asserts value is number => assertType(is.evenInteger(value), AssertionTypeDescription.evenInteger, value),
-	oddInteger: (value: number): asserts value is number => assertType(is.oddInteger(value), AssertionTypeDescription.oddInteger, value),
+	evenInteger: (value: number, customMessage?: string): asserts value is number => assertType(is.evenInteger(value), AssertionTypeDescription.evenInteger, value, customMessage),
+	oddInteger: (value: number, customMessage?: string): asserts value is number => assertType(is.oddInteger(value), AssertionTypeDescription.oddInteger, value, customMessage),
 
 	// Two arguments.
-	directInstanceOf: <T>(instance: unknown, class_: Class<T>): asserts instance is T => assertType(is.directInstanceOf(instance, class_), AssertionTypeDescription.directInstanceOf, instance),
-	inRange: (value: number, range: number | number[]): asserts value is number => assertType(is.inRange(value, range), AssertionTypeDescription.inRange, value),
+	directInstanceOf: <T>(instance: unknown, class_: Class<T>, customMessage?: string): asserts instance is T => assertType(is.directInstanceOf(instance, class_), AssertionTypeDescription.directInstanceOf, instance, customMessage),
+	inRange: (value: number, range: number | number[], customMessage?: string): asserts value is number => assertType(is.inRange(value, range), AssertionTypeDescription.inRange, value, customMessage),
 
 	// Variadic functions.
-	any: (predicate: Predicate | Predicate[], ...values: unknown[]): void | never => assertType(is.any(predicate, ...values), AssertionTypeDescription.any, values, {multipleValues: true}),
-	all: (predicate: Predicate, ...values: unknown[]): void | never => assertType(is.all(predicate, ...values), AssertionTypeDescription.all, values, {multipleValues: true}),
+	any: (predicate: Predicate | Predicate[], ...values: unknown[]): void | never => assertType(is.any(predicate, ...values), AssertionTypeDescription.any, values, undefined, {multipleValues: true}),
+	all: (predicate: Predicate, ...values: unknown[]): void | never => assertType(is.all(predicate, ...values), AssertionTypeDescription.all, values, undefined, {multipleValues: true}),
 };
 /* eslint-enable @typescript-eslint/no-confusing-void-expression */
 

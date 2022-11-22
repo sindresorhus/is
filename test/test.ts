@@ -1799,3 +1799,11 @@ test('assert', t => {
 		t.true(is.string(badlyTypedVariable));
 	}
 });
+
+test('assert-custom-message', t => {
+	const errorMessage = 'Custom error message';
+	const error = t.throws(() => {
+		assert.truthy(false, errorMessage);
+	});
+	t.is(error?.message, errorMessage);
+});
