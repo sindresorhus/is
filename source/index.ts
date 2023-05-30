@@ -167,7 +167,7 @@ is.boolean = (value: unknown): value is boolean => value === true || value === f
 
 is.symbol = isOfType<symbol>('symbol');
 
-is.numericString = (value: unknown): value is string =>
+is.numericString = (value: unknown): value is `${number}` =>
 	is.string(value) && !is.emptyStringOrWhitespace(value) && !Number.isNaN(Number(value));
 
 is.array = <T = unknown>(value: unknown, assertion?: (value: T) => value is T): value is T[] => {
@@ -502,7 +502,7 @@ type Assert = {
 	class_: (value: unknown) => asserts value is Class;
 	boolean: (value: unknown) => asserts value is boolean;
 	symbol: (value: unknown) => asserts value is symbol;
-	numericString: (value: unknown) => asserts value is string;
+	numericString: (value: unknown) => asserts value is `${number}`;
 	array: <T = unknown>(value: unknown, assertion?: (element: unknown) => asserts element is T) => asserts value is T[];
 	buffer: (value: unknown) => asserts value is Buffer;
 	blob: (value: unknown) => asserts value is Blob;
@@ -600,7 +600,7 @@ export const assert: Assert = {
 	class_: (value: unknown): asserts value is Class => assertType(is.class_(value), AssertionTypeDescription.class_, value),
 	boolean: (value: unknown): asserts value is boolean => assertType(is.boolean(value), 'boolean', value),
 	symbol: (value: unknown): asserts value is symbol => assertType(is.symbol(value), 'symbol', value),
-	numericString: (value: unknown): asserts value is string => assertType(is.numericString(value), AssertionTypeDescription.numericString, value),
+	numericString: (value: unknown): asserts value is `${number}` => assertType(is.numericString(value), AssertionTypeDescription.numericString, value),
 	array: <T = unknown>(value: unknown, assertion?: (element: unknown) => asserts element is T): asserts value is T[] => { // eslint-disable-line object-shorthand
 		const assert: (condition: boolean, description: string, value: unknown) => asserts condition = assertType;
 		assert(is.array(value), 'Array', value);
