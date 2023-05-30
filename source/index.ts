@@ -105,20 +105,34 @@ function is(value: unknown): TypeName {
 	}
 
 	switch (typeof value) {
-		case 'undefined':
+		case 'undefined': {
 			return 'undefined';
-		case 'string':
+		}
+
+		case 'string': {
 			return 'string';
-		case 'number':
+		}
+
+		case 'number': {
 			return Number.isNaN(value) ? 'NaN' : 'number';
-		case 'boolean':
+		}
+
+		case 'boolean': {
 			return 'boolean';
-		case 'function':
+		}
+
+		case 'function': {
 			return 'Function';
-		case 'bigint':
+		}
+
+		case 'bigint': {
 			return 'bigint';
-		case 'symbol':
+		}
+
+		case 'symbol': {
 			return 'symbol';
+		}
+
 		default:
 	}
 
@@ -179,6 +193,7 @@ is.array = <T = unknown>(value: unknown, assertion?: (value: T) => value is T): 
 		return true;
 	}
 
+	// eslint-disable-next-line @typescript-eslint/no-unsafe-argument
 	return value.every(element => assertion(element));
 };
 
@@ -251,6 +266,7 @@ is.sharedArrayBuffer = isObjectOfType<SharedArrayBuffer>('SharedArrayBuffer');
 
 is.dataView = isObjectOfType<DataView>('DataView');
 
+// eslint-disable-next-line @typescript-eslint/no-unsafe-argument
 is.enumCase = <T = unknown>(value: unknown, targetEnum: T): boolean => Object.values(targetEnum as any).includes(value as string);
 
 is.directInstanceOf = <T>(instance: unknown, class_: Class<T>): instance is T => Object.getPrototypeOf(instance) === class_.prototype;

@@ -603,7 +603,7 @@ const testType = (t: ExecutionContext, type: string, exclude?: string[]) => {
 
 		for (const fixture of fixtures) {
 			assertIs(testIs(fixture), `Value: ${inspect(fixture)}`);
-			const valueType = typeDescription ? typeDescription : typename;
+			const valueType = typeDescription ?? typename;
 
 			if (isTypeUnderTest) {
 				t.notThrows(() => {
@@ -1611,6 +1611,7 @@ test('is.any', t => {
 	t.false(is.any([is.boolean, is.number], 'unicorns', [], new Map()));
 
 	t.throws(() => {
+		// eslint-disable-next-line @typescript-eslint/no-unsafe-argument
 		is.any(null as any, true);
 	});
 
@@ -1635,6 +1636,7 @@ test('is.any', t => {
 	});
 
 	t.throws(() => {
+		// eslint-disable-next-line @typescript-eslint/no-unsafe-argument
 		assert.any(null as any, true);
 	});
 
@@ -1673,6 +1675,7 @@ test('is.all', t => {
 	t.true(is.all(is.array, ['1'], ['2']));
 
 	t.throws(() => {
+		// eslint-disable-next-line @typescript-eslint/no-unsafe-argument
 		is.all(null as any, true);
 	});
 
@@ -1697,6 +1700,7 @@ test('is.all', t => {
 	});
 
 	t.throws(() => {
+		// eslint-disable-next-line @typescript-eslint/no-unsafe-argument
 		assert.all(null as any, true);
 	});
 
