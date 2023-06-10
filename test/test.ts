@@ -24,6 +24,8 @@ const {window} = new JSDOM();
 const {document} = window;
 const createDomElement = (element: string) => document.createElement(element);
 
+const structuredClone = globalThis.structuredClone ?? (x => x);
+
 type Test = {
 	assert: (...args: any[]) => void | never;
 	fixtures: unknown[];
@@ -487,6 +489,9 @@ const types = new Map<string, Test>([
 			{x: 1},
 			Object.create(null),
 			new Object(), // eslint-disable-line no-new-object
+			structuredClone({x: 1}),
+			structuredClone(Object.create(null)),
+			structuredClone(new Object()), // eslint-disable-line no-new-object
 		],
 		typename: 'Object',
 		typeDescription: AssertionTypeDescription.plainObject,
