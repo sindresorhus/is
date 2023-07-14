@@ -410,6 +410,14 @@ function foo() {
 foo();
 ```
 
+#### .positiveNumber(value)
+
+Check if `value` is a number and is more than 0.
+
+#### .negativeNumber(value)
+
+Check if `value` is a number and is less than 0.
+
 ##### .inRange(value, range)
 
 Check if `value` (number) is in the given `range`. The range is an array of two values, lower bound and upper bound, in no specific order.

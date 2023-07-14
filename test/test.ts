@@ -645,6 +645,82 @@ test('is.number', t => {
 	testType(t, 'number', ['integer', 'safeInteger', 'infinite']);
 });
 
+test('is.positiveNumber', t => {
+	t.true(is.positiveNumber(6));
+	t.true(is.positiveNumber(1.4));
+	t.true(is.positiveNumber(Number.POSITIVE_INFINITY));
+
+	t.notThrows(() => {
+		assert.positiveNumber(6);
+	});
+	t.notThrows(() => {
+		assert.positiveNumber(1.4);
+	});
+	t.notThrows(() => {
+		assert.positiveNumber(Number.POSITIVE_INFINITY);
+	});
+
+	t.false(is.positiveNumber(0));
+	t.false(is.positiveNumber(-0));
+	t.false(is.positiveNumber(-6));
+	t.false(is.positiveNumber(-1.4));
+	t.false(is.positiveNumber(Number.NEGATIVE_INFINITY));
+
+	t.throws(() => {
+		assert.positiveNumber(0);
+	});
+	t.throws(() => {
+		assert.positiveNumber(-0);
+	});
+	t.throws(() => {
+		assert.positiveNumber(-6);
+	});
+	t.throws(() => {
+		assert.positiveNumber(-1.4);
+	});
+	t.throws(() => {
+		assert.positiveNumber(Number.NEGATIVE_INFINITY);
+	});
+});
+
+test('is.negativeNumber', t => {
+	t.true(is.negativeNumber(-6));
+	t.true(is.negativeNumber(-1.4));
+	t.true(is.negativeNumber(Number.NEGATIVE_INFINITY));
+
+	t.notThrows(() => {
+		assert.negativeNumber(-6);
+	});
+	t.notThrows(() => {
+		assert.negativeNumber(-1.4);
+	});
+	t.notThrows(() => {
+		assert.negativeNumber(Number.NEGATIVE_INFINITY);
+	});
+
+	t.false(is.negativeNumber(0));
+	t.false(is.negativeNumber(-0));
+	t.false(is.negativeNumber(6));
+	t.false(is.negativeNumber(1.4));
+	t.false(is.negativeNumber(Number.POSITIVE_INFINITY));
+
+	t.throws(() => {
+		assert.negativeNumber(0);
+	});
+	t.throws(() => {
+		assert.negativeNumber(-0);
+	});
+	t.throws(() => {
+		assert.negativeNumber(6);
+	});
+	t.throws(() => {
+		assert.negativeNumber(1.4);
+	});
+	t.throws(() => {
+		assert.negativeNumber(Number.POSITIVE_INFINITY);
+	});
+});
+
 test('is.bigint', t => {
 	testType(t, 'bigint');
 });
