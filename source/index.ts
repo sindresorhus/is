@@ -384,7 +384,7 @@ is.oddInteger = isAbsoluteMod2(1);
 
 is.emptyArray = (value: unknown): value is never[] => is.array(value) && value.length === 0;
 
-is.nonEmptyArray = (value: unknown): value is [unknown, ...unknown[]] => is.array(value) && value.length > 0;
+is.nonEmptyArray = <T = unknown>(value: T | T[]): value is [T, ...T[]] => is.array(value) && value.length > 0;
 
 is.emptyString = (value: unknown): value is '' => is.string(value) && value.length === 0;
 
