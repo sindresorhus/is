@@ -1477,6 +1477,36 @@ test('is.nonEmptyArray', t => {
 			function_(value);
 		}
 	}
+
+	{
+		const strings = ['🦄', 'unicorn'];
+		const function_ = (value: string) => value;
+
+		assert.nonEmptyArray(strings);
+
+		const value = strings[0];
+		function_(value);
+	}
+
+	{
+		const mixed = ['🦄', 'unicorn', 1, 2];
+		const function_ = (value: string | number) => value;
+
+		assert.nonEmptyArray(mixed);
+
+		const value = mixed[0];
+		function_(value);
+	}
+
+	{
+		const arrays = [['🦄'], ['unicorn']];
+		const function_ = (value: string[]) => value;
+
+		assert.nonEmptyArray(arrays);
+
+		const value = arrays[0];
+		function_(value);
+	}
 });
 
 test('is.emptyString', t => {

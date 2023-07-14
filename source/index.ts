@@ -575,7 +575,7 @@ type Assert = {
 	nodeStream: (value: unknown) => asserts value is NodeStream;
 	infinite: (value: unknown) => asserts value is number;
 	emptyArray: (value: unknown) => asserts value is never[];
-	nonEmptyArray: (value: unknown) => asserts value is [unknown, ...unknown[]];
+	nonEmptyArray: <T = unknown>(value: T | T[]) => asserts value is [T, ...T[]];
 	emptyString: (value: unknown) => asserts value is '';
 	emptyStringOrWhitespace: (value: unknown) => asserts value is string;
 	nonEmptyString: (value: unknown) => asserts value is string;
@@ -681,7 +681,7 @@ export const assert: Assert = {
 	nodeStream: (value: unknown): asserts value is NodeStream => assertType(is.nodeStream(value), AssertionTypeDescription.nodeStream, value),
 	infinite: (value: unknown): asserts value is number => assertType(is.infinite(value), AssertionTypeDescription.infinite, value),
 	emptyArray: (value: unknown): asserts value is never[] => assertType(is.emptyArray(value), AssertionTypeDescription.emptyArray, value),
-	nonEmptyArray: (value: unknown): asserts value is [unknown, ...unknown[]] => assertType(is.nonEmptyArray(value), AssertionTypeDescription.nonEmptyArray, value),
+	nonEmptyArray: <T = unknown>(value: T | T[]): asserts value is [T, ...T[]] => assertType(is.nonEmptyArray(value), AssertionTypeDescription.nonEmptyArray, value),
 	emptyString: (value: unknown): asserts value is '' => assertType(is.emptyString(value), AssertionTypeDescription.emptyString, value),
 	emptyStringOrWhitespace: (value: unknown): asserts value is string => assertType(is.emptyStringOrWhitespace(value), AssertionTypeDescription.emptyStringOrWhitespace, value),
 	nonEmptyString: (value: unknown): asserts value is string => assertType(is.nonEmptyString(value), AssertionTypeDescription.nonEmptyString, value),
