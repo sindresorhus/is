@@ -294,7 +294,7 @@ is.urlString = (value: unknown): value is string => {
 is.truthy = <T>(value: T | Falsy): value is T => Boolean(value); // eslint-disable-line unicorn/prefer-native-coercion-functions
 
 // Example: `is.falsy = (value: unknown): value is (not true | 0 | '' | undefined | null) => Boolean(value);`
-is.falsy = <T>(value: T | Falsy): value is Falsy => !value;
+is.falsy = (value: unknown): value is Falsy => !value;
 
 is.nan = (value: unknown) => Number.isNaN(value as number);
 
