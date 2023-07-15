@@ -1076,6 +1076,54 @@ test('is.truthy', t => {
 	t.notThrows(() => {
 		assert.truthy(BigInt(1));
 	});
+
+	// Checks that `assert.truthy` narrow downs boolean type to `true`.
+	{
+		const booleans = [true, false];
+		const function_ = (value: true) => value;
+		assert.truthy(booleans[0]);
+		function_(booleans[0]);
+	}
+
+	// Checks that `assert.truthy` excludes zero value from number type.
+	{
+		const bits: Array<0 | 1> = [1, 0, -0];
+		const function_ = (value: 1) => value;
+		assert.truthy(bits[0]);
+		function_(bits[0]);
+	}
+
+	// Checks that `assert.truthy` excludes zero value from bigint type.
+	{
+		const bits: Array<0n | 1n> = [1n, 0n, -0n];
+		const function_ = (value: 1n) => value;
+		assert.truthy(bits[0]);
+		function_(bits[0]);
+	}
+
+	// Checks that `assert.truthy` excludes empty string from string type.
+	{
+		const strings: Array<'nonEmpty' | ''> = ['nonEmpty', ''];
+		const function_ = (value: 'nonEmpty') => value;
+		assert.truthy(strings[0]);
+		function_(strings[0]);
+	}
+
+	// Checks that `assert.truthy` excludes undefined from mixed type.
+	{
+		const maybeUndefineds = ['🦄', undefined];
+		const function_ = (value: string) => value;
+		assert.truthy(maybeUndefineds[0]);
+		function_(maybeUndefineds[0]);
+	}
+
+	// Checks that `assert.truthy` excludes null from mixed type.
+	{
+		const maybeNulls = ['🦄', null];
+		const function_ = (value: string) => value;
+		assert.truthy(maybeNulls[0]);
+		function_(maybeNulls[0]);
+	}
 });
 
 test('is.falsy', t => {
@@ -1119,6 +1167,59 @@ test('is.falsy', t => {
 	t.notThrows(() => {
 		assert.falsy(BigInt(0));
 	});
+
+	// Checks that `assert.falsy` narrow downs boolean type to `false`.
+	{
+		const booleans = [false, true];
+		const function_ = (value: false) => value;
+		assert.falsy(booleans[0]);
+		function_(booleans[0]);
+	}
+
+	// Checks that `assert.falsy` narrow downs number type to `0`.
+	{
+		const bits = [0, -0, 1];
+		const function_ = (value: 0) => value;
+		assert.falsy(bits[0]);
+		function_(bits[0]);
+		assert.falsy(bits[1]);
+		function_(bits[1]);
+	}
+
+	// Checks that `assert.falsy` narrow downs bigint type to `0n`.
+	{
+		const bits = [0n, -0n, 1n];
+		const function_ = (value: 0n) => value;
+		assert.falsy(bits[0]);
+		function_(bits[0]);
+		assert.falsy(bits[1]);
+		function_(bits[1]);
+	}
+
+	// Checks that `assert.falsy` narrow downs string type to empty string.
+	{
+		const strings = ['', 'nonEmpty'];
+		const function_ = (value: '') => value;
+		assert.falsy(strings[0]);
+		function_(strings[0]);
+	}
+
+	// Checks that `assert.falsy` can narrow down mixed type to undefined.
+	{
+		const maybeUndefineds = [undefined, Symbol('🦄')];
+		const function_ = (value: undefined) => value;
+		assert.falsy(maybeUndefineds[0]);
+		function_(maybeUndefineds[0]);
+	}
+
+	// Checks that `assert.falsy` can narrow down mixed type to null.
+	{
+		const maybeNulls = [null, Symbol('🦄')];
+		// eslint-disable-next-line @typescript-eslint/ban-types
+		const function_ = (value: null) => value;
+		assert.falsy(maybeNulls[0]);
+		function_(maybeNulls[0]);
+	}
 });
 
 test('is.nan', t => {
