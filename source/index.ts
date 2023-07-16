@@ -294,7 +294,7 @@ is.urlString = (value: unknown): value is string => {
 is.truthy = <T>(value: T | Falsy): value is T => Boolean(value); // eslint-disable-line unicorn/prefer-native-coercion-functions
 
 // Example: `is.falsy = (value: unknown): value is (not true | 0 | '' | undefined | null) => Boolean(value);`
-is.falsy = <T>(value: T | Falsy): value is Falsy => !value;
+is.falsy = (value: unknown): value is Falsy => !value;
 
 is.nan = (value: unknown) => Number.isNaN(value as number);
 
@@ -570,9 +570,9 @@ type Assert = {
 	enumCase: <T = unknown>(value: unknown, targetEnum: T) => asserts value is T[keyof T];
 	urlInstance: (value: unknown) => asserts value is URL;
 	urlString: (value: unknown) => asserts value is string;
-	truthy: (value: unknown) => asserts value is unknown;
-	falsy: (value: unknown) => asserts value is unknown;
-	nan: (value: unknown) => asserts value is unknown;
+	truthy: <T>(value: T | Falsy) => asserts value is T;
+	falsy: (value: unknown) => asserts value is Falsy;
+	nan: (value: unknown) => asserts value is number;
 	primitive: (value: unknown) => asserts value is Primitive;
 	integer: (value: unknown) => asserts value is number;
 	safeInteger: (value: unknown) => asserts value is number;
@@ -678,9 +678,9 @@ export const assert: Assert = {
 	enumCase: <T = unknown>(value: unknown, targetEnum: T): asserts value is T[keyof T] => assertType(is.enumCase(value, targetEnum), 'EnumCase', value),
 	urlInstance: (value: unknown): asserts value is URL => assertType(is.urlInstance(value), 'URL', value),
 	urlString: (value: unknown): asserts value is string => assertType(is.urlString(value), AssertionTypeDescription.urlString, value),
-	truthy: (value: unknown): asserts value is unknown => assertType(is.truthy(value), AssertionTypeDescription.truthy, value),
-	falsy: (value: unknown): asserts value is unknown => assertType(is.falsy(value), AssertionTypeDescription.falsy, value),
-	nan: (value: unknown): asserts value is unknown => assertType(is.nan(value), AssertionTypeDescription.nan, value),
+	truthy: <T>(value: T | Falsy): asserts value is T => assertType(is.truthy(value), AssertionTypeDescription.truthy, value),
+	falsy: (value: unknown): asserts value is Falsy => assertType(is.falsy(value), AssertionTypeDescription.falsy, value),
+	nan: (value: unknown): asserts value is number => assertType(is.nan(value), AssertionTypeDescription.nan, value),
 	primitive: (value: unknown): asserts value is Primitive => assertType(is.primitive(value), AssertionTypeDescription.primitive, value),
 	integer: (value: unknown): asserts value is number => assertType(is.integer(value), AssertionTypeDescription.integer, value),
 	safeInteger: (value: unknown): asserts value is number => assertType(is.safeInteger(value), AssertionTypeDescription.safeInteger, value),
