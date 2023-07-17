@@ -1626,7 +1626,7 @@ test('is.nonEmptyArray', t => {
 	});
 
 	{
-		const strings = ['🦄', 'unicorn'];
+		const strings = ['🦄', 'unicorn'] as string[] | undefined;
 		const function_ = (value: string) => value;
 
 		if (is.nonEmptyArray(strings)) {
@@ -1656,7 +1656,7 @@ test('is.nonEmptyArray', t => {
 	}
 
 	{
-		const strings = ['🦄', 'unicorn'];
+		const strings = ['🦄', 'unicorn'] as string[] | undefined;
 		const function_ = (value: string) => value;
 
 		assert.nonEmptyArray(strings);
