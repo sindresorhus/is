@@ -1445,6 +1445,43 @@ test('is.arrayLike', t => {
 	});
 });
 
+test('is.tupleLike', t => {
+	(function () {
+		t.false(is.tupleLike(arguments, [])); // eslint-disable-line prefer-rest-params
+	})();
+
+	t.true(is.tupleLike([], []));
+	t.true(is.tupleLike([1, '2', true, {}, [], undefined, null], [is.number, is.string, is.boolean, is.object, is.array, is.undefined, is.nullOrUndefined]));
+	t.false(is.tupleLike('unicorn', [is.string]));
+
+	t.false(is.tupleLike({}, []));
+	t.false(is.tupleLike(() => {}, [is.function_]));
+	t.false(is.tupleLike(new Map(), [is.map]));
+
+	(function () {
+		t.throws(function () {
+			assert.tupleLike(arguments, []); // eslint-disable-line prefer-rest-params
+		});
+	})();
+
+	t.notThrows(() => {
+		assert.tupleLike([], []);
+	});
+	t.throws(() => {
+		assert.tupleLike('unicorn', [is.string]);
+	});
+
+	t.throws(() => {
+		assert.tupleLike({}, [is.object]);
+	});
+	t.throws(() => {
+		assert.tupleLike(() => {}, [is.function_]);
+	});
+	t.throws(() => {
+		assert.tupleLike(new Map(), [is.map]);
+	});
+});
+
 test('is.inRange', t => {
 	const x = 3;
 
