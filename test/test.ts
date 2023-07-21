@@ -1480,6 +1480,47 @@ test('is.tupleLike', t => {
 	t.throws(() => {
 		assert.tupleLike(new Map(), [is.map]);
 	});
+
+	{
+		const tuple = [[false, 'unicorn'], 'string', true];
+		const function_ = (value: string) => value;
+
+		if (is.tupleLike(tuple, [is.array, is.string, is.boolean])) {
+			if (is.tupleLike(tuple[0], [is.boolean, is.string])) { // eslint-disable-line unicorn/no-lonely-if
+				const value = tuple[0][1];
+				function_(value);
+			}
+		}
+	}
+
+	{
+		const tuple = [{isTest: true}, '1', true, null];
+		const function_ = (value: Record<string, unknown>) => value;
+
+		if (is.tupleLike(tuple, [is.nonEmptyObject, is.string, is.boolean, is.null_])) {
+			const value = tuple[0];
+			function_(value);
+		}
+	}
+
+	{
+		const tuple = [1, '1', true, null, undefined];
+		// eslint-disable-next-line @typescript-eslint/ban-types
+		const function_ = (value: number | string | boolean | undefined | null) => value;
+
+		if (is.tupleLike(tuple, [is.number, is.string, is.boolean, is.undefined, is.null_])) {
+			const numericValue = tuple[0];
+			const stringValue = tuple[1];
+			const booleanValue = tuple[2];
+			const undefinedValue = tuple[3];
+			const nullValue = tuple[4];
+			function_(numericValue);
+			function_(stringValue);
+			function_(booleanValue);
+			function_(undefinedValue);
+			function_(nullValue);
+		}
+	}
 });
 
 test('is.inRange', t => {
