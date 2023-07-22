@@ -8,6 +8,7 @@ import test, {type ExecutionContext} from 'ava';
 import {JSDOM} from 'jsdom';
 import {Subject, Observable} from 'rxjs';
 import {temporaryFile} from 'tempy';
+import {expectTypeOf} from 'expect-type';
 import ZenObservable from 'zen-observable';
 import is, {
 	assert,
@@ -1483,30 +1484,26 @@ test('is.tupleLike', t => {
 
 	{
 		const tuple = [[false, 'unicorn'], 'string', true];
-		const function_ = (value: string) => value;
 
 		if (is.tupleLike(tuple, [is.array, is.string, is.boolean])) {
 			if (is.tupleLike(tuple[0], [is.boolean, is.string])) { // eslint-disable-line unicorn/no-lonely-if
 				const value = tuple[0][1];
-				function_(value);
+				expectTypeOf(value).toEqualTypeOf<string>();
 			}
 		}
 	}
 
 	{
 		const tuple = [{isTest: true}, '1', true, null];
-		const function_ = (value: Record<string, unknown>) => value;
 
 		if (is.tupleLike(tuple, [is.nonEmptyObject, is.string, is.boolean, is.null_])) {
 			const value = tuple[0];
-			function_(value);
+			expectTypeOf(value).toEqualTypeOf<Record<string | number | symbol, unknown>>();
 		}
 	}
 
 	{
 		const tuple = [1, '1', true, null, undefined];
-		// eslint-disable-next-line @typescript-eslint/ban-types
-		const function_ = (value: number | string | boolean | undefined | null) => value;
 
 		if (is.tupleLike(tuple, [is.number, is.string, is.boolean, is.undefined, is.null_])) {
 			const numericValue = tuple[0];
@@ -1514,11 +1511,12 @@ test('is.tupleLike', t => {
 			const booleanValue = tuple[2];
 			const undefinedValue = tuple[3];
 			const nullValue = tuple[4];
-			function_(numericValue);
-			function_(stringValue);
-			function_(booleanValue);
-			function_(undefinedValue);
-			function_(nullValue);
+			expectTypeOf(numericValue).toEqualTypeOf<number>();
+			expectTypeOf(stringValue).toEqualTypeOf<string>();
+			expectTypeOf(booleanValue).toEqualTypeOf<boolean>();
+			expectTypeOf(undefinedValue).toEqualTypeOf<undefined>();
+			// eslint-disable-next-line @typescript-eslint/ban-types
+			expectTypeOf(nullValue).toEqualTypeOf<null>();
 		}
 	}
 });
