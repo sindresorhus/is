@@ -329,7 +329,12 @@ is.arrayLike = <T = unknown>(value: unknown): value is ArrayLike<T> => !is.nullO
 type TypeGuard<T> = (value: unknown) => value is T;
 
 // eslint-disable-next-line @typescript-eslint/ban-types
-type ResolveTypesOfTypeGuardsTuple<TypeGuardsOfT, ResultOfT extends unknown[] = [] > = TypeGuardsOfT extends [TypeGuard<infer U>, ...infer TOthers] ? ResolveTypesOfTypeGuardsTuple<TOthers, [...ResultOfT, U]> : TypeGuardsOfT extends undefined[] ? ResultOfT : never;
+type ResolveTypesOfTypeGuardsTuple<TypeGuardsOfT, ResultOfT extends unknown[] = [] > =
+	TypeGuardsOfT extends [TypeGuard<infer U>, ...infer TOthers]
+		? ResolveTypesOfTypeGuardsTuple<TOthers, [...ResultOfT, U]>
+		: TypeGuardsOfT extends undefined[]
+			? ResultOfT
+			: never;
 
 is.tupleLike = <T extends Array<TypeGuard<unknown>>>(value: unknown, guards: [...T]): value is ResolveTypesOfTypeGuardsTuple<T> => {
 	if (is.array(guards) && is.array(value) && guards.length === value.length) {
