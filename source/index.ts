@@ -326,6 +326,24 @@ export type ArrayLike<T> = {
 const isValidLength = (value: unknown): value is number => is.safeInteger(value) && value >= 0;
 is.arrayLike = <T = unknown>(value: unknown): value is ArrayLike<T> => !is.nullOrUndefined(value) && !is.function_(value) && isValidLength((value as ArrayLike<T>).length);
 
+type TypeGuard<T> = (value: unknown) => value is T;
+
+// eslint-disable-next-line @typescript-eslint/ban-types
+type ResolveTypesOfTypeGuardsTuple<TypeGuardsOfT, ResultOfT extends unknown[] = [] > =
+	TypeGuardsOfT extends [TypeGuard<infer U>, ...infer TOthers]
+		? ResolveTypesOfTypeGuardsTuple<TOthers, [...ResultOfT, U]>
+		: TypeGuardsOfT extends undefined[]
+			? ResultOfT
+			: never;
+
+is.tupleLike = <T extends Array<TypeGuard<unknown>>>(value: unknown, guards: [...T]): value is ResolveTypesOfTypeGuardsTuple<T> => {
+	if (is.array(guards) && is.array(value) && guards.length === value.length) {
+		return guards.every((guard, index) => guard(value[index]));
+	}
+
+	return false;
+};
+
 is.inRange = (value: number, range: number | number[]): value is number => {
 	if (is.number(range)) {
 		return value >= Math.min(0, range) && value <= Math.max(range, 0);
@@ -482,6 +500,7 @@ export const enum AssertionTypeDescription {
 	safeInteger = 'integer', // eslint-disable-line @typescript-eslint/no-duplicate-enum-values
 	plainObject = 'plain object',
 	arrayLike = 'array-like',
+	tupleLike = 'tuple-like',
 	typedArray = 'TypedArray',
 	domElement = 'HTMLElement',
 	nodeStream = 'Node.js Stream',
@@ -579,6 +598,7 @@ type Assert = {
 	plainObject: <Value = unknown>(value: unknown) => asserts value is Record<PropertyKey, Value>;
 	typedArray: (value: unknown) => asserts value is TypedArray;
 	arrayLike: <T = unknown>(value: unknown) => asserts value is ArrayLike<T>;
+	tupleLike: <T extends Array<TypeGuard<unknown>>>(value: unknown, guards: [...T]) => asserts value is ResolveTypesOfTypeGuardsTuple<T>;
 	domElement: (value: unknown) => asserts value is HTMLElement;
 	observable: (value: unknown) => asserts value is ObservableLike;
 	nodeStream: (value: unknown) => asserts value is NodeStream;
@@ -687,6 +707,7 @@ export const assert: Assert = {
 	plainObject: <Value = unknown>(value: unknown): asserts value is Record<PropertyKey, Value> => assertType(is.plainObject(value), AssertionTypeDescription.plainObject, value),
 	typedArray: (value: unknown): asserts value is TypedArray => assertType(is.typedArray(value), AssertionTypeDescription.typedArray, value),
 	arrayLike: <T = unknown>(value: unknown): asserts value is ArrayLike<T> => assertType(is.arrayLike(value), AssertionTypeDescription.arrayLike, value),
+	tupleLike: <T extends Array<TypeGuard<unknown>>>(value: unknown, guards: [...T]): asserts value is ResolveTypesOfTypeGuardsTuple<T> => assertType(is.tupleLike(value, guards), AssertionTypeDescription.tupleLike, value),
 	domElement: (value: unknown): asserts value is HTMLElement => assertType(is.domElement(value), AssertionTypeDescription.domElement, value),
 	observable: (value: unknown): asserts value is ObservableLike => assertType(is.observable(value), 'Observable', value),
 	nodeStream: (value: unknown): asserts value is NodeStream => assertType(is.nodeStream(value), AssertionTypeDescription.nodeStream, value),

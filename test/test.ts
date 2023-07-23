@@ -8,6 +8,7 @@ import test, {type ExecutionContext} from 'ava';
 import {JSDOM} from 'jsdom';
 import {Subject, Observable} from 'rxjs';
 import {temporaryFile} from 'tempy';
+import {expectTypeOf} from 'expect-type';
 import ZenObservable from 'zen-observable';
 import is, {
 	assert,
@@ -1443,6 +1444,81 @@ test('is.arrayLike', t => {
 	t.throws(() => {
 		assert.arrayLike(new Map());
 	});
+});
+
+test('is.tupleLike', t => {
+	(function () {
+		t.false(is.tupleLike(arguments, [])); // eslint-disable-line prefer-rest-params
+	})();
+
+	t.true(is.tupleLike([], []));
+	t.true(is.tupleLike([1, '2', true, {}, [], undefined, null], [is.number, is.string, is.boolean, is.object, is.array, is.undefined, is.nullOrUndefined]));
+	t.false(is.tupleLike('unicorn', [is.string]));
+
+	t.false(is.tupleLike({}, []));
+	t.false(is.tupleLike(() => {}, [is.function_]));
+	t.false(is.tupleLike(new Map(), [is.map]));
+
+	(function () {
+		t.throws(function () {
+			assert.tupleLike(arguments, []); // eslint-disable-line prefer-rest-params
+		});
+	})();
+
+	t.notThrows(() => {
+		assert.tupleLike([], []);
+	});
+	t.throws(() => {
+		assert.tupleLike('unicorn', [is.string]);
+	});
+
+	t.throws(() => {
+		assert.tupleLike({}, [is.object]);
+	});
+	t.throws(() => {
+		assert.tupleLike(() => {}, [is.function_]);
+	});
+	t.throws(() => {
+		assert.tupleLike(new Map(), [is.map]);
+	});
+
+	{
+		const tuple = [[false, 'unicorn'], 'string', true];
+
+		if (is.tupleLike(tuple, [is.array, is.string, is.boolean])) {
+			if (is.tupleLike(tuple[0], [is.boolean, is.string])) { // eslint-disable-line unicorn/no-lonely-if
+				const value = tuple[0][1];
+				expectTypeOf(value).toEqualTypeOf<string>();
+			}
+		}
+	}
+
+	{
+		const tuple = [{isTest: true}, '1', true, null];
+
+		if (is.tupleLike(tuple, [is.nonEmptyObject, is.string, is.boolean, is.null_])) {
+			const value = tuple[0];
+			expectTypeOf(value).toEqualTypeOf<Record<string | number | symbol, unknown>>();
+		}
+	}
+
+	{
+		const tuple = [1, '1', true, null, undefined];
+
+		if (is.tupleLike(tuple, [is.number, is.string, is.boolean, is.undefined, is.null_])) {
+			const numericValue = tuple[0];
+			const stringValue = tuple[1];
+			const booleanValue = tuple[2];
+			const undefinedValue = tuple[3];
+			const nullValue = tuple[4];
+			expectTypeOf(numericValue).toEqualTypeOf<number>();
+			expectTypeOf(stringValue).toEqualTypeOf<string>();
+			expectTypeOf(booleanValue).toEqualTypeOf<boolean>();
+			expectTypeOf(undefinedValue).toEqualTypeOf<undefined>();
+			// eslint-disable-next-line @typescript-eslint/ban-types
+			expectTypeOf(nullValue).toEqualTypeOf<null>();
+		}
+	}
 });
 
 test('is.inRange', t => {

@@ -410,6 +410,26 @@ function foo() {
 foo();
 ```
 
+##### .tupleLike(value, guards)
+
+A `value` is tuple-like if it matches the provided `guards` array both in `.length` and in types.
+
+```js
+is.tupleLike([1], [is.number]);
+//=> true
+```
+
+```js
+function foo() {
+	const tuple = [1, '2', true];
+	if (is.tupleLike(tuple, [is.number, is.string, is.boolean])) {
+		tuple // [number, string, boolean]
+	}
+}
+
+foo();
+```
+
 #### .positiveNumber(value)
 
 Check if `value` is a number and is more than 0.

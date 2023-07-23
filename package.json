@@ -61,7 +61,8 @@
 		"ts-node": "^10.9.1",
 		"typescript": "^5.0.4",
 		"xo": "^0.54.2",
-		"zen-observable": "^0.10.0"
+		"zen-observable": "^0.10.0",
+		"expect-type": "^0.16.0"
 	},
 	"sideEffects": false,
 	"ava": {
