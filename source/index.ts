@@ -77,6 +77,52 @@ function isPrimitiveTypeName(name: unknown): name is PrimitiveTypeName {
 
 export type TypeName = ObjectTypeName | PrimitiveTypeName;
 
+const assertionTypeDescriptions = [
+	'positive number',
+	'negative number',
+	'Class',
+	'string with a number',
+	'null or undefined',
+	'Iterable',
+	'AsyncIterable',
+	'native Promise',
+	'EnumCase',
+	'string with a URL',
+	'truthy',
+	'falsy',
+	'primitive',
+	'integer',
+	'plain object',
+	'TypedArray',
+	'array-like',
+	'tuple-like',
+	'Node.js Stream',
+	'infinite number',
+	'empty array',
+	'non-empty array',
+	'empty string',
+	'empty string or whitespace',
+	'non-empty string',
+	'non-empty string and not whitespace',
+	'empty object',
+	'non-empty object',
+	'empty set',
+	'non-empty set',
+	'empty map',
+	'non-empty map',
+	'PropertyKey',
+	'even integer',
+	'odd integer',
+	'T',
+	'in range',
+	'predicate returns truthy for any value',
+	'predicate returns truthy for all values',
+	...objectTypeNames,
+	...primitiveTypeNames,
+] as const;
+
+export type AssertionTypeDescription = typeof assertionTypeDescriptions[number];
+
 // eslint-disable-next-line @typescript-eslint/ban-types
 function isOfType<T extends Primitive | Function>(type: PrimitiveTypeName | 'function') {
 	return (value: unknown): value is T => typeof value === type;
@@ -469,7 +515,7 @@ is.any = (predicate: Predicate | Predicate[], ...values: unknown[]): boolean => 
 
 is.all = (predicate: Predicate, ...values: unknown[]): boolean => predicateOnArray(Array.prototype.every, predicate, values);
 
-const assertType = (condition: boolean, description: string, value: unknown, options: {multipleValues?: boolean} = {}): asserts condition => {
+const assertType = (condition: boolean, description: AssertionTypeDescription, value: unknown, options: {multipleValues?: boolean} = {}): asserts condition => {
 	if (!condition) {
 		const {multipleValues} = options;
 		const valuesMessage = multipleValues
@@ -483,53 +529,6 @@ const assertType = (condition: boolean, description: string, value: unknown, opt
 		throw new TypeError(`Expected value which is \`${description}\`, ${valuesMessage}.`);
 	}
 };
-
-export const enum AssertionTypeDescription {
-	class_ = 'Class',
-	numericString = 'string with a number',
-	nullOrUndefined = 'null or undefined',
-	iterable = 'Iterable',
-	asyncIterable = 'AsyncIterable',
-	nativePromise = 'native Promise',
-	urlString = 'string with a URL',
-	truthy = 'truthy',
-	falsy = 'falsy',
-	nan = 'NaN',
-	primitive = 'primitive',
-	integer = 'integer',
-	safeInteger = 'integer', // eslint-disable-line @typescript-eslint/no-duplicate-enum-values
-	plainObject = 'plain object',
-	arrayLike = 'array-like',
-	tupleLike = 'tuple-like',
-	typedArray = 'TypedArray',
-	domElement = 'HTMLElement',
-	nodeStream = 'Node.js Stream',
-	infinite = 'infinite number',
-	emptyArray = 'empty array',
-	nonEmptyArray = 'non-empty array',
-	emptyString = 'empty string',
-	emptyStringOrWhitespace = 'empty string or whitespace',
-	nonEmptyString = 'non-empty string',
-	nonEmptyStringAndNotWhitespace = 'non-empty string and not whitespace',
-	emptyObject = 'empty object',
-	nonEmptyObject = 'non-empty object',
-	emptySet = 'empty set',
-	nonEmptySet = 'non-empty set',
-	emptyMap = 'empty map',
-	nonEmptyMap = 'non-empty map',
-
-	evenInteger = 'even integer',
-	oddInteger = 'odd integer',
-
-	positiveNumber = 'positive number',
-	negativeNumber = 'negative number',
-
-	directInstanceOf = 'T',
-	inRange = 'in range',
-
-	any = 'predicate returns truthy for any value',
-	all = 'predicate returns truthy for all values',
-}
 
 // Type assertions have to be declared with an explicit type.
 type Assert = {
@@ -638,18 +637,18 @@ export const assert: Assert = {
 	undefined: (value: unknown): asserts value is undefined => assertType(is.undefined(value), 'undefined', value),
 	string: (value: unknown): asserts value is string => assertType(is.string(value), 'string', value),
 	number: (value: unknown): asserts value is number => assertType(is.number(value), 'number', value),
-	positiveNumber: (value: unknown): asserts value is number => assertType(is.positiveNumber(value), AssertionTypeDescription.positiveNumber, value),
-	negativeNumber: (value: unknown): asserts value is number => assertType(is.negativeNumber(value), AssertionTypeDescription.negativeNumber, value),
+	positiveNumber: (value: unknown): asserts value is number => assertType(is.positiveNumber(value), 'positive number', value),
+	negativeNumber: (value: unknown): asserts value is number => assertType(is.negativeNumber(value), 'negative number', value),
 	bigint: (value: unknown): asserts value is bigint => assertType(is.bigint(value), 'bigint', value),
 	// eslint-disable-next-line @typescript-eslint/ban-types
 	function_: (value: unknown): asserts value is Function => assertType(is.function_(value), 'Function', value),
 	null_: (value: unknown): asserts value is null => assertType(is.null_(value), 'null', value), // eslint-disable-line @typescript-eslint/ban-types
-	class_: (value: unknown): asserts value is Class => assertType(is.class_(value), AssertionTypeDescription.class_, value),
+	class_: (value: unknown): asserts value is Class => assertType(is.class_(value), 'Class', value),
 	boolean: (value: unknown): asserts value is boolean => assertType(is.boolean(value), 'boolean', value),
 	symbol: (value: unknown): asserts value is symbol => assertType(is.symbol(value), 'symbol', value),
-	numericString: (value: unknown): asserts value is `${number}` => assertType(is.numericString(value), AssertionTypeDescription.numericString, value),
+	numericString: (value: unknown): asserts value is `${number}` => assertType(is.numericString(value), 'string with a number', value),
 	array: <T = unknown>(value: unknown, assertion?: (element: unknown) => asserts element is T): asserts value is T[] => { // eslint-disable-line object-shorthand
-		const assert: (condition: boolean, description: string, value: unknown) => asserts condition = assertType;
+		const assert: (condition: boolean, description: AssertionTypeDescription, value: unknown) => asserts condition = assertType;
 		assert(is.array(value), 'Array', value);
 
 		if (assertion) {
@@ -659,13 +658,13 @@ export const assert: Assert = {
 	},
 	buffer: (value: unknown): asserts value is Buffer => assertType(is.buffer(value), 'Buffer', value),
 	blob: (value: unknown): asserts value is Blob => assertType(is.blob(value), 'Blob', value),
-	nullOrUndefined: (value: unknown): asserts value is null | undefined => assertType(is.nullOrUndefined(value), AssertionTypeDescription.nullOrUndefined, value), // eslint-disable-line @typescript-eslint/ban-types
+	nullOrUndefined: (value: unknown): asserts value is null | undefined => assertType(is.nullOrUndefined(value), 'null or undefined', value), // eslint-disable-line @typescript-eslint/ban-types
 	object: (value: unknown): asserts value is object => assertType(is.object(value), 'Object', value), // eslint-disable-line @typescript-eslint/ban-types
-	iterable: <T = unknown>(value: unknown): asserts value is Iterable<T> => assertType(is.iterable(value), AssertionTypeDescription.iterable, value),
-	asyncIterable: <T = unknown>(value: unknown): asserts value is AsyncIterable<T> => assertType(is.asyncIterable(value), AssertionTypeDescription.asyncIterable, value),
+	iterable: <T = unknown>(value: unknown): asserts value is Iterable<T> => assertType(is.iterable(value), 'Iterable', value),
+	asyncIterable: <T = unknown>(value: unknown): asserts value is AsyncIterable<T> => assertType(is.asyncIterable(value), 'AsyncIterable', value),
 	generator: (value: unknown): asserts value is Generator => assertType(is.generator(value), 'Generator', value),
 	asyncGenerator: (value: unknown): asserts value is AsyncGenerator => assertType(is.asyncGenerator(value), 'AsyncGenerator', value),
-	nativePromise: <T = unknown>(value: unknown): asserts value is Promise<T> => assertType(is.nativePromise(value), AssertionTypeDescription.nativePromise, value),
+	nativePromise: <T = unknown>(value: unknown): asserts value is Promise<T> => assertType(is.nativePromise(value), 'native Promise', value),
 	promise: <T = unknown>(value: unknown): asserts value is Promise<T> => assertType(is.promise(value), 'Promise', value),
 	generatorFunction: (value: unknown): asserts value is GeneratorFunction => assertType(is.generatorFunction(value), 'GeneratorFunction', value),
 	asyncGeneratorFunction: (value: unknown): asserts value is AsyncGeneratorFunction => assertType(is.asyncGeneratorFunction(value), 'AsyncGeneratorFunction', value),
@@ -697,48 +696,48 @@ export const assert: Assert = {
 	dataView: (value: unknown): asserts value is DataView => assertType(is.dataView(value), 'DataView', value),
 	enumCase: <T = unknown>(value: unknown, targetEnum: T): asserts value is T[keyof T] => assertType(is.enumCase(value, targetEnum), 'EnumCase', value),
 	urlInstance: (value: unknown): asserts value is URL => assertType(is.urlInstance(value), 'URL', value),
-	urlString: (value: unknown): asserts value is string => assertType(is.urlString(value), AssertionTypeDescription.urlString, value),
-	truthy: <T>(value: T | Falsy): asserts value is T => assertType(is.truthy(value), AssertionTypeDescription.truthy, value),
-	falsy: (value: unknown): asserts value is Falsy => assertType(is.falsy(value), AssertionTypeDescription.falsy, value),
-	nan: (value: unknown): asserts value is number => assertType(is.nan(value), AssertionTypeDescription.nan, value),
-	primitive: (value: unknown): asserts value is Primitive => assertType(is.primitive(value), AssertionTypeDescription.primitive, value),
-	integer: (value: unknown): asserts value is number => assertType(is.integer(value), AssertionTypeDescription.integer, value),
-	safeInteger: (value: unknown): asserts value is number => assertType(is.safeInteger(value), AssertionTypeDescription.safeInteger, value),
-	plainObject: <Value = unknown>(value: unknown): asserts value is Record<PropertyKey, Value> => assertType(is.plainObject(value), AssertionTypeDescription.plainObject, value),
-	typedArray: (value: unknown): asserts value is TypedArray => assertType(is.typedArray(value), AssertionTypeDescription.typedArray, value),
-	arrayLike: <T = unknown>(value: unknown): asserts value is ArrayLike<T> => assertType(is.arrayLike(value), AssertionTypeDescription.arrayLike, value),
-	tupleLike: <T extends Array<TypeGuard<unknown>>>(value: unknown, guards: [...T]): asserts value is ResolveTypesOfTypeGuardsTuple<T> => assertType(is.tupleLike(value, guards), AssertionTypeDescription.tupleLike, value),
-	domElement: (value: unknown): asserts value is HTMLElement => assertType(is.domElement(value), AssertionTypeDescription.domElement, value),
+	urlString: (value: unknown): asserts value is string => assertType(is.urlString(value), 'string with a URL', value),
+	truthy: <T>(value: T | Falsy): asserts value is T => assertType(is.truthy(value), 'truthy', value),
+	falsy: (value: unknown): asserts value is Falsy => assertType(is.falsy(value), 'falsy', value),
+	nan: (value: unknown): asserts value is number => assertType(is.nan(value), 'NaN', value),
+	primitive: (value: unknown): asserts value is Primitive => assertType(is.primitive(value), 'primitive', value),
+	integer: (value: unknown): asserts value is number => assertType(is.integer(value), 'integer', value),
+	safeInteger: (value: unknown): asserts value is number => assertType(is.safeInteger(value), 'integer', value),
+	plainObject: <Value = unknown>(value: unknown): asserts value is Record<PropertyKey, Value> => assertType(is.plainObject(value), 'plain object', value),
+	typedArray: (value: unknown): asserts value is TypedArray => assertType(is.typedArray(value), 'TypedArray', value),
+	arrayLike: <T = unknown>(value: unknown): asserts value is ArrayLike<T> => assertType(is.arrayLike(value), 'array-like', value),
+	tupleLike: <T extends Array<TypeGuard<unknown>>>(value: unknown, guards: [...T]): asserts value is ResolveTypesOfTypeGuardsTuple<T> => assertType(is.tupleLike(value, guards), 'tuple-like', value),
+	domElement: (value: unknown): asserts value is HTMLElement => assertType(is.domElement(value), 'HTMLElement', value),
 	observable: (value: unknown): asserts value is ObservableLike => assertType(is.observable(value), 'Observable', value),
-	nodeStream: (value: unknown): asserts value is NodeStream => assertType(is.nodeStream(value), AssertionTypeDescription.nodeStream, value),
-	infinite: (value: unknown): asserts value is number => assertType(is.infinite(value), AssertionTypeDescription.infinite, value),
-	emptyArray: (value: unknown): asserts value is never[] => assertType(is.emptyArray(value), AssertionTypeDescription.emptyArray, value),
-	nonEmptyArray: <T = unknown, Item = unknown>(value: T | Item[]): asserts value is [Item, ...Item[]] => assertType(is.nonEmptyArray(value), AssertionTypeDescription.nonEmptyArray, value),
-	emptyString: (value: unknown): asserts value is '' => assertType(is.emptyString(value), AssertionTypeDescription.emptyString, value),
-	emptyStringOrWhitespace: (value: unknown): asserts value is string => assertType(is.emptyStringOrWhitespace(value), AssertionTypeDescription.emptyStringOrWhitespace, value),
-	nonEmptyString: (value: unknown): asserts value is string => assertType(is.nonEmptyString(value), AssertionTypeDescription.nonEmptyString, value),
-	nonEmptyStringAndNotWhitespace: (value: unknown): asserts value is string => assertType(is.nonEmptyStringAndNotWhitespace(value), AssertionTypeDescription.nonEmptyStringAndNotWhitespace, value),
-	emptyObject: <Key extends keyof any = string>(value: unknown): asserts value is Record<Key, never> => assertType(is.emptyObject(value), AssertionTypeDescription.emptyObject, value),
-	nonEmptyObject: <Key extends keyof any = string, Value = unknown>(value: unknown): asserts value is Record<Key, Value> => assertType(is.nonEmptyObject(value), AssertionTypeDescription.nonEmptyObject, value),
-	emptySet: (value: unknown): asserts value is Set<never> => assertType(is.emptySet(value), AssertionTypeDescription.emptySet, value),
-	nonEmptySet: <T = unknown>(value: unknown): asserts value is Set<T> => assertType(is.nonEmptySet(value), AssertionTypeDescription.nonEmptySet, value),
-	emptyMap: (value: unknown): asserts value is Map<never, never> => assertType(is.emptyMap(value), AssertionTypeDescription.emptyMap, value),
-	nonEmptyMap: <Key = unknown, Value = unknown>(value: unknown): asserts value is Map<Key, Value> => assertType(is.nonEmptyMap(value), AssertionTypeDescription.nonEmptyMap, value),
+	nodeStream: (value: unknown): asserts value is NodeStream => assertType(is.nodeStream(value), 'Node.js Stream', value),
+	infinite: (value: unknown): asserts value is number => assertType(is.infinite(value), 'infinite number', value),
+	emptyArray: (value: unknown): asserts value is never[] => assertType(is.emptyArray(value), 'empty array', value),
+	nonEmptyArray: <T = unknown, Item = unknown>(value: T | Item[]): asserts value is [Item, ...Item[]] => assertType(is.nonEmptyArray(value), 'non-empty array', value),
+	emptyString: (value: unknown): asserts value is '' => assertType(is.emptyString(value), 'empty string', value),
+	emptyStringOrWhitespace: (value: unknown): asserts value is string => assertType(is.emptyStringOrWhitespace(value), 'empty string or whitespace', value),
+	nonEmptyString: (value: unknown): asserts value is string => assertType(is.nonEmptyString(value), 'non-empty string', value),
+	nonEmptyStringAndNotWhitespace: (value: unknown): asserts value is string => assertType(is.nonEmptyStringAndNotWhitespace(value), 'non-empty string and not whitespace', value),
+	emptyObject: <Key extends keyof any = string>(value: unknown): asserts value is Record<Key, never> => assertType(is.emptyObject(value), 'empty object', value),
+	nonEmptyObject: <Key extends keyof any = string, Value = unknown>(value: unknown): asserts value is Record<Key, Value> => assertType(is.nonEmptyObject(value), 'non-empty object', value),
+	emptySet: (value: unknown): asserts value is Set<never> => assertType(is.emptySet(value), 'empty set', value),
+	nonEmptySet: <T = unknown>(value: unknown): asserts value is Set<T> => assertType(is.nonEmptySet(value), 'non-empty set', value),
+	emptyMap: (value: unknown): asserts value is Map<never, never> => assertType(is.emptyMap(value), 'empty map', value),
+	nonEmptyMap: <Key = unknown, Value = unknown>(value: unknown): asserts value is Map<Key, Value> => assertType(is.nonEmptyMap(value), 'non-empty map', value),
 	propertyKey: (value: unknown): asserts value is number => assertType(is.propertyKey(value), 'PropertyKey', value),
 	formData: (value: unknown): asserts value is FormData => assertType(is.formData(value), 'FormData', value),
 	urlSearchParams: (value: unknown): asserts value is URLSearchParams => assertType(is.urlSearchParams(value), 'URLSearchParams', value),
 
 	// Numbers.
-	evenInteger: (value: number): asserts value is number => assertType(is.evenInteger(value), AssertionTypeDescription.evenInteger, value),
-	oddInteger: (value: number): asserts value is number => assertType(is.oddInteger(value), AssertionTypeDescription.oddInteger, value),
+	evenInteger: (value: number): asserts value is number => assertType(is.evenInteger(value), 'even integer', value),
+	oddInteger: (value: number): asserts value is number => assertType(is.oddInteger(value), 'odd integer', value),
 
 	// Two arguments.
-	directInstanceOf: <T>(instance: unknown, class_: Class<T>): asserts instance is T => assertType(is.directInstanceOf(instance, class_), AssertionTypeDescription.directInstanceOf, instance),
-	inRange: (value: number, range: number | number[]): asserts value is number => assertType(is.inRange(value, range), AssertionTypeDescription.inRange, value),
+	directInstanceOf: <T>(instance: unknown, class_: Class<T>): asserts instance is T => assertType(is.directInstanceOf(instance, class_), 'T', instance),
+	inRange: (value: number, range: number | number[]): asserts value is number => assertType(is.inRange(value, range), 'in range', value),
 
 	// Variadic functions.
-	any: (predicate: Predicate | Predicate[], ...values: unknown[]): void | never => assertType(is.any(predicate, ...values), AssertionTypeDescription.any, values, {multipleValues: true}),
-	all: (predicate: Predicate, ...values: unknown[]): void | never => assertType(is.all(predicate, ...values), AssertionTypeDescription.all, values, {multipleValues: true}),
+	any: (predicate: Predicate | Predicate[], ...values: unknown[]): void | never => assertType(is.any(predicate, ...values), 'predicate returns truthy for any value', values, {multipleValues: true}),
+	all: (predicate: Predicate, ...values: unknown[]): void | never => assertType(is.all(predicate, ...values), 'predicate returns truthy for all values', values, {multipleValues: true}),
 };
 /* eslint-enable @typescript-eslint/no-confusing-void-expression */
 
