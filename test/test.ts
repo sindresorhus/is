@@ -12,7 +12,7 @@ import {expectTypeOf} from 'expect-type';
 import ZenObservable from 'zen-observable';
 import is, {
 	assert,
-	AssertionTypeDescription,
+	type AssertionTypeDescription,
 	type Primitive,
 	type TypedArray,
 	type TypeName,
@@ -31,11 +31,11 @@ type Test = {
 	assert: (...args: any[]) => void | never;
 	fixtures: unknown[];
 	typename?: TypeName;
-	typeDescription?: AssertionTypeDescription | TypeName;
+	typeDescription?: AssertionTypeDescription;
 	is(value: unknown): boolean;
 };
 
-const invertAssertThrow = (description: string, fn: () => void | never, value: unknown): void | never => {
+const invertAssertThrow = (description: AssertionTypeDescription, fn: () => void | never, value: unknown): void | never => {
 	const expectedAssertErrorMessage = `Expected value which is \`${description}\`, received value of type \`${is(value)}\`.`;
 
 	try {
@@ -86,7 +86,7 @@ const types = new Map<string, Test>([
 			String(),
 		],
 		typename: 'string',
-		typeDescription: AssertionTypeDescription.emptyString,
+		typeDescription: 'empty string',
 	}],
 	['number', {
 		is: is.number,
@@ -139,7 +139,7 @@ const types = new Map<string, Test>([
 			'0x56',
 		],
 		typename: 'string',
-		typeDescription: AssertionTypeDescription.numericString,
+		typeDescription: 'string with a number',
 	}],
 	['array', {
 		is: is.array,
@@ -158,7 +158,7 @@ const types = new Map<string, Test>([
 			new Array(), // eslint-disable-line @typescript-eslint/no-array-constructor
 		],
 		typename: 'Array',
-		typeDescription: AssertionTypeDescription.emptyArray,
+		typeDescription: 'empty array',
 	}],
 	['function', {
 		is: is.function_,
@@ -232,7 +232,7 @@ const types = new Map<string, Test>([
 			PromiseSubclassFixture.resolve(),
 		],
 		typename: 'Promise',
-		typeDescription: AssertionTypeDescription.nativePromise,
+		typeDescription: 'native Promise',
 	}],
 	['promise', {
 		is: is.promise,
@@ -319,7 +319,7 @@ const types = new Map<string, Test>([
 			new Map(),
 		],
 		typename: 'Map',
-		typeDescription: AssertionTypeDescription.emptyMap,
+		typeDescription: 'empty map',
 	}],
 	['set', {
 		is: is.set,
@@ -336,7 +336,7 @@ const types = new Map<string, Test>([
 			new Set(),
 		],
 		typename: 'Set',
-		typeDescription: AssertionTypeDescription.emptySet,
+		typeDescription: 'empty set',
 	}],
 	['weakSet', {
 		is: is.weakSet,
@@ -472,7 +472,7 @@ const types = new Map<string, Test>([
 			Number.NaN,
 		],
 		typename: 'NaN',
-		typeDescription: AssertionTypeDescription.nan,
+		typeDescription: 'NaN',
 	}],
 	['nullOrUndefined', {
 		is: is.nullOrUndefined,
@@ -481,7 +481,7 @@ const types = new Map<string, Test>([
 			null,
 			undefined,
 		],
-		typeDescription: AssertionTypeDescription.nullOrUndefined,
+		typeDescription: 'null or undefined',
 	}],
 	['plainObject', {
 		is: is.plainObject,
@@ -495,7 +495,7 @@ const types = new Map<string, Test>([
 			structuredClone(new Object()), // eslint-disable-line no-new-object
 		],
 		typename: 'Object',
-		typeDescription: AssertionTypeDescription.plainObject,
+		typeDescription: 'plain object',
 	}],
 	['integer', {
 		is: is.integer,
@@ -504,7 +504,7 @@ const types = new Map<string, Test>([
 			6,
 		],
 		typename: 'number',
-		typeDescription: AssertionTypeDescription.integer,
+		typeDescription: 'integer',
 	}],
 	['safeInteger', {
 		is: is.safeInteger,
@@ -514,7 +514,7 @@ const types = new Map<string, Test>([
 			-(2 ** 53) + 1,
 		],
 		typename: 'number',
-		typeDescription: AssertionTypeDescription.safeInteger,
+		typeDescription: 'integer',
 	}],
 	['domElement', {
 		is: is.domElement,
@@ -528,12 +528,12 @@ const types = new Map<string, Test>([
 			'script',
 		]
 			.map(fixture => createDomElement(fixture)),
-		typeDescription: AssertionTypeDescription.domElement,
+		typeDescription: 'HTMLElement',
 	}],
 	['non-domElements', {
 		is: value => !is.domElement(value),
 		assert(value: unknown) {
-			invertAssertThrow(AssertionTypeDescription.domElement, () => {
+			invertAssertThrow('HTMLElement', () => {
 				assert.domElement(value);
 			}, value);
 		},
@@ -571,7 +571,7 @@ const types = new Map<string, Test>([
 			new Stream.Writable(),
 		],
 		typename: 'Object',
-		typeDescription: AssertionTypeDescription.nodeStream,
+		typeDescription: 'Node.js Stream',
 	}],
 	['infinite', {
 		is: is.infinite,
@@ -581,7 +581,7 @@ const types = new Map<string, Test>([
 			Number.NEGATIVE_INFINITY,
 		],
 		typename: 'number',
-		typeDescription: AssertionTypeDescription.infinite,
+		typeDescription: 'infinite number',
 	}],
 ]);
 
@@ -609,7 +609,7 @@ const testType = (t: ExecutionContext, type: string, exclude?: string[]) => {
 
 		for (const fixture of fixtures) {
 			assertIs(testIs(fixture), `Value: ${inspect(fixture)}`);
-			const valueType = typeDescription ?? typename;
+			const valueType = typeDescription ?? typename ?? 'unspecified';
 
 			if (isTypeUnderTest) {
 				t.notThrows(() => {
@@ -619,12 +619,12 @@ const testType = (t: ExecutionContext, type: string, exclude?: string[]) => {
 				t.throws(() => {
 					testAssert(fixture);
 				}, {
-					message: `Expected value which is \`${valueType as string}\`, received value of type \`${is(fixture)}\`.`,
+					message: `Expected value which is \`${valueType}\`, received value of type \`${is(fixture)}\`.`,
 				});
 			}
 
 			if (isTypeUnderTest && typename) {
-				t.is<TypeName>(is(fixture), typename);
+				t.is<TypeName, TypeName>(is(fixture), typename);
 			}
 		}
 	}
