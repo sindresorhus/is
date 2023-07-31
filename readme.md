@@ -83,8 +83,6 @@ All the below methods accept a value and returns a boolean for whether the value
 ##### .undefined(value)
 ##### .null(value)
 
-**Note:** TypeScript users must use `.null_()` because of a TypeScript naming limitation.
-
 ##### .string(value)
 ##### .number(value)
 
@@ -106,8 +104,6 @@ is.array(value, is.number); // Validate `value` is an array and all of its items
 ```
 
 ##### .function(value)
-
-**Note:** TypeScript users must use `.function_()` because of a TypeScript naming limitation.
 
 ##### .buffer(value)
 ##### .blob(value)
@@ -391,8 +387,6 @@ An object is plain if it's created by either `{}`, `new Object()`, or `Object.cr
 
 Returns `true` for instances created by a class.
 
-**Note:** TypeScript users must use `.class_()` because of a TypeScript naming limitation.
-
 ##### .typedArray(value)
 
 ##### .arrayLike(value)
@@ -458,7 +452,7 @@ is.inRange(3, 10);
 
 ##### .domElement(value)
 
-Returns `true` if `value` is a DOM Element.
+Returns `true` if `value` is an [HTMLElement](https://developer.mozilla.org/en-US/docs/Web/API/HTMLElement).
 
 ##### .nodeStream(value)
 
@@ -553,6 +547,14 @@ is.all(is.object, {}, new Map(), new Set());
 is.all(is.string, '🦄', [], 'unicorns');
 //=> false
 ```
+
+##### .validLength(value)
+
+Returns `true` if the value is a safe integer that is greater than or equal to zero
+
+##### .whitespaceString(value)
+
+Returns `true` if the value is a string with only whitespace characters
 
 ## Type guards
 
