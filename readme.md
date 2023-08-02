@@ -550,11 +550,11 @@ is.all(is.string, '🦄', [], 'unicorns');
 
 ##### .validLength(value)
 
-Returns `true` if the value is a safe integer that is greater than or equal to zero
+Returns `true` if the value is a safe integer that is greater than or equal to zero.
 
 ##### .whitespaceString(value)
 
-Returns `true` if the value is a string with only whitespace characters
+Returns `true` if the value is a string with only whitespace characters.
 
 ## Type guards
 
