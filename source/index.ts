@@ -234,7 +234,7 @@ const is = Object.assign(
 		boundFunction: isBoundFunction,
 		buffer: isBuffer,
 		class: isClass,
-		/** @deprecated */
+		/** @deprecated Renamed to `class`. */
 		class_: isClass,
 		dataView: isDataView,
 		date: isDate,
