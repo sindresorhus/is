@@ -254,7 +254,7 @@ const is = Object.assign(
 		float64Array: isFloat64Array,
 		formData: isFormData,
 		function: isFunction,
-		/** @deprecated */
+		/** @deprecated Renamed to `function`. */
 		function_: isFunction,
 		generator: isGenerator,
 		generatorFunction: isGeneratorFunction,
@@ -277,7 +277,7 @@ const is = Object.assign(
 		nonEmptyString: isNonEmptyString,
 		nonEmptyStringAndNotWhitespace: isNonEmptyStringAndNotWhitespace,
 		null: isNull,
-		/** @deprecated */
+		/** @deprecated Renamed to `null`. */
 		null_: isNull,
 		nullOrUndefined: isNullOrUndefined,
 		number: isNumber,
@@ -810,16 +810,16 @@ type Assert = {
 	bigint: (value: unknown) => asserts value is bigint;
 	// eslint-disable-next-line @typescript-eslint/ban-types
 	function: (value: unknown) => asserts value is Function;
-	/** @deprecated */
+	/** @deprecated Renamed to `function`. */
 	// eslint-disable-next-line @typescript-eslint/ban-types
 	function_: (value: unknown) => asserts value is Function;
 	// eslint-disable-next-line @typescript-eslint/ban-types
 	null: (value: unknown) => asserts value is null;
-	/** @deprecated */
+	/** @deprecated Renamed to `null`. */
 	// eslint-disable-next-line @typescript-eslint/ban-types
 	null_: (value: unknown) => asserts value is null;
 	class: (value: unknown) => asserts value is Class;
-	/** @deprecated */
+	/** @deprecated Renamed to `class`. */
 	class_: (value: unknown) => asserts value is Class;
 	boolean: (value: unknown) => asserts value is boolean;
 	symbol: (value: unknown) => asserts value is symbol;
