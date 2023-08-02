@@ -369,7 +369,15 @@ Returns `true` if `value` is one of: `false`, `0`, `''`, `null`, `undefined`, `N
 ##### .nullOrUndefined(value)
 ##### .primitive(value)
 
-JavaScript primitives are as follows: `null`, `undefined`, `string`, `number`, `boolean`, `symbol`.
+JavaScript primitives are as follows:
+
+- `null`
+- `undefined`
+- `string`
+- `number`
+- `boolean`
+- `symbol`
+- `bigint`
 
 ##### .integer(value)
 
