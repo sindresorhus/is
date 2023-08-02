@@ -560,6 +560,8 @@ is.all(is.string, '🦄', [], 'unicorns');
 
 Returns `true` if the value is a safe integer that is greater than or equal to zero.
 
+This can be useful to confirm that a value is a valid count of something, ie. 0 or more.
+
 ##### .whitespaceString(value)
 
 Returns `true` if the value is a string with only whitespace characters.
