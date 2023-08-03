@@ -72,11 +72,17 @@ Example:
 - `'Function'`
 - `'Object'`
 
+This method is also exported as `detect`, you can import it like this:
+
+```js
+import {detect} from '@sindresorhus/is';
+```
+
 Note: It will throw an error if you try to feed it object-wrapped primitives, as that's a bad practice. For example `new String('foo')`.
 
 ### is.{method}
 
-All the below methods accept a value and returns a boolean for whether the value is of the desired type.
+All the below methods accept a value and return a boolean for whether the value is of the desired type.
 
 #### Primitives
 
@@ -565,6 +571,18 @@ This can be useful to confirm that a value is a valid count of something, ie. 0 
 ##### .whitespaceString(value)
 
 Returns `true` if the value is a string with only whitespace characters.
+
+## Named Exports
+
+Named exports allow tooling to perform tree-shaking, potentially reducing bundle size by including only code from the methods that are used.
+
+Every method listed above is available as a named export. Each method is prefixed by either `is` or `assert` depending on usage.
+
+For example:
+
+```js
+import {assertNull, isUndefined} from '@sindresorhus/is';
+```
 
 ## Type guards
 

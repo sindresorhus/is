@@ -149,73 +149,73 @@ const getObjectType = (value: unknown): ObjectTypeName | undefined => {
 	return undefined;
 };
 
-const isObjectOfType = <T>(type: ObjectTypeName) => (value: unknown): value is T => getObjectType(value) === type;
+function detect(value: unknown): TypeName {
+	if (value === null) {
+		return 'null';
+	}
+
+	switch (typeof value) {
+		case 'undefined': {
+			return 'undefined';
+		}
+
+		case 'string': {
+			return 'string';
+		}
+
+		case 'number': {
+			return Number.isNaN(value) ? 'NaN' : 'number';
+		}
+
+		case 'boolean': {
+			return 'boolean';
+		}
+
+		case 'function': {
+			return 'Function';
+		}
+
+		case 'bigint': {
+			return 'bigint';
+		}
+
+		case 'symbol': {
+			return 'symbol';
+		}
+
+		default:
+	}
+
+	if (isObservable(value)) {
+		return 'Observable';
+	}
+
+	if (isArray(value)) {
+		return 'Array';
+	}
+
+	if (isBuffer(value)) {
+		return 'Buffer';
+	}
+
+	const tagType = getObjectType(value);
+	if (tagType) {
+		return tagType;
+	}
+
+	if (value instanceof String || value instanceof Boolean || value instanceof Number) {
+		throw new TypeError('Please don\'t use object wrappers for primitive types');
+	}
+
+	return 'Object';
+}
 
 function hasPromiseApi<T = unknown>(value: unknown): value is Promise<T> {
 	return isFunction((value as Promise<T>)?.then) && isFunction((value as Promise<T>)?.catch);
 }
 
 const is = Object.assign(
-	(value: unknown): TypeName => {
-		if (value === null) {
-			return 'null';
-		}
-
-		switch (typeof value) {
-			case 'undefined': {
-				return 'undefined';
-			}
-
-			case 'string': {
-				return 'string';
-			}
-
-			case 'number': {
-				return Number.isNaN(value) ? 'NaN' : 'number';
-			}
-
-			case 'boolean': {
-				return 'boolean';
-			}
-
-			case 'function': {
-				return 'Function';
-			}
-
-			case 'bigint': {
-				return 'bigint';
-			}
-
-			case 'symbol': {
-				return 'symbol';
-			}
-
-			default:
-		}
-
-		if (isObservable(value)) {
-			return 'Observable';
-		}
-
-		if (isArray(value)) {
-			return 'Array';
-		}
-
-		if (isBuffer(value)) {
-			return 'Buffer';
-		}
-
-		const tagType = getObjectType(value);
-		if (tagType) {
-			return tagType;
-		}
-
-		if (value instanceof String || value instanceof Boolean || value instanceof Number) {
-			throw new TypeError('Please don\'t use object wrappers for primitive types');
-		}
-
-		return 'Object';
-	},
+	detect,
 	{
 		all: isAll,
 		any: isAny,
@@ -238,6 +238,7 @@ const is = Object.assign(
 		class_: isClass,
 		dataView: isDataView,
 		date: isDate,
+		detect,
 		directInstanceOf: isDirectInstanceOf,
 		domElement: isDomElement,
 		emptyArray: isEmptyArray,
@@ -380,7 +381,7 @@ export function isBigUint64Array(value: unknown): value is BigUint64Array {
 }
 
 export function isBlob(value: unknown): value is Blob {
-	return isObjectOfType<Blob>('Blob')(value);
+	return getObjectType(value) === 'Blob';
 }
 
 export function isBoolean(value: unknown): value is boolean {
