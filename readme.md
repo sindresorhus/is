@@ -54,6 +54,18 @@ assert.string(foo);
 // `foo` is now typed as a `string`.
 ```
 
+## Named Exports
+
+Named exports allow tooling to perform tree-shaking, potentially reducing bundle size by including only code from the methods that are used.
+
+Every method listed above is available as a named export. Each method is prefixed by either `is` or `assert` depending on usage.
+
+For example:
+
+```js
+import {assertNull, isUndefined} from '@sindresorhus/is';
+```
+
 ## API
 
 ### is(value)
@@ -571,18 +583,6 @@ This can be useful to confirm that a value is a valid count of something, ie. 0 
 ##### .whitespaceString(value)
 
 Returns `true` if the value is a string with only whitespace characters.
-
-## Named Exports
-
-Named exports allow tooling to perform tree-shaking, potentially reducing bundle size by including only code from the methods that are used.
-
-Every method listed above is available as a named export. Each method is prefixed by either `is` or `assert` depending on usage.
-
-For example:
-
-```js
-import {assertNull, isUndefined} from '@sindresorhus/is';
-```
 
 ## Type guards
 
