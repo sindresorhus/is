@@ -54,11 +54,11 @@ assert.string(foo);
 // `foo` is now typed as a `string`.
 ```
 
-## Named Exports
+### Named exports
 
 Named exports allow tooling to perform tree-shaking, potentially reducing bundle size by including only code from the methods that are used.
 
-Every method listed above is available as a named export. Each method is prefixed by either `is` or `assert` depending on usage.
+Every method listed below is available as a named export. Each method is prefixed by either `is` or `assert` depending on usage.
 
 For example:
 
