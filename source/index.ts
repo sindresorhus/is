@@ -794,10 +794,33 @@ function typeErrorMessage(description: AssertionTypeDescription, value: unknown)
 	return `Expected value which is \`${description}\`, received value of type \`${is(value)}\`.`;
 }
 
-function typeErrorMessageMultipleValue(description: AssertionTypeDescription, values: unknown[]): string {
+function unique<T>(values: T[]): T[] {
 	// eslint-disable-next-line unicorn/prefer-spread
-	const valueTypes = Array.from(new Set(values.map(singleValue => `\`${is(singleValue)}\``))).join(', ');
-	return `Expected value which is \`${description}\`, received values of types ${valueTypes}.`;
+	return Array.from(new Set(values));
+}
+
+function joinWithWord(values: string[], word: 'and' | 'or'): string {
+	switch (values.length) {
+		case 0:
+		case 1: {
+			return values.join('');
+		}
+
+		case 2: {
+			return values.join(` ${word} `);
+		}
+
+		default: {
+			// TODO: Replace with .at after node v14 support is dropped
+			return `${[...values].slice(0, -1).join(', ')}, ${word} ${values[values.length - 1] ?? ''}`;
+		}
+	}
+}
+
+function typeErrorMessageMultipleValues(expectedType: AssertionTypeDescription | AssertionTypeDescription[], values: unknown[]): string {
+	const uniqueExpectedTypes = unique((isArray(expectedType) ? expectedType : [expectedType]).map(value => `\`${value}\``));
+	const uniqueValueTypes = unique(values.map(value => `\`${is(value)}\``));
+	return `Expected values which are ${joinWithWord(uniqueExpectedTypes, 'or')}. Received values of type${uniqueValueTypes.length > 1 ? 's' : ''} ${joinWithWord(uniqueValueTypes, 'and')}.`;
 }
 
 // Type assertions have to be declared with an explicit type.
@@ -1011,15 +1034,119 @@ export const assert: Assert = {
 	whitespaceString: assertWhitespaceString,
 };
 
+const methodTypeMap = {
+	isArray: 'Array',
+	isArrayBuffer: 'ArrayBuffer',
+	isArrayLike: 'array-like',
+	isAsyncFunction: 'AsyncFunction',
+	isAsyncGenerator: 'AsyncGenerator',
+	isAsyncGeneratorFunction: 'AsyncGeneratorFunction',
+	isAsyncIterable: 'AsyncIterable',
+	isBigint: 'bigint',
+	isBigInt64Array: 'BigInt64Array',
+	isBigUint64Array: 'BigUint64Array',
+	isBlob: 'Blob',
+	isBoolean: 'boolean',
+	isBoundFunction: 'Function',
+	isBuffer: 'Buffer',
+	isClass: 'Class',
+	isDataView: 'DataView',
+	isDate: 'Date',
+	isDirectInstanceOf: 'T',
+	isDomElement: 'HTMLElement',
+	isEmptyArray: 'empty array',
+	isEmptyMap: 'empty map',
+	isEmptyObject: 'empty object',
+	isEmptySet: 'empty set',
+	isEmptyString: 'empty string',
+	isEmptyStringOrWhitespace: 'empty string or whitespace',
+	isEnumCase: 'EnumCase',
+	isError: 'Error',
+	isEvenInteger: 'even integer',
+	isFalsy: 'falsy',
+	isFloat32Array: 'Float32Array',
+	isFloat64Array: 'Float64Array',
+	isFormData: 'FormData',
+	isFunction: 'Function',
+	isGenerator: 'Generator',
+	isGeneratorFunction: 'GeneratorFunction',
+	isInfinite: 'infinite number',
+	isInRange: 'in range',
+	isInt16Array: 'Int16Array',
+	isInt32Array: 'Int32Array',
+	isInt8Array: 'Int8Array',
+	isInteger: 'integer',
+	isIterable: 'Iterable',
+	isMap: 'Map',
+	isNan: 'NaN',
+	isNativePromise: 'native Promise',
+	isNegativeNumber: 'negative number',
+	isNodeStream: 'Node.js Stream',
+	isNonEmptyArray: 'non-empty array',
+	isNonEmptyMap: 'non-empty map',
+	isNonEmptyObject: 'non-empty object',
+	isNonEmptySet: 'non-empty set',
+	isNonEmptyString: 'non-empty string',
+	isNonEmptyStringAndNotWhitespace: 'non-empty string and not whitespace',
+	isNull: 'null',
+	isNullOrUndefined: 'null or undefined',
+	isNumber: 'number',
+	isNumericString: 'string with a number',
+	isObject: 'Object',
+	isObservable: 'Observable',
+	isOddInteger: 'odd integer',
+	isPlainObject: 'plain object',
+	isPositiveNumber: 'positive number',
+	isPrimitive: 'primitive',
+	isPromise: 'Promise',
+	isPropertyKey: 'PropertyKey',
+	isRegExp: 'RegExp',
+	isSafeInteger: 'integer',
+	isSet: 'Set',
+	isSharedArrayBuffer: 'SharedArrayBuffer',
+	isString: 'string',
+	isSymbol: 'symbol',
+	isTruthy: 'truthy',
+	isTupleLike: 'tuple-like',
+	isTypedArray: 'TypedArray',
+	isUint16Array: 'Uint16Array',
+	isUint32Array: 'Uint32Array',
+	isUint8Array: 'Uint8Array',
+	isUint8ClampedArray: 'Uint8ClampedArray',
+	isUndefined: 'undefined',
+	isUrlInstance: 'URL',
+	isUrlSearchParams: 'URLSearchParams',
+	isUrlString: 'string with a URL',
+	isValidLength: 'valid length',
+	isWeakMap: 'WeakMap',
+	isWeakRef: 'WeakRef',
+	isWeakSet: 'WeakSet',
+	isWhitespaceString: 'whitespace string',
+} as const;
+
+function keysOf<T extends Record<PropertyKey, unknown>>(value: T): Array<keyof T> {
+	return Object.keys(value) as Array<keyof T>;
+}
+
+type IsMethodName = keyof typeof methodTypeMap;
+const isMethodNames: IsMethodName[] = keysOf(methodTypeMap);
+
+function isIsMethodName(value: unknown): value is IsMethodName {
+	return isMethodNames.includes(value as IsMethodName);
+}
+
 export function assertAll(predicate: Predicate, ...values: unknown[]): void | never {
 	if (!isAll(predicate, ...values)) {
-		throw new TypeError(typeErrorMessageMultipleValue('predicate returns truthy for all values', values));
+		const expectedType = isIsMethodName(predicate.name) ? methodTypeMap[predicate.name] : 'predicate returns truthy for all values';
+		throw new TypeError(typeErrorMessageMultipleValues(expectedType, values));
 	}
 }
 
 export function assertAny(predicate: Predicate | Predicate[], ...values: unknown[]): void | never {
 	if (!isAny(predicate, ...values)) {
-		throw new TypeError(typeErrorMessageMultipleValue('predicate returns truthy for any value', values));
+		const predicates = isArray(predicate) ? predicate : [predicate];
+		const expectedTypes = predicates.map(predicate => isIsMethodName(predicate.name) ? methodTypeMap[predicate.name] : 'predicate returns truthy for any value');
+		throw new TypeError(typeErrorMessageMultipleValues(expectedTypes, values));
 	}
 }
 
@@ -1138,6 +1265,12 @@ export function assertDirectInstanceOf<T>(instance: unknown, class_: Class<T>): 
 	}
 }
 
+export function assertDomElement(value: unknown): asserts value is HTMLElement {
+	if (!isDomElement(value)) {
+		throw new TypeError(typeErrorMessage('HTMLElement', value));
+	}
+}
+
 export function assertEmptyArray(value: unknown): asserts value is never[] {
 	if (!isEmptyArray(value)) {
 		throw new TypeError(typeErrorMessage('empty array', value));
@@ -1235,12 +1368,6 @@ export function assertGeneratorFunction(value: unknown): asserts value is Genera
 	}
 }
 
-export function assertDomElement(value: unknown): asserts value is HTMLElement {
-	if (!isDomElement(value)) {
-		throw new TypeError(typeErrorMessage('HTMLElement', value));
-	}
-}
-
 export function assertInfinite(value: unknown): asserts value is number {
 	if (!isInfinite(value)) {
 		throw new TypeError(typeErrorMessage('infinite number', value));
@@ -1283,12 +1410,6 @@ export function assertIterable<T = unknown>(value: unknown): asserts value is It
 	}
 }
 
-export function assertNativePromise<T = unknown>(value: unknown): asserts value is Promise<T> {
-	if (!isNativePromise(value)) {
-		throw new TypeError(typeErrorMessage('native Promise', value));
-	}
-}
-
 export function assertMap<Key = unknown, Value = unknown>(value: unknown): asserts value is Map<Key, Value> {
 	if (!isMap(value)) {
 		throw new TypeError(typeErrorMessage('Map', value));
@@ -1298,6 +1419,12 @@ export function assertMap<Key = unknown, Value = unknown>(value: unknown): asser
 export function assertNan(value: unknown): asserts value is number {
 	if (!isNan(value)) {
 		throw new TypeError(typeErrorMessage('NaN', value));
+	}
+}
+
+export function assertNativePromise<T = unknown>(value: unknown): asserts value is Promise<T> {
+	if (!isNativePromise(value)) {
+		throw new TypeError(typeErrorMessage('native Promise', value));
 	}
 }
 

@@ -1960,22 +1960,36 @@ test('is.any', t => {
 	t.throws(() => {
 		assert.any(is.string, 1, 2, 3);
 	}, {
-		// Removes duplicates:
-		message: /received values of types `number`./,
+		// Includes expected type and removes duplicates from received types:
+		message: /Expected values which are `string`. Received values of type `number`./,
 	});
 
 	t.throws(() => {
 		assert.any(is.string, 1, [4]);
 	}, {
-		// Lists all types:
-		message: /received values of types `number`, `Array`./,
+		// Includes expected type and lists all received types:
+		message: /Expected values which are `string`. Received values of types `number` and `Array`./,
 	});
 
 	t.throws(() => {
 		assert.any([is.string, is.nullOrUndefined], 1);
 	}, {
 		// Handles array as first argument:
-		message: /received values of types `number`./,
+		message: /Expected values which are `string` or `null or undefined`. Received values of type `number`./,
+	});
+
+	t.throws(() => {
+		assert.any([is.string, is.number, is.boolean], null, undefined, Number.NaN);
+	}, {
+		// Handles more than 2 expected and received types:
+		message: /Expected values which are `string`, `number`, or `boolean`. Received values of types `null`, `undefined`, and `NaN`./,
+	});
+
+	t.throws(() => {
+		assert.any(() => false, 1);
+	}, {
+		// Default type assertion message
+		message: /Expected values which are `predicate returns truthy for any value`./,
 	});
 });
 
@@ -2024,15 +2038,22 @@ test('is.all', t => {
 	t.throws(() => {
 		assert.all(is.string, 1, 2, 3);
 	}, {
-		// Removes duplicates:
-		message: /received values of types `number`./,
+		// Includes expected type and removes duplicates from received types:
+		message: /Expected values which are `string`. Received values of type `number`./,
 	});
 
 	t.throws(() => {
 		assert.all(is.string, 1, [4]);
 	}, {
-		// Lists all types:
-		message: /received values of types `number`, `Array`./,
+		// Includes expected type and lists all received types:
+		message: /Expected values which are `string`. Received values of types `number` and `Array`./,
+	});
+
+	t.throws(() => {
+		assert.all(() => false, 1);
+	}, {
+		// Default type assertion message
+		message: /Expected values which are `predicate returns truthy for all values`./,
 	});
 });
 
