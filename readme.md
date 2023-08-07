@@ -54,6 +54,18 @@ assert.string(foo);
 // `foo` is now typed as a `string`.
 ```
 
+### Named exports
+
+Named exports allow tooling to perform tree-shaking, potentially reducing bundle size by including only code from the methods that are used.
+
+Every method listed below is available as a named export. Each method is prefixed by either `is` or `assert` depending on usage.
+
+For example:
+
+```js
+import {assertNull, isUndefined} from '@sindresorhus/is';
+```
+
 ## API
 
 ### is(value)
@@ -72,18 +84,22 @@ Example:
 - `'Function'`
 - `'Object'`
 
+This method is also exported as `detect`. You can import it like this:
+
+```js
+import {detect} from '@sindresorhus/is';
+```
+
 Note: It will throw an error if you try to feed it object-wrapped primitives, as that's a bad practice. For example `new String('foo')`.
 
 ### is.{method}
 
-All the below methods accept a value and returns a boolean for whether the value is of the desired type.
+All the below methods accept a value and return a boolean for whether the value is of the desired type.
 
 #### Primitives
 
 ##### .undefined(value)
 ##### .null(value)
-
-**Note:** TypeScript users must use `.null_()` because of a TypeScript naming limitation.
 
 ##### .string(value)
 ##### .number(value)
@@ -106,8 +122,6 @@ is.array(value, is.number); // Validate `value` is an array and all of its items
 ```
 
 ##### .function(value)
-
-**Note:** TypeScript users must use `.function_()` because of a TypeScript naming limitation.
 
 ##### .buffer(value)
 ##### .blob(value)
@@ -373,7 +387,15 @@ Returns `true` if `value` is one of: `false`, `0`, `''`, `null`, `undefined`, `N
 ##### .nullOrUndefined(value)
 ##### .primitive(value)
 
-JavaScript primitives are as follows: `null`, `undefined`, `string`, `number`, `boolean`, `symbol`.
+JavaScript primitives are as follows:
+
+- `null`
+- `undefined`
+- `string`
+- `number`
+- `boolean`
+- `symbol`
+- `bigint`
 
 ##### .integer(value)
 
@@ -390,8 +412,6 @@ An object is plain if it's created by either `{}`, `new Object()`, or `Object.cr
 ##### .class(value)
 
 Returns `true` for instances created by a class.
-
-**Note:** TypeScript users must use `.class_()` because of a TypeScript naming limitation.
 
 ##### .typedArray(value)
 
@@ -458,7 +478,7 @@ is.inRange(3, 10);
 
 ##### .domElement(value)
 
-Returns `true` if `value` is a DOM Element.
+Returns `true` if `value` is an [HTMLElement](https://developer.mozilla.org/en-US/docs/Web/API/HTMLElement).
 
 ##### .nodeStream(value)
 
@@ -553,6 +573,16 @@ is.all(is.object, {}, new Map(), new Set());
 is.all(is.string, '🦄', [], 'unicorns');
 //=> false
 ```
+
+##### .validLength(value)
+
+Returns `true` if the value is a safe integer that is greater than or equal to zero.
+
+This can be useful to confirm that a value is a valid count of something, ie. 0 or more.
+
+##### .whitespaceString(value)
+
+Returns `true` if the value is a string with only whitespace characters.
 
 ## Type guards
 

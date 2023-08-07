@@ -1,5 +1,15 @@
 import type {Buffer} from 'node:buffer';
-import type {Class, Falsy, TypedArray, ObservableLike, Primitive, WeakRef} from './types.js';
+import type {
+	ArrayLike,
+	Class,
+	Falsy,
+	NodeStream,
+	ObservableLike,
+	Predicate,
+	Primitive,
+	TypedArray,
+	WeakRef,
+} from './types.js';
 
 const typedArrayTypeNames = [
 	'Int8Array',
@@ -117,22 +127,18 @@ const assertionTypeDescriptions = [
 	'in range',
 	'predicate returns truthy for any value',
 	'predicate returns truthy for all values',
+	'valid length',
+	'whitespace string',
 	...objectTypeNames,
 	...primitiveTypeNames,
 ] as const;
 
 export type AssertionTypeDescription = typeof assertionTypeDescriptions[number];
 
-// eslint-disable-next-line @typescript-eslint/ban-types
-function isOfType<T extends Primitive | Function>(type: PrimitiveTypeName | 'function') {
-	return (value: unknown): value is T => typeof value === type;
-}
-
-const {toString} = Object.prototype;
 const getObjectType = (value: unknown): ObjectTypeName | undefined => {
-	const objectTypeName = toString.call(value).slice(8, -1);
+	const objectTypeName = Object.prototype.toString.call(value).slice(8, -1);
 
-	if (/HTML\w+Element/.test(objectTypeName) && is.domElement(value)) {
+	if (/HTML\w+Element/.test(objectTypeName) && isDomElement(value)) {
 		return 'HTMLElement';
 	}
 
@@ -143,9 +149,7 @@ const getObjectType = (value: unknown): ObjectTypeName | undefined => {
 	return undefined;
 };
 
-const isObjectOfType = <T>(type: ObjectTypeName) => (value: unknown): value is T => getObjectType(value) === type;
-
-function is(value: unknown): TypeName {
+function detect(value: unknown): TypeName {
 	if (value === null) {
 		return 'null';
 	}
@@ -182,15 +186,15 @@ function is(value: unknown): TypeName {
 		default:
 	}
 
-	if (is.observable(value)) {
+	if (isObservable(value)) {
 		return 'Observable';
 	}
 
-	if (is.array(value)) {
+	if (isArray(value)) {
 		return 'Array';
 	}
 
-	if (is.buffer(value)) {
+	if (isBuffer(value)) {
 		return 'Buffer';
 	}
 
@@ -206,201 +210,276 @@ function is(value: unknown): TypeName {
 	return 'Object';
 }
 
-is.undefined = isOfType<undefined>('undefined');
+function hasPromiseApi<T = unknown>(value: unknown): value is Promise<T> {
+	return isFunction((value as Promise<T>)?.then) && isFunction((value as Promise<T>)?.catch);
+}
 
-is.string = isOfType<string>('string');
+const is = Object.assign(
+	detect,
+	{
+		all: isAll,
+		any: isAny,
+		array: isArray,
+		arrayBuffer: isArrayBuffer,
+		arrayLike: isArrayLike,
+		asyncFunction: isAsyncFunction,
+		asyncGenerator: isAsyncGenerator,
+		asyncGeneratorFunction: isAsyncGeneratorFunction,
+		asyncIterable: isAsyncIterable,
+		bigint: isBigint,
+		bigInt64Array: isBigInt64Array,
+		bigUint64Array: isBigUint64Array,
+		blob: isBlob,
+		boolean: isBoolean,
+		boundFunction: isBoundFunction,
+		buffer: isBuffer,
+		class: isClass,
+		/** @deprecated Renamed to `class`. */
+		class_: isClass,
+		dataView: isDataView,
+		date: isDate,
+		detect,
+		directInstanceOf: isDirectInstanceOf,
+		domElement: isDomElement,
+		emptyArray: isEmptyArray,
+		emptyMap: isEmptyMap,
+		emptyObject: isEmptyObject,
+		emptySet: isEmptySet,
+		emptyString: isEmptyString,
+		emptyStringOrWhitespace: isEmptyStringOrWhitespace,
+		enumCase: isEnumCase,
+		error: isError,
+		evenInteger: isEvenInteger,
+		falsy: isFalsy,
+		float32Array: isFloat32Array,
+		float64Array: isFloat64Array,
+		formData: isFormData,
+		function: isFunction,
+		/** @deprecated Renamed to `function`. */
+		function_: isFunction,
+		generator: isGenerator,
+		generatorFunction: isGeneratorFunction,
+		infinite: isInfinite,
+		inRange: isInRange,
+		int16Array: isInt16Array,
+		int32Array: isInt32Array,
+		int8Array: isInt8Array,
+		integer: isInteger,
+		iterable: isIterable,
+		map: isMap,
+		nan: isNan,
+		nativePromise: isNativePromise,
+		negativeNumber: isNegativeNumber,
+		nodeStream: isNodeStream,
+		nonEmptyArray: isNonEmptyArray,
+		nonEmptyMap: isNonEmptyMap,
+		nonEmptyObject: isNonEmptyObject,
+		nonEmptySet: isNonEmptySet,
+		nonEmptyString: isNonEmptyString,
+		nonEmptyStringAndNotWhitespace: isNonEmptyStringAndNotWhitespace,
+		null: isNull,
+		/** @deprecated Renamed to `null`. */
+		null_: isNull,
+		nullOrUndefined: isNullOrUndefined,
+		number: isNumber,
+		numericString: isNumericString,
+		object: isObject,
+		observable: isObservable,
+		oddInteger: isOddInteger,
+		plainObject: isPlainObject,
+		positiveNumber: isPositiveNumber,
+		primitive: isPrimitive,
+		promise: isPromise,
+		propertyKey: isPropertyKey,
+		regExp: isRegExp,
+		safeInteger: isSafeInteger,
+		set: isSet,
+		sharedArrayBuffer: isSharedArrayBuffer,
+		string: isString,
+		symbol: isSymbol,
+		truthy: isTruthy,
+		tupleLike: isTupleLike,
+		typedArray: isTypedArray,
+		uint16Array: isUint16Array,
+		uint32Array: isUint32Array,
+		uint8Array: isUint8Array,
+		uint8ClampedArray: isUint8ClampedArray,
+		undefined: isUndefined,
+		urlInstance: isUrlInstance,
+		urlSearchParams: isUrlSearchParams,
+		urlString: isUrlString,
+		validLength: isValidLength,
+		weakMap: isWeakMap,
+		weakRef: isWeakRef,
+		weakSet: isWeakSet,
+		whitespaceString: isWhitespaceString,
+	},
+);
 
-const isNumberType = isOfType<number>('number');
-is.number = (value: unknown): value is number => isNumberType(value) && !is.nan(value);
+function isAbsoluteMod2(remainder: 0 | 1) {
+	return (value: unknown): value is number => isInteger(value) && Math.abs(value % 2) === remainder;
+}
 
-is.positiveNumber = (value: unknown): value is number => is.number(value) && value > 0;
+export function isAll(predicate: Predicate, ...values: unknown[]): boolean {
+	return predicateOnArray(Array.prototype.every, predicate, values);
+}
 
-is.negativeNumber = (value: unknown): value is number => is.number(value) && value < 0;
+export function isAny(predicate: Predicate | Predicate[], ...values: unknown[]): boolean {
+	const predicates = isArray(predicate) ? predicate : [predicate];
+	return predicates.some(singlePredicate =>
+		predicateOnArray(Array.prototype.some, singlePredicate, values),
+	);
+}
 
-is.bigint = isOfType<bigint>('bigint');
-
-// eslint-disable-next-line @typescript-eslint/ban-types
-is.function_ = isOfType<Function>('function');
-
-// eslint-disable-next-line @typescript-eslint/ban-types
-is.null_ = (value: unknown): value is null => value === null;
-
-is.class_ = (value: unknown): value is Class => is.function_(value) && value.toString().startsWith('class ');
-
-is.boolean = (value: unknown): value is boolean => value === true || value === false;
-
-is.symbol = isOfType<symbol>('symbol');
-
-is.numericString = (value: unknown): value is `${number}` =>
-	is.string(value) && !is.emptyStringOrWhitespace(value) && !Number.isNaN(Number(value));
-
-is.array = <T = unknown>(value: unknown, assertion?: (value: T) => value is T): value is T[] => {
+export function isArray<T = unknown>(value: unknown, assertion?: (value: T) => value is T): value is T[] {
 	if (!Array.isArray(value)) {
 		return false;
 	}
 
-	if (!is.function_(assertion)) {
+	if (!isFunction(assertion)) {
 		return true;
 	}
 
 	// eslint-disable-next-line @typescript-eslint/no-unsafe-argument
 	return value.every(element => assertion(element));
-};
+}
 
-// eslint-disable-next-line @typescript-eslint/no-unsafe-return, @typescript-eslint/no-unsafe-call
-is.buffer = (value: unknown): value is Buffer => (value as any)?.constructor?.isBuffer?.(value) ?? false;
+export function isArrayBuffer(value: unknown): value is ArrayBuffer {
+	return getObjectType(value) === 'ArrayBuffer';
+}
 
-is.blob = (value: unknown): value is Blob => isObjectOfType<Blob>('Blob')(value);
+export function isArrayLike<T = unknown>(value: unknown): value is ArrayLike<T> {
+	return !isNullOrUndefined(value) && !isFunction(value) && isValidLength((value as ArrayLike<T>).length);
+}
 
-is.nullOrUndefined = (value: unknown): value is null | undefined => is.null_(value) || is.undefined(value); // eslint-disable-line @typescript-eslint/ban-types
+export function isAsyncFunction<T = unknown>(value: unknown): value is ((...args: any[]) => Promise<T>) {
+	return getObjectType(value) === 'AsyncFunction';
+}
 
-is.object = (value: unknown): value is object => !is.null_(value) && (typeof value === 'object' || is.function_(value)); // eslint-disable-line @typescript-eslint/ban-types
+export function isAsyncGenerator(value: unknown): value is AsyncGenerator {
+	return isAsyncIterable(value) && isFunction((value as AsyncGenerator).next) && isFunction((value as AsyncGenerator).throw);
+}
 
-is.iterable = <T = unknown>(value: unknown): value is Iterable<T> => is.function_((value as Iterable<T>)?.[Symbol.iterator]);
+export function isAsyncGeneratorFunction(value: unknown): value is ((...args: any[]) => Promise<unknown>) {
+	return getObjectType(value) === 'AsyncGeneratorFunction';
+}
 
-is.asyncIterable = <T = unknown>(value: unknown): value is AsyncIterable<T> => is.function_((value as AsyncIterable<T>)?.[Symbol.asyncIterator]);
+export function isAsyncIterable<T = unknown>(value: unknown): value is AsyncIterable<T> {
+	return isFunction((value as AsyncIterable<T>)?.[Symbol.asyncIterator]);
+}
 
-is.generator = (value: unknown): value is Generator => is.iterable(value) && is.function_((value as Generator)?.next) && is.function_((value as Generator)?.throw);
+export function isBigint(value: unknown): value is bigint {
+	return typeof value === 'bigint';
+}
 
-is.asyncGenerator = (value: unknown): value is AsyncGenerator => is.asyncIterable(value) && is.function_((value as AsyncGenerator).next) && is.function_((value as AsyncGenerator).throw);
+export function isBigInt64Array(value: unknown): value is BigInt64Array {
+	return getObjectType(value) === 'BigInt64Array';
+}
 
-is.nativePromise = <T = unknown>(value: unknown): value is Promise<T> =>
-	isObjectOfType<Promise<T>>('Promise')(value);
+export function isBigUint64Array(value: unknown): value is BigUint64Array {
+	return getObjectType(value) === 'BigUint64Array';
+}
 
-const hasPromiseApi = <T = unknown>(value: unknown): value is Promise<T> =>
-	is.function_((value as Promise<T>)?.then)
-		&& is.function_((value as Promise<T>)?.catch);
+export function isBlob(value: unknown): value is Blob {
+	return getObjectType(value) === 'Blob';
+}
 
-is.promise = <T = unknown>(value: unknown): value is Promise<T> => is.nativePromise(value) || hasPromiseApi(value);
-
-is.generatorFunction = isObjectOfType<GeneratorFunction>('GeneratorFunction');
-
-is.asyncGeneratorFunction = (value: unknown): value is ((...args: any[]) => Promise<unknown>) => getObjectType(value) === 'AsyncGeneratorFunction';
-
-is.asyncFunction = <T = unknown>(value: unknown): value is ((...args: any[]) => Promise<T>) => getObjectType(value) === 'AsyncFunction';
-
-// eslint-disable-next-line no-prototype-builtins, @typescript-eslint/ban-types
-is.boundFunction = (value: unknown): value is Function => is.function_(value) && !value.hasOwnProperty('prototype');
-
-is.regExp = isObjectOfType<RegExp>('RegExp');
-
-is.date = isObjectOfType<Date>('Date');
-
-is.error = isObjectOfType<Error>('Error');
-
-is.map = <Key = unknown, Value = unknown>(value: unknown): value is Map<Key, Value> => isObjectOfType<Map<Key, Value>>('Map')(value);
-
-is.set = <T = unknown>(value: unknown): value is Set<T> => isObjectOfType<Set<T>>('Set')(value);
-
-is.weakMap = <Key extends object = object, Value = unknown>(value: unknown): value is WeakMap<Key, Value> => isObjectOfType<WeakMap<Key, Value>>('WeakMap')(value); // eslint-disable-line @typescript-eslint/ban-types
-
-is.weakSet = (value: unknown): value is WeakSet<object> => isObjectOfType<WeakSet<object>>('WeakSet')(value); // eslint-disable-line @typescript-eslint/ban-types
-
-is.weakRef = (value: unknown): value is WeakRef<object> => isObjectOfType<WeakRef<object>>('WeakRef')(value); // eslint-disable-line @typescript-eslint/ban-types
-
-is.int8Array = isObjectOfType<Int8Array>('Int8Array');
-is.uint8Array = isObjectOfType<Uint8Array>('Uint8Array');
-is.uint8ClampedArray = isObjectOfType<Uint8ClampedArray>('Uint8ClampedArray');
-is.int16Array = isObjectOfType<Int16Array>('Int16Array');
-is.uint16Array = isObjectOfType<Uint16Array>('Uint16Array');
-is.int32Array = isObjectOfType<Int32Array>('Int32Array');
-is.uint32Array = isObjectOfType<Uint32Array>('Uint32Array');
-is.float32Array = isObjectOfType<Float32Array>('Float32Array');
-is.float64Array = isObjectOfType<Float64Array>('Float64Array');
-is.bigInt64Array = isObjectOfType<BigInt64Array>('BigInt64Array');
-is.bigUint64Array = isObjectOfType<BigUint64Array>('BigUint64Array');
-
-is.arrayBuffer = isObjectOfType<ArrayBuffer>('ArrayBuffer');
-
-is.sharedArrayBuffer = isObjectOfType<SharedArrayBuffer>('SharedArrayBuffer');
-
-is.dataView = isObjectOfType<DataView>('DataView');
-
-// eslint-disable-next-line @typescript-eslint/no-unsafe-argument
-is.enumCase = <T = unknown>(value: unknown, targetEnum: T): boolean => Object.values(targetEnum as any).includes(value as string);
-
-is.directInstanceOf = <T>(instance: unknown, class_: Class<T>): instance is T => Object.getPrototypeOf(instance) === class_.prototype;
-
-is.urlInstance = (value: unknown): value is URL => isObjectOfType<URL>('URL')(value);
-
-is.urlString = (value: unknown): value is string => {
-	if (!is.string(value)) {
-		return false;
-	}
-
-	try {
-		new URL(value); // eslint-disable-line no-new
-		return true;
-	} catch {
-		return false;
-	}
-};
-
-// Example: `is.truthy = (value: unknown): value is (not false | not 0 | not '' | not undefined | not null) => Boolean(value);`
-is.truthy = <T>(value: T | Falsy): value is T => Boolean(value); // eslint-disable-line unicorn/prefer-native-coercion-functions
-
-// Example: `is.falsy = (value: unknown): value is (not true | 0 | '' | undefined | null) => Boolean(value);`
-is.falsy = (value: unknown): value is Falsy => !value;
-
-is.nan = (value: unknown) => Number.isNaN(value as number);
-
-is.primitive = (value: unknown): value is Primitive => is.null_(value) || isPrimitiveTypeName(typeof value);
-
-is.integer = (value: unknown): value is number => Number.isInteger(value as number);
-
-is.safeInteger = (value: unknown): value is number => Number.isSafeInteger(value as number);
-
-is.plainObject = <Value = unknown>(value: unknown): value is Record<PropertyKey, Value> => {
-	// From: https://github.com/sindresorhus/is-plain-obj/blob/main/index.js
-	if (typeof value !== 'object' || value === null) {
-		return false;
-	}
-
-	// eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-	const prototype = Object.getPrototypeOf(value);
-
-	return (prototype === null || prototype === Object.prototype || Object.getPrototypeOf(prototype) === null) && !(Symbol.toStringTag in value) && !(Symbol.iterator in value);
-};
-
-is.typedArray = (value: unknown): value is TypedArray => isTypedArrayName(getObjectType(value));
-
-export type ArrayLike<T> = {
-	readonly [index: number]: T;
-	readonly length: number;
-};
-
-const isValidLength = (value: unknown): value is number => is.safeInteger(value) && value >= 0;
-is.arrayLike = <T = unknown>(value: unknown): value is ArrayLike<T> => !is.nullOrUndefined(value) && !is.function_(value) && isValidLength((value as ArrayLike<T>).length);
-
-type TypeGuard<T> = (value: unknown) => value is T;
+export function isBoolean(value: unknown): value is boolean {
+	return value === true || value === false;
+}
 
 // eslint-disable-next-line @typescript-eslint/ban-types
-type ResolveTypesOfTypeGuardsTuple<TypeGuardsOfT, ResultOfT extends unknown[] = [] > =
-	TypeGuardsOfT extends [TypeGuard<infer U>, ...infer TOthers]
-		? ResolveTypesOfTypeGuardsTuple<TOthers, [...ResultOfT, U]>
-		: TypeGuardsOfT extends undefined[]
-			? ResultOfT
-			: never;
+export function isBoundFunction(value: unknown): value is Function {
+	return isFunction(value) && !Object.prototype.hasOwnProperty.call(value, 'prototype');
+}
 
-is.tupleLike = <T extends Array<TypeGuard<unknown>>>(value: unknown, guards: [...T]): value is ResolveTypesOfTypeGuardsTuple<T> => {
-	if (is.array(guards) && is.array(value) && guards.length === value.length) {
-		return guards.every((guard, index) => guard(value[index]));
-	}
+export function isBuffer(value: unknown): value is Buffer {
+	// eslint-disable-next-line @typescript-eslint/no-unsafe-return, @typescript-eslint/no-unsafe-call
+	return (value as any)?.constructor?.isBuffer?.(value) ?? false;
+}
 
-	return false;
-};
+export function isClass(value: unknown): value is Class {
+	return isFunction(value) && value.toString().startsWith('class ');
+}
 
-is.inRange = (value: number, range: number | number[]): value is number => {
-	if (is.number(range)) {
-		return value >= Math.min(0, range) && value <= Math.max(range, 0);
-	}
+export function isDataView(value: unknown): value is DataView {
+	return getObjectType(value) === 'DataView';
+}
 
-	if (is.array(range) && range.length === 2) {
-		return value >= Math.min(...range) && value <= Math.max(...range);
-	}
+export function isDate(value: unknown): value is Date {
+	return getObjectType(value) === 'Date';
+}
 
-	throw new TypeError(`Invalid range: ${JSON.stringify(range)}`);
-};
+export function isDirectInstanceOf<T>(instance: unknown, class_: Class<T>): instance is T {
+	return Object.getPrototypeOf(instance) === class_.prototype;
+}
+
+export function isEmptyArray(value: unknown): value is never[] {
+	return isArray(value) && value.length === 0;
+}
+
+export function isEmptyMap(value: unknown): value is Map<never, never> {
+	return isMap(value) && value.size === 0;
+}
+
+export function isEmptyObject<Key extends keyof any = string>(value: unknown): value is Record<Key, never> {
+	return isObject(value) && !isMap(value) && !isSet(value) && Object.keys(value).length === 0;
+}
+
+export function isEmptySet(value: unknown): value is Set<never> {
+	return isSet(value) && value.size === 0;
+}
+
+export function isEmptyString(value: unknown): value is '' {
+	return isString(value) && value.length === 0;
+}
+
+export function isEmptyStringOrWhitespace(value: unknown): value is string {
+	return isEmptyString(value) || isWhitespaceString(value);
+}
+
+export function isEnumCase<T = unknown>(value: unknown, targetEnum: T): boolean {
+	// eslint-disable-next-line @typescript-eslint/no-unsafe-argument
+	return Object.values(targetEnum as any).includes(value as string);
+}
+
+export function isError(value: unknown): value is Error {
+	return getObjectType(value) === 'Error';
+}
+
+export function isEvenInteger(value: unknown): value is number {
+	return isAbsoluteMod2(0)(value);
+}
+
+// Example: `is.falsy = (value: unknown): value is (not true | 0 | '' | undefined | null) => Boolean(value);`
+export function isFalsy(value: unknown): value is Falsy {
+	return !value;
+}
+
+export function isFloat32Array(value: unknown): value is Float32Array {
+	return getObjectType(value) === 'Float32Array';
+}
+
+export function isFloat64Array(value: unknown): value is Float64Array {
+	return getObjectType(value) === 'Float64Array';
+}
+
+export function isFormData(value: unknown): value is FormData {
+	return getObjectType(value) === 'FormData';
+}
+
+// eslint-disable-next-line @typescript-eslint/ban-types
+export function isFunction(value: unknown): value is Function {
+	return typeof value === 'function';
+}
+
+export function isGenerator(value: unknown): value is Generator {
+	return isIterable(value) && isFunction((value as Generator)?.next) && isFunction((value as Generator)?.throw);
+}
+
+export function isGeneratorFunction(value: unknown): value is GeneratorFunction {
+	return getObjectType(value) === 'GeneratorFunction';
+}
 
 // eslint-disable-next-line @typescript-eslint/naming-convention
 const NODE_TYPE_ELEMENT = 1;
@@ -414,13 +493,122 @@ const DOM_PROPERTIES_TO_CHECK: Array<(keyof HTMLElement)> = [
 	'nodeValue',
 ];
 
-is.domElement = (value: unknown): value is HTMLElement => is.object(value)
-	&& (value as HTMLElement).nodeType === NODE_TYPE_ELEMENT
-	&& is.string((value as HTMLElement).nodeName)
-	&& !is.plainObject(value)
-	&& DOM_PROPERTIES_TO_CHECK.every(property => property in value);
+export function isDomElement(value: unknown): value is HTMLElement {
+	return isObject(value)
+		&& (value as HTMLElement).nodeType === NODE_TYPE_ELEMENT
+		&& isString((value as HTMLElement).nodeName)
+		&& !isPlainObject(value)
+		&& DOM_PROPERTIES_TO_CHECK.every(property => property in value);
+}
 
-is.observable = (value: unknown): value is ObservableLike => {
+export function isInfinite(value: unknown): value is number {
+	return value === Number.POSITIVE_INFINITY || value === Number.NEGATIVE_INFINITY;
+}
+
+export function isInRange(value: number, range: number | [number, number]): value is number {
+	if (isNumber(range)) {
+		return value >= Math.min(0, range) && value <= Math.max(range, 0);
+	}
+
+	if (isArray(range) && range.length === 2) {
+		return value >= Math.min(...range) && value <= Math.max(...range);
+	}
+
+	throw new TypeError(`Invalid range: ${JSON.stringify(range)}`);
+}
+
+export function isInt16Array(value: unknown): value is Int16Array {
+	return getObjectType(value) === 'Int16Array';
+}
+
+export function isInt32Array(value: unknown): value is Int32Array {
+	return getObjectType(value) === 'Int32Array';
+}
+
+export function isInt8Array(value: unknown): value is Int8Array {
+	return getObjectType(value) === 'Int8Array';
+}
+
+export function isInteger(value: unknown): value is number {
+	return Number.isInteger(value);
+}
+
+export function isIterable<T = unknown>(value: unknown): value is Iterable<T> {
+	return isFunction((value as Iterable<T>)?.[Symbol.iterator]);
+}
+
+export function isMap<Key = unknown, Value = unknown>(value: unknown): value is Map<Key, Value> {
+	return getObjectType(value) === 'Map';
+}
+
+export function isNan(value: unknown) {
+	return Number.isNaN(value);
+}
+
+export function isNativePromise<T = unknown>(value: unknown): value is Promise<T> {
+	return getObjectType(value) === 'Promise';
+}
+
+export function isNegativeNumber(value: unknown): value is number {
+	return isNumber(value) && value < 0;
+}
+
+export function isNodeStream(value: unknown): value is NodeStream {
+	return isObject(value) && isFunction((value as NodeStream).pipe) && !isObservable(value);
+}
+
+export function isNonEmptyArray<T = unknown, Item = unknown>(value: T | Item[]): value is [Item, ...Item[]] {
+	return isArray(value) && value.length > 0;
+}
+
+export function isNonEmptyMap<Key = unknown, Value = unknown>(value: unknown): value is Map<Key, Value> {
+	return isMap(value) && value.size > 0;
+}
+
+// TODO: Use `not` operator here to remove `Map` and `Set` from type guard:
+// - https://github.com/Microsoft/TypeScript/pull/29317
+export function isNonEmptyObject<Key extends keyof any = string, Value = unknown>(value: unknown): value is Record<Key, Value> {
+	return isObject(value) && !isMap(value) && !isSet(value) && Object.keys(value).length > 0;
+}
+
+export function isNonEmptySet<T = unknown>(value: unknown): value is Set<T> {
+	return isSet(value) && value.size > 0;
+}
+
+// TODO: Use `not ''` when the `not` operator is available.
+export function isNonEmptyString(value: unknown): value is string {
+	return isString(value) && value.length > 0;
+}
+
+// TODO: Use `not ''` when the `not` operator is available.
+export function isNonEmptyStringAndNotWhitespace(value: unknown): value is string {
+	return isString(value) && !isEmptyStringOrWhitespace(value);
+}
+
+// eslint-disable-next-line @typescript-eslint/ban-types
+export function isNull(value: unknown): value is null {
+	return value === null;
+}
+
+// eslint-disable-next-line @typescript-eslint/ban-types
+export function isNullOrUndefined(value: unknown): value is null | undefined {
+	return isNull(value) || isUndefined(value);
+}
+
+export function isNumber(value: unknown): value is number {
+	return typeof value === 'number' && !Number.isNaN(value);
+}
+
+export function isNumericString(value: unknown): value is `${number}` {
+	return isString(value) && !isEmptyStringOrWhitespace(value) && !Number.isNaN(Number(value));
+}
+
+// eslint-disable-next-line @typescript-eslint/ban-types
+export function isObject(value: unknown): value is object {
+	return !isNull(value) && (typeof value === 'object' || isFunction(value));
+}
+
+export function isObservable(value: unknown): value is ObservableLike {
 	if (!value) {
 		return false;
 	}
@@ -436,66 +624,162 @@ is.observable = (value: unknown): value is ObservableLike => {
 	}
 
 	return false;
-};
+}
 
-export type NodeStream = {
-	pipe<T extends NodeJS.WritableStream>(destination: T, options?: {end?: boolean}): T;
-} & NodeJS.EventEmitter;
+export function isOddInteger(value: unknown): value is number {
+	return isAbsoluteMod2(1)(value);
+}
 
-is.nodeStream = (value: unknown): value is NodeStream => is.object(value) && is.function_((value as NodeStream).pipe) && !is.observable(value);
+export function isPlainObject<Value = unknown>(value: unknown): value is Record<PropertyKey, Value> {
+	// From: https://github.com/sindresorhus/is-plain-obj/blob/main/index.js
+	if (typeof value !== 'object' || value === null) {
+		return false;
+	}
 
-is.infinite = (value: unknown): value is number => value === Number.POSITIVE_INFINITY || value === Number.NEGATIVE_INFINITY;
+	// eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+	const prototype = Object.getPrototypeOf(value);
 
-const isAbsoluteMod2 = (remainder: number) => (value: number): value is number => is.integer(value) && Math.abs(value % 2) === remainder;
-is.evenInteger = isAbsoluteMod2(0);
-is.oddInteger = isAbsoluteMod2(1);
+	return (prototype === null || prototype === Object.prototype || Object.getPrototypeOf(prototype) === null) && !(Symbol.toStringTag in value) && !(Symbol.iterator in value);
+}
 
-is.emptyArray = (value: unknown): value is never[] => is.array(value) && value.length === 0;
+export function isPositiveNumber(value: unknown): value is number {
+	return isNumber(value) && value > 0;
+}
 
-is.nonEmptyArray = <T = unknown, Item = unknown>(value: T | Item[]): value is [Item, ...Item[]] => is.array(value) && value.length > 0;
+export function isPrimitive(value: unknown): value is Primitive {
+	return isNull(value) || isPrimitiveTypeName(typeof value);
+}
 
-is.emptyString = (value: unknown): value is '' => is.string(value) && value.length === 0;
-
-const isWhiteSpaceString = (value: unknown): value is string => is.string(value) && !/\S/.test(value);
-is.emptyStringOrWhitespace = (value: unknown): value is string => is.emptyString(value) || isWhiteSpaceString(value);
-
-// TODO: Use `not ''` when the `not` operator is available.
-is.nonEmptyString = (value: unknown): value is string => is.string(value) && value.length > 0;
-
-// TODO: Use `not ''` when the `not` operator is available.
-is.nonEmptyStringAndNotWhitespace = (value: unknown): value is string => is.string(value) && !is.emptyStringOrWhitespace(value);
-
-// eslint-disable-next-line unicorn/no-array-callback-reference
-is.emptyObject = <Key extends keyof any = string>(value: unknown): value is Record<Key, never> => is.object(value) && !is.map(value) && !is.set(value) && Object.keys(value).length === 0;
-
-// TODO: Use `not` operator here to remove `Map` and `Set` from type guard:
-// - https://github.com/Microsoft/TypeScript/pull/29317
-// eslint-disable-next-line unicorn/no-array-callback-reference
-is.nonEmptyObject = <Key extends keyof any = string, Value = unknown>(value: unknown): value is Record<Key, Value> => is.object(value) && !is.map(value) && !is.set(value) && Object.keys(value).length > 0;
-
-is.emptySet = (value: unknown): value is Set<never> => is.set(value) && value.size === 0;
-
-is.nonEmptySet = <T = unknown>(value: unknown): value is Set<T> => is.set(value) && value.size > 0;
-
-// eslint-disable-next-line unicorn/no-array-callback-reference
-is.emptyMap = (value: unknown): value is Map<never, never> => is.map(value) && value.size === 0;
-
-// eslint-disable-next-line unicorn/no-array-callback-reference
-is.nonEmptyMap = <Key = unknown, Value = unknown>(value: unknown): value is Map<Key, Value> => is.map(value) && value.size > 0;
+export function isPromise<T = unknown>(value: unknown): value is Promise<T> {
+	return isNativePromise(value) || hasPromiseApi(value);
+}
 
 // `PropertyKey` is any value that can be used as an object key (string, number, or symbol)
-is.propertyKey = (value: unknown): value is PropertyKey => is.any([is.string, is.number, is.symbol], value);
+export function isPropertyKey(value: unknown): value is PropertyKey {
+	return isAny([isString, isNumber, isSymbol], value);
+}
 
-is.formData = (value: unknown): value is FormData => isObjectOfType<FormData>('FormData')(value);
+export function isRegExp(value: unknown): value is RegExp {
+	return getObjectType(value) === 'RegExp';
+}
 
-is.urlSearchParams = (value: unknown): value is URLSearchParams => isObjectOfType<URLSearchParams>('URLSearchParams')(value);
+export function isSafeInteger(value: unknown): value is number {
+	return Number.isSafeInteger(value);
+}
 
-export type Predicate = (value: unknown) => boolean;
+export function isSet<T = unknown>(value: unknown): value is Set<T> {
+	return getObjectType(value) === 'Set';
+}
+
+export function isSharedArrayBuffer(value: unknown): value is SharedArrayBuffer {
+	return getObjectType(value) === 'SharedArrayBuffer';
+}
+
+export function isString(value: unknown): value is string {
+	return typeof value === 'string';
+}
+
+export function isSymbol(value: unknown): value is symbol {
+	return typeof value === 'symbol';
+}
+
+// Example: `is.truthy = (value: unknown): value is (not false | not 0 | not '' | not undefined | not null) => Boolean(value);`
+// eslint-disable-next-line unicorn/prefer-native-coercion-functions
+export function isTruthy<T>(value: T | Falsy): value is T {
+	return Boolean(value);
+}
+
+type TypeGuard<T> = (value: unknown) => value is T;
+
+// eslint-disable-next-line @typescript-eslint/ban-types
+type ResolveTypesOfTypeGuardsTuple<TypeGuardsOfT, ResultOfT extends unknown[] = [] > =
+	TypeGuardsOfT extends [TypeGuard<infer U>, ...infer TOthers]
+		? ResolveTypesOfTypeGuardsTuple<TOthers, [...ResultOfT, U]>
+		: TypeGuardsOfT extends undefined[]
+			? ResultOfT
+			: never;
+
+export function isTupleLike<T extends Array<TypeGuard<unknown>>>(value: unknown, guards: [...T]): value is ResolveTypesOfTypeGuardsTuple<T> {
+	if (isArray(guards) && isArray(value) && guards.length === value.length) {
+		return guards.every((guard, index) => guard(value[index]));
+	}
+
+	return false;
+}
+
+export function isTypedArray(value: unknown): value is TypedArray {
+	return isTypedArrayName(getObjectType(value));
+}
+
+export function isUint16Array(value: unknown): value is Uint16Array {
+	return getObjectType(value) === 'Uint16Array';
+}
+
+export function isUint32Array(value: unknown): value is Uint32Array {
+	return getObjectType(value) === 'Uint32Array';
+}
+
+export function isUint8Array(value: unknown): value is Uint8Array {
+	return getObjectType(value) === 'Uint8Array';
+}
+
+export function isUint8ClampedArray(value: unknown): value is Uint8ClampedArray {
+	return getObjectType(value) === 'Uint8ClampedArray';
+}
+
+export function isUndefined(value: unknown): value is undefined {
+	return value === undefined;
+}
+
+export function isUrlInstance(value: unknown): value is URL {
+	return getObjectType(value) === 'URL';
+}
+
+// eslint-disable-next-line unicorn/prevent-abbreviations
+export function isUrlSearchParams(value: unknown): value is URLSearchParams {
+	return getObjectType(value) === 'URLSearchParams';
+}
+
+export function isUrlString(value: unknown): value is string {
+	if (!isString(value)) {
+		return false;
+	}
+
+	try {
+		new URL(value); // eslint-disable-line no-new
+		return true;
+	} catch {
+		return false;
+	}
+}
+
+export function isValidLength(value: unknown): value is number {
+	return isSafeInteger(value) && value >= 0;
+}
+
+// eslint-disable-next-line @typescript-eslint/ban-types
+export function isWeakMap<Key extends object = object, Value = unknown>(value: unknown): value is WeakMap<Key, Value> {
+	return getObjectType(value) === 'WeakMap';
+}
+
+// eslint-disable-next-line @typescript-eslint/ban-types
+export function isWeakRef(value: unknown): value is WeakRef<object> {
+	return getObjectType(value) === 'WeakRef';
+}
+
+// eslint-disable-next-line @typescript-eslint/ban-types
+export function isWeakSet(value: unknown): value is WeakSet<object> {
+	return getObjectType(value) === 'WeakSet';
+}
+
+export function isWhitespaceString(value: unknown): value is string {
+	return isString(value) && /^\s+$/.test(value);
+}
 
 type ArrayMethod = (fn: (value: unknown, index: number, array: unknown[]) => boolean, thisArg?: unknown) => boolean;
 
-const predicateOnArray = (method: ArrayMethod, predicate: Predicate, values: unknown[]) => {
-	if (!is.function_(predicate)) {
+function predicateOnArray(method: ArrayMethod, predicate: Predicate, values: unknown[]) {
+	if (!isFunction(predicate)) {
 		throw new TypeError(`Invalid predicate: ${JSON.stringify(predicate)}`);
 	}
 
@@ -504,31 +788,17 @@ const predicateOnArray = (method: ArrayMethod, predicate: Predicate, values: unk
 	}
 
 	return method.call(values, predicate);
-};
+}
 
-is.any = (predicate: Predicate | Predicate[], ...values: unknown[]): boolean => {
-	const predicates = is.array(predicate) ? predicate : [predicate];
-	return predicates.some(singlePredicate =>
-		predicateOnArray(Array.prototype.some, singlePredicate, values),
-	);
-};
+function typeErrorMessage(description: AssertionTypeDescription, value: unknown): string {
+	return `Expected value which is \`${description}\`, received value of type \`${is(value)}\`.`;
+}
 
-is.all = (predicate: Predicate, ...values: unknown[]): boolean => predicateOnArray(Array.prototype.every, predicate, values);
-
-const assertType = (condition: boolean, description: AssertionTypeDescription, value: unknown, options: {multipleValues?: boolean} = {}): asserts condition => {
-	if (!condition) {
-		const {multipleValues} = options;
-		const valuesMessage = multipleValues
-			? `received values of types ${[
-				...new Set(
-					(value as any[]).map(singleValue => `\`${is(singleValue)}\``),
-				),
-			].join(', ')}`
-			: `received value of type \`${is(value)}\``;
-
-		throw new TypeError(`Expected value which is \`${description}\`, ${valuesMessage}.`);
-	}
-};
+function typeErrorMessageMultipleValue(description: AssertionTypeDescription, values: unknown[]): string {
+	// eslint-disable-next-line unicorn/prefer-spread
+	const valueTypes = Array.from(new Set(values.map(singleValue => `\`${is(singleValue)}\``))).join(', ');
+	return `Expected value which is \`${description}\`, received values of types ${valueTypes}.`;
+}
 
 // Type assertions have to be declared with an explicit type.
 type Assert = {
@@ -540,8 +810,17 @@ type Assert = {
 	negativeNumber: (value: unknown) => asserts value is number;
 	bigint: (value: unknown) => asserts value is bigint;
 	// eslint-disable-next-line @typescript-eslint/ban-types
+	function: (value: unknown) => asserts value is Function;
+	/** @deprecated Renamed to `function`. */
+	// eslint-disable-next-line @typescript-eslint/ban-types
 	function_: (value: unknown) => asserts value is Function;
-	null_: (value: unknown) => asserts value is null; // eslint-disable-line @typescript-eslint/ban-types
+	// eslint-disable-next-line @typescript-eslint/ban-types
+	null: (value: unknown) => asserts value is null;
+	/** @deprecated Renamed to `null`. */
+	// eslint-disable-next-line @typescript-eslint/ban-types
+	null_: (value: unknown) => asserts value is null;
+	class: (value: unknown) => asserts value is Class;
+	/** @deprecated Renamed to `class`. */
 	class_: (value: unknown) => asserts value is Class;
 	boolean: (value: unknown) => asserts value is boolean;
 	symbol: (value: unknown) => asserts value is symbol;
@@ -549,7 +828,8 @@ type Assert = {
 	array: <T = unknown>(value: unknown, assertion?: (element: unknown) => asserts element is T) => asserts value is T[];
 	buffer: (value: unknown) => asserts value is Buffer;
 	blob: (value: unknown) => asserts value is Blob;
-	nullOrUndefined: (value: unknown) => asserts value is null | undefined; // eslint-disable-line @typescript-eslint/ban-types
+	// eslint-disable-next-line @typescript-eslint/ban-types
+	nullOrUndefined: (value: unknown) => asserts value is null | undefined;
 	object: <Key extends keyof any = string, Value = unknown>(value: unknown) => asserts value is Record<Key, Value>;
 	iterable: <T = unknown>(value: unknown) => asserts value is Iterable<T>;
 	asyncIterable: <T = unknown>(value: unknown) => asserts value is AsyncIterable<T>;
@@ -568,9 +848,12 @@ type Assert = {
 	error: (value: unknown) => asserts value is Error;
 	map: <Key = unknown, Value = unknown>(value: unknown) => asserts value is Map<Key, Value>;
 	set: <T = unknown>(value: unknown) => asserts value is Set<T>;
-	weakMap: <Key extends object = object, Value = unknown>(value: unknown) => asserts value is WeakMap<Key, Value>; // eslint-disable-line @typescript-eslint/ban-types
-	weakSet: <T extends object = object>(value: unknown) => asserts value is WeakSet<T>; // eslint-disable-line @typescript-eslint/ban-types
-	weakRef: <T extends object = object>(value: unknown) => asserts value is WeakRef<T>; // eslint-disable-line @typescript-eslint/ban-types
+	// eslint-disable-next-line @typescript-eslint/ban-types
+	weakMap: <Key extends object = object, Value = unknown>(value: unknown) => asserts value is WeakMap<Key, Value>;
+	// eslint-disable-next-line @typescript-eslint/ban-types
+	weakSet: <T extends object = object>(value: unknown) => asserts value is WeakSet<T>;
+	// eslint-disable-next-line @typescript-eslint/ban-types
+	weakRef: <T extends object = object>(value: unknown) => asserts value is WeakRef<T>;
 	int8Array: (value: unknown) => asserts value is Int8Array;
 	uint8Array: (value: unknown) => asserts value is Uint8Array;
 	uint8ClampedArray: (value: unknown) => asserts value is Uint8ClampedArray;
@@ -617,6 +900,8 @@ type Assert = {
 	propertyKey: (value: unknown) => asserts value is PropertyKey;
 	formData: (value: unknown) => asserts value is FormData;
 	urlSearchParams: (value: unknown) => asserts value is URLSearchParams;
+	validLength: (value: unknown) => asserts value is number;
+	whitespaceString: (value: unknown) => asserts value is string;
 
 	// Numbers.
 	evenInteger: (value: number) => asserts value is number;
@@ -624,148 +909,665 @@ type Assert = {
 
 	// Two arguments.
 	directInstanceOf: <T>(instance: unknown, class_: Class<T>) => asserts instance is T;
-	inRange: (value: number, range: number | number[]) => asserts value is number;
+	inRange: (value: number, range: number | [number, number]) => asserts value is number;
 
 	// Variadic functions.
 	any: (predicate: Predicate | Predicate[], ...values: unknown[]) => void | never;
 	all: (predicate: Predicate, ...values: unknown[]) => void | never;
 };
 
-/* eslint-disable @typescript-eslint/no-confusing-void-expression */
 export const assert: Assert = {
-	// Unknowns.
-	undefined: (value: unknown): asserts value is undefined => assertType(is.undefined(value), 'undefined', value),
-	string: (value: unknown): asserts value is string => assertType(is.string(value), 'string', value),
-	number: (value: unknown): asserts value is number => assertType(is.number(value), 'number', value),
-	positiveNumber: (value: unknown): asserts value is number => assertType(is.positiveNumber(value), 'positive number', value),
-	negativeNumber: (value: unknown): asserts value is number => assertType(is.negativeNumber(value), 'negative number', value),
-	bigint: (value: unknown): asserts value is bigint => assertType(is.bigint(value), 'bigint', value),
-	// eslint-disable-next-line @typescript-eslint/ban-types
-	function_: (value: unknown): asserts value is Function => assertType(is.function_(value), 'Function', value),
-	null_: (value: unknown): asserts value is null => assertType(is.null_(value), 'null', value), // eslint-disable-line @typescript-eslint/ban-types
-	class_: (value: unknown): asserts value is Class => assertType(is.class_(value), 'Class', value),
-	boolean: (value: unknown): asserts value is boolean => assertType(is.boolean(value), 'boolean', value),
-	symbol: (value: unknown): asserts value is symbol => assertType(is.symbol(value), 'symbol', value),
-	numericString: (value: unknown): asserts value is `${number}` => assertType(is.numericString(value), 'string with a number', value),
-	array: <T = unknown>(value: unknown, assertion?: (element: unknown) => asserts element is T): asserts value is T[] => { // eslint-disable-line object-shorthand
-		const assert: (condition: boolean, description: AssertionTypeDescription, value: unknown) => asserts condition = assertType;
-		assert(is.array(value), 'Array', value);
-
-		if (assertion) {
-			// eslint-disable-next-line unicorn/no-array-for-each, unicorn/no-array-callback-reference
-			value.forEach(assertion);
-		}
-	},
-	buffer: (value: unknown): asserts value is Buffer => assertType(is.buffer(value), 'Buffer', value),
-	blob: (value: unknown): asserts value is Blob => assertType(is.blob(value), 'Blob', value),
-	nullOrUndefined: (value: unknown): asserts value is null | undefined => assertType(is.nullOrUndefined(value), 'null or undefined', value), // eslint-disable-line @typescript-eslint/ban-types
-	object: (value: unknown): asserts value is object => assertType(is.object(value), 'Object', value), // eslint-disable-line @typescript-eslint/ban-types
-	iterable: <T = unknown>(value: unknown): asserts value is Iterable<T> => assertType(is.iterable(value), 'Iterable', value),
-	asyncIterable: <T = unknown>(value: unknown): asserts value is AsyncIterable<T> => assertType(is.asyncIterable(value), 'AsyncIterable', value),
-	generator: (value: unknown): asserts value is Generator => assertType(is.generator(value), 'Generator', value),
-	asyncGenerator: (value: unknown): asserts value is AsyncGenerator => assertType(is.asyncGenerator(value), 'AsyncGenerator', value),
-	nativePromise: <T = unknown>(value: unknown): asserts value is Promise<T> => assertType(is.nativePromise(value), 'native Promise', value),
-	promise: <T = unknown>(value: unknown): asserts value is Promise<T> => assertType(is.promise(value), 'Promise', value),
-	generatorFunction: (value: unknown): asserts value is GeneratorFunction => assertType(is.generatorFunction(value), 'GeneratorFunction', value),
-	asyncGeneratorFunction: (value: unknown): asserts value is AsyncGeneratorFunction => assertType(is.asyncGeneratorFunction(value), 'AsyncGeneratorFunction', value),
-	// eslint-disable-next-line @typescript-eslint/ban-types
-	asyncFunction: (value: unknown): asserts value is Function => assertType(is.asyncFunction(value), 'AsyncFunction', value),
-	// eslint-disable-next-line @typescript-eslint/ban-types
-	boundFunction: (value: unknown): asserts value is Function => assertType(is.boundFunction(value), 'Function', value),
-	regExp: (value: unknown): asserts value is RegExp => assertType(is.regExp(value), 'RegExp', value),
-	date: (value: unknown): asserts value is Date => assertType(is.date(value), 'Date', value),
-	error: (value: unknown): asserts value is Error => assertType(is.error(value), 'Error', value),
-	map: <Key = unknown, Value = unknown>(value: unknown): asserts value is Map<Key, Value> => assertType(is.map(value), 'Map', value), // eslint-disable-line unicorn/no-array-callback-reference
-	set: <T = unknown>(value: unknown): asserts value is Set<T> => assertType(is.set(value), 'Set', value),
-	weakMap: <Key extends object = object, Value = unknown>(value: unknown): asserts value is WeakMap<Key, Value> => assertType(is.weakMap(value), 'WeakMap', value), // eslint-disable-line @typescript-eslint/ban-types
-	weakSet: <T extends object = object>(value: unknown): asserts value is WeakSet<T> => assertType(is.weakSet(value), 'WeakSet', value), // eslint-disable-line @typescript-eslint/ban-types
-	weakRef: <T extends object = object>(value: unknown): asserts value is WeakRef<T> => assertType(is.weakRef(value), 'WeakRef', value), // eslint-disable-line @typescript-eslint/ban-types
-	int8Array: (value: unknown): asserts value is Int8Array => assertType(is.int8Array(value), 'Int8Array', value),
-	uint8Array: (value: unknown): asserts value is Uint8Array => assertType(is.uint8Array(value), 'Uint8Array', value),
-	uint8ClampedArray: (value: unknown): asserts value is Uint8ClampedArray => assertType(is.uint8ClampedArray(value), 'Uint8ClampedArray', value),
-	int16Array: (value: unknown): asserts value is Int16Array => assertType(is.int16Array(value), 'Int16Array', value),
-	uint16Array: (value: unknown): asserts value is Uint16Array => assertType(is.uint16Array(value), 'Uint16Array', value),
-	int32Array: (value: unknown): asserts value is Int32Array => assertType(is.int32Array(value), 'Int32Array', value),
-	uint32Array: (value: unknown): asserts value is Uint32Array => assertType(is.uint32Array(value), 'Uint32Array', value),
-	float32Array: (value: unknown): asserts value is Float32Array => assertType(is.float32Array(value), 'Float32Array', value),
-	float64Array: (value: unknown): asserts value is Float64Array => assertType(is.float64Array(value), 'Float64Array', value),
-	bigInt64Array: (value: unknown): asserts value is BigInt64Array => assertType(is.bigInt64Array(value), 'BigInt64Array', value),
-	bigUint64Array: (value: unknown): asserts value is BigUint64Array => assertType(is.bigUint64Array(value), 'BigUint64Array', value),
-	arrayBuffer: (value: unknown): asserts value is ArrayBuffer => assertType(is.arrayBuffer(value), 'ArrayBuffer', value),
-	sharedArrayBuffer: (value: unknown): asserts value is SharedArrayBuffer => assertType(is.sharedArrayBuffer(value), 'SharedArrayBuffer', value),
-	dataView: (value: unknown): asserts value is DataView => assertType(is.dataView(value), 'DataView', value),
-	enumCase: <T = unknown>(value: unknown, targetEnum: T): asserts value is T[keyof T] => assertType(is.enumCase(value, targetEnum), 'EnumCase', value),
-	urlInstance: (value: unknown): asserts value is URL => assertType(is.urlInstance(value), 'URL', value),
-	urlString: (value: unknown): asserts value is string => assertType(is.urlString(value), 'string with a URL', value),
-	truthy: <T>(value: T | Falsy): asserts value is T => assertType(is.truthy(value), 'truthy', value),
-	falsy: (value: unknown): asserts value is Falsy => assertType(is.falsy(value), 'falsy', value),
-	nan: (value: unknown): asserts value is number => assertType(is.nan(value), 'NaN', value),
-	primitive: (value: unknown): asserts value is Primitive => assertType(is.primitive(value), 'primitive', value),
-	integer: (value: unknown): asserts value is number => assertType(is.integer(value), 'integer', value),
-	safeInteger: (value: unknown): asserts value is number => assertType(is.safeInteger(value), 'integer', value),
-	plainObject: <Value = unknown>(value: unknown): asserts value is Record<PropertyKey, Value> => assertType(is.plainObject(value), 'plain object', value),
-	typedArray: (value: unknown): asserts value is TypedArray => assertType(is.typedArray(value), 'TypedArray', value),
-	arrayLike: <T = unknown>(value: unknown): asserts value is ArrayLike<T> => assertType(is.arrayLike(value), 'array-like', value),
-	tupleLike: <T extends Array<TypeGuard<unknown>>>(value: unknown, guards: [...T]): asserts value is ResolveTypesOfTypeGuardsTuple<T> => assertType(is.tupleLike(value, guards), 'tuple-like', value),
-	domElement: (value: unknown): asserts value is HTMLElement => assertType(is.domElement(value), 'HTMLElement', value),
-	observable: (value: unknown): asserts value is ObservableLike => assertType(is.observable(value), 'Observable', value),
-	nodeStream: (value: unknown): asserts value is NodeStream => assertType(is.nodeStream(value), 'Node.js Stream', value),
-	infinite: (value: unknown): asserts value is number => assertType(is.infinite(value), 'infinite number', value),
-	emptyArray: (value: unknown): asserts value is never[] => assertType(is.emptyArray(value), 'empty array', value),
-	nonEmptyArray: <T = unknown, Item = unknown>(value: T | Item[]): asserts value is [Item, ...Item[]] => assertType(is.nonEmptyArray(value), 'non-empty array', value),
-	emptyString: (value: unknown): asserts value is '' => assertType(is.emptyString(value), 'empty string', value),
-	emptyStringOrWhitespace: (value: unknown): asserts value is string => assertType(is.emptyStringOrWhitespace(value), 'empty string or whitespace', value),
-	nonEmptyString: (value: unknown): asserts value is string => assertType(is.nonEmptyString(value), 'non-empty string', value),
-	nonEmptyStringAndNotWhitespace: (value: unknown): asserts value is string => assertType(is.nonEmptyStringAndNotWhitespace(value), 'non-empty string and not whitespace', value),
-	emptyObject: <Key extends keyof any = string>(value: unknown): asserts value is Record<Key, never> => assertType(is.emptyObject(value), 'empty object', value),
-	nonEmptyObject: <Key extends keyof any = string, Value = unknown>(value: unknown): asserts value is Record<Key, Value> => assertType(is.nonEmptyObject(value), 'non-empty object', value),
-	emptySet: (value: unknown): asserts value is Set<never> => assertType(is.emptySet(value), 'empty set', value),
-	nonEmptySet: <T = unknown>(value: unknown): asserts value is Set<T> => assertType(is.nonEmptySet(value), 'non-empty set', value),
-	emptyMap: (value: unknown): asserts value is Map<never, never> => assertType(is.emptyMap(value), 'empty map', value),
-	nonEmptyMap: <Key = unknown, Value = unknown>(value: unknown): asserts value is Map<Key, Value> => assertType(is.nonEmptyMap(value), 'non-empty map', value),
-	propertyKey: (value: unknown): asserts value is number => assertType(is.propertyKey(value), 'PropertyKey', value),
-	formData: (value: unknown): asserts value is FormData => assertType(is.formData(value), 'FormData', value),
-	urlSearchParams: (value: unknown): asserts value is URLSearchParams => assertType(is.urlSearchParams(value), 'URLSearchParams', value),
-
-	// Numbers.
-	evenInteger: (value: number): asserts value is number => assertType(is.evenInteger(value), 'even integer', value),
-	oddInteger: (value: number): asserts value is number => assertType(is.oddInteger(value), 'odd integer', value),
-
-	// Two arguments.
-	directInstanceOf: <T>(instance: unknown, class_: Class<T>): asserts instance is T => assertType(is.directInstanceOf(instance, class_), 'T', instance),
-	inRange: (value: number, range: number | number[]): asserts value is number => assertType(is.inRange(value, range), 'in range', value),
-
-	// Variadic functions.
-	any: (predicate: Predicate | Predicate[], ...values: unknown[]): void | never => assertType(is.any(predicate, ...values), 'predicate returns truthy for any value', values, {multipleValues: true}),
-	all: (predicate: Predicate, ...values: unknown[]): void | never => assertType(is.all(predicate, ...values), 'predicate returns truthy for all values', values, {multipleValues: true}),
+	all: assertAll,
+	any: assertAny,
+	array: assertArray,
+	arrayBuffer: assertArrayBuffer,
+	arrayLike: assertArrayLike,
+	asyncFunction: assertAsyncFunction,
+	asyncGenerator: assertAsyncGenerator,
+	asyncGeneratorFunction: assertAsyncGeneratorFunction,
+	asyncIterable: assertAsyncIterable,
+	bigint: assertBigint,
+	bigInt64Array: assertBigInt64Array,
+	bigUint64Array: assertBigUint64Array,
+	blob: assertBlob,
+	boolean: assertBoolean,
+	boundFunction: assertBoundFunction,
+	buffer: assertBuffer,
+	class: assertClass,
+	class_: assertClass,
+	dataView: assertDataView,
+	date: assertDate,
+	directInstanceOf: assertDirectInstanceOf,
+	domElement: assertDomElement,
+	emptyArray: assertEmptyArray,
+	emptyMap: assertEmptyMap,
+	emptyObject: assertEmptyObject,
+	emptySet: assertEmptySet,
+	emptyString: assertEmptyString,
+	emptyStringOrWhitespace: assertEmptyStringOrWhitespace,
+	enumCase: assertEnumCase,
+	error: assertError,
+	evenInteger: assertEvenInteger,
+	falsy: assertFalsy,
+	float32Array: assertFloat32Array,
+	float64Array: assertFloat64Array,
+	formData: assertFormData,
+	function: assertFunction,
+	function_: assertFunction,
+	generator: assertGenerator,
+	generatorFunction: assertGeneratorFunction,
+	infinite: assertInfinite,
+	inRange: assertInRange,
+	int16Array: assertInt16Array,
+	int32Array: assertInt32Array,
+	int8Array: assertInt8Array,
+	integer: assertInteger,
+	iterable: assertIterable,
+	map: assertMap,
+	nan: assertNan,
+	nativePromise: assertNativePromise,
+	negativeNumber: assertNegativeNumber,
+	nodeStream: assertNodeStream,
+	nonEmptyArray: assertNonEmptyArray,
+	nonEmptyMap: assertNonEmptyMap,
+	nonEmptyObject: assertNonEmptyObject,
+	nonEmptySet: assertNonEmptySet,
+	nonEmptyString: assertNonEmptyString,
+	nonEmptyStringAndNotWhitespace: assertNonEmptyStringAndNotWhitespace,
+	null: assertNull,
+	null_: assertNull,
+	nullOrUndefined: assertNullOrUndefined,
+	number: assertNumber,
+	numericString: assertNumericString,
+	object: assertObject,
+	observable: assertObservable,
+	oddInteger: assertOddInteger,
+	plainObject: assertPlainObject,
+	positiveNumber: assertPositiveNumber,
+	primitive: assertPrimitive,
+	promise: assertPromise,
+	propertyKey: assertPropertyKey,
+	regExp: assertRegExp,
+	safeInteger: assertSafeInteger,
+	set: assertSet,
+	sharedArrayBuffer: assertSharedArrayBuffer,
+	string: assertString,
+	symbol: assertSymbol,
+	truthy: assertTruthy,
+	tupleLike: assertTupleLike,
+	typedArray: assertTypedArray,
+	uint16Array: assertUint16Array,
+	uint32Array: assertUint32Array,
+	uint8Array: assertUint8Array,
+	uint8ClampedArray: assertUint8ClampedArray,
+	undefined: assertUndefined,
+	urlInstance: assertUrlInstance,
+	urlSearchParams: assertUrlSearchParams,
+	urlString: assertUrlString,
+	validLength: assertValidLength,
+	weakMap: assertWeakMap,
+	weakRef: assertWeakRef,
+	weakSet: assertWeakSet,
+	whitespaceString: assertWhitespaceString,
 };
-/* eslint-enable @typescript-eslint/no-confusing-void-expression */
 
-// Some few keywords are reserved, but we'll populate them for Node.js users
-// See https://github.com/Microsoft/TypeScript/issues/2536
-Object.defineProperties(is, {
-	class: {
-		value: is.class_,
-	},
-	function: {
-		value: is.function_,
-	},
-	null: {
-		value: is.null_,
-	},
-});
-Object.defineProperties(assert, {
-	class: {
-		value: assert.class_,
-	},
-	function: {
-		value: assert.function_,
-	},
-	null: {
-		value: assert.null_,
-	},
-});
+export function assertAll(predicate: Predicate, ...values: unknown[]): void | never {
+	if (!isAll(predicate, ...values)) {
+		throw new TypeError(typeErrorMessageMultipleValue('predicate returns truthy for all values', values));
+	}
+}
+
+export function assertAny(predicate: Predicate | Predicate[], ...values: unknown[]): void | never {
+	if (!isAny(predicate, ...values)) {
+		throw new TypeError(typeErrorMessageMultipleValue('predicate returns truthy for any value', values));
+	}
+}
+
+export function assertArray<T = unknown>(value: unknown, assertion?: (element: unknown) => asserts element is T): asserts value is T[] {
+	if (!isArray(value)) {
+		throw new TypeError(typeErrorMessage('Array', value));
+	}
+
+	if (assertion) {
+		// eslint-disable-next-line unicorn/no-array-for-each, unicorn/no-array-callback-reference
+		value.forEach(assertion);
+	}
+}
+
+export function assertArrayBuffer(value: unknown): asserts value is ArrayBuffer {
+	if (!isArrayBuffer(value)) {
+		throw new TypeError(typeErrorMessage('ArrayBuffer', value));
+	}
+}
+
+export function assertArrayLike<T = unknown>(value: unknown): asserts value is ArrayLike<T> {
+	if (!isArrayLike(value)) {
+		throw new TypeError(typeErrorMessage('array-like', value));
+	}
+}
+
+// eslint-disable-next-line @typescript-eslint/ban-types
+export function assertAsyncFunction(value: unknown): asserts value is Function {
+	if (!isAsyncFunction(value)) {
+		throw new TypeError(typeErrorMessage('AsyncFunction', value));
+	}
+}
+
+export function assertAsyncGenerator(value: unknown): asserts value is AsyncGenerator {
+	if (!isAsyncGenerator(value)) {
+		throw new TypeError(typeErrorMessage('AsyncGenerator', value));
+	}
+}
+
+export function assertAsyncGeneratorFunction(value: unknown): asserts value is AsyncGeneratorFunction {
+	if (!isAsyncGeneratorFunction(value)) {
+		throw new TypeError(typeErrorMessage('AsyncGeneratorFunction', value));
+	}
+}
+
+export function assertAsyncIterable<T = unknown>(value: unknown): asserts value is AsyncIterable<T> {
+	if (!isAsyncIterable(value)) {
+		throw new TypeError(typeErrorMessage('AsyncIterable', value));
+	}
+}
+
+export function assertBigint(value: unknown): asserts value is bigint {
+	if (!isBigint(value)) {
+		throw new TypeError(typeErrorMessage('bigint', value));
+	}
+}
+
+export function assertBigInt64Array(value: unknown): asserts value is BigInt64Array {
+	if (!isBigInt64Array(value)) {
+		throw new TypeError(typeErrorMessage('BigInt64Array', value));
+	}
+}
+
+export function assertBigUint64Array(value: unknown): asserts value is BigUint64Array {
+	if (!isBigUint64Array(value)) {
+		throw new TypeError(typeErrorMessage('BigUint64Array', value));
+	}
+}
+
+export function assertBlob(value: unknown): asserts value is Blob {
+	if (!isBlob(value)) {
+		throw new TypeError(typeErrorMessage('Blob', value));
+	}
+}
+
+export function assertBoolean(value: unknown): asserts value is boolean {
+	if (!isBoolean(value)) {
+		throw new TypeError(typeErrorMessage('boolean', value));
+	}
+}
+
+// eslint-disable-next-line @typescript-eslint/ban-types
+export function assertBoundFunction(value: unknown): asserts value is Function {
+	if (!isBoundFunction(value)) {
+		throw new TypeError(typeErrorMessage('Function', value));
+	}
+}
+
+export function assertBuffer(value: unknown): asserts value is Buffer {
+	if (!isBuffer(value)) {
+		throw new TypeError(typeErrorMessage('Buffer', value));
+	}
+}
+
+export function assertClass(value: unknown): asserts value is Class {
+	if (!isClass(value)) {
+		throw new TypeError(typeErrorMessage('Class', value));
+	}
+}
+
+export function assertDataView(value: unknown): asserts value is DataView {
+	if (!isDataView(value)) {
+		throw new TypeError(typeErrorMessage('DataView', value));
+	}
+}
+
+export function assertDate(value: unknown): asserts value is Date {
+	if (!isDate(value)) {
+		throw new TypeError(typeErrorMessage('Date', value));
+	}
+}
+
+export function assertDirectInstanceOf<T>(instance: unknown, class_: Class<T>): asserts instance is T {
+	if (!isDirectInstanceOf(instance, class_)) {
+		throw new TypeError(typeErrorMessage('T', instance));
+	}
+}
+
+export function assertEmptyArray(value: unknown): asserts value is never[] {
+	if (!isEmptyArray(value)) {
+		throw new TypeError(typeErrorMessage('empty array', value));
+	}
+}
+
+export function assertEmptyMap(value: unknown): asserts value is Map<never, never> {
+	if (!isEmptyMap(value)) {
+		throw new TypeError(typeErrorMessage('empty map', value));
+	}
+}
+
+export function assertEmptyObject<Key extends keyof any = string>(value: unknown): asserts value is Record<Key, never> {
+	if (!isEmptyObject(value)) {
+		throw new TypeError(typeErrorMessage('empty object', value));
+	}
+}
+
+export function assertEmptySet(value: unknown): asserts value is Set<never> {
+	if (!isEmptySet(value)) {
+		throw new TypeError(typeErrorMessage('empty set', value));
+	}
+}
+
+export function assertEmptyString(value: unknown): asserts value is '' {
+	if (!isEmptyString(value)) {
+		throw new TypeError(typeErrorMessage('empty string', value));
+	}
+}
+
+export function assertEmptyStringOrWhitespace(value: unknown): asserts value is string {
+	if (!isEmptyStringOrWhitespace(value)) {
+		throw new TypeError(typeErrorMessage('empty string or whitespace', value));
+	}
+}
+
+export function assertEnumCase<T = unknown>(value: unknown, targetEnum: T): asserts value is T[keyof T] {
+	if (!isEnumCase(value, targetEnum)) {
+		throw new TypeError(typeErrorMessage('EnumCase', value));
+	}
+}
+
+export function assertError(value: unknown): asserts value is Error {
+	if (!isError(value)) {
+		throw new TypeError(typeErrorMessage('Error', value));
+	}
+}
+
+export function assertEvenInteger(value: number): asserts value is number {
+	if (!isEvenInteger(value)) {
+		throw new TypeError(typeErrorMessage('even integer', value));
+	}
+}
+
+export function assertFalsy(value: unknown): asserts value is Falsy {
+	if (!isFalsy(value)) {
+		throw new TypeError(typeErrorMessage('falsy', value));
+	}
+}
+
+export function assertFloat32Array(value: unknown): asserts value is Float32Array {
+	if (!isFloat32Array(value)) {
+		throw new TypeError(typeErrorMessage('Float32Array', value));
+	}
+}
+
+export function assertFloat64Array(value: unknown): asserts value is Float64Array {
+	if (!isFloat64Array(value)) {
+		throw new TypeError(typeErrorMessage('Float64Array', value));
+	}
+}
+
+export function assertFormData(value: unknown): asserts value is FormData {
+	if (!isFormData(value)) {
+		throw new TypeError(typeErrorMessage('FormData', value));
+	}
+}
+
+// eslint-disable-next-line @typescript-eslint/ban-types
+export function assertFunction(value: unknown): asserts value is Function {
+	if (!isFunction(value)) {
+		throw new TypeError(typeErrorMessage('Function', value));
+	}
+}
+
+export function assertGenerator(value: unknown): asserts value is Generator {
+	if (!isGenerator(value)) {
+		throw new TypeError(typeErrorMessage('Generator', value));
+	}
+}
+
+export function assertGeneratorFunction(value: unknown): asserts value is GeneratorFunction {
+	if (!isGeneratorFunction(value)) {
+		throw new TypeError(typeErrorMessage('GeneratorFunction', value));
+	}
+}
+
+export function assertDomElement(value: unknown): asserts value is HTMLElement {
+	if (!isDomElement(value)) {
+		throw new TypeError(typeErrorMessage('HTMLElement', value));
+	}
+}
+
+export function assertInfinite(value: unknown): asserts value is number {
+	if (!isInfinite(value)) {
+		throw new TypeError(typeErrorMessage('infinite number', value));
+	}
+}
+
+export function assertInRange(value: number, range: number | [number, number]): asserts value is number {
+	if (!isInRange(value, range)) {
+		throw new TypeError(typeErrorMessage('in range', value));
+	}
+}
+
+export function assertInt16Array(value: unknown): asserts value is Int16Array {
+	if (!isInt16Array(value)) {
+		throw new TypeError(typeErrorMessage('Int16Array', value));
+	}
+}
+
+export function assertInt32Array(value: unknown): asserts value is Int32Array {
+	if (!isInt32Array(value)) {
+		throw new TypeError(typeErrorMessage('Int32Array', value));
+	}
+}
+
+export function assertInt8Array(value: unknown): asserts value is Int8Array {
+	if (!isInt8Array(value)) {
+		throw new TypeError(typeErrorMessage('Int8Array', value));
+	}
+}
+
+export function assertInteger(value: unknown): asserts value is number {
+	if (!isInteger(value)) {
+		throw new TypeError(typeErrorMessage('integer', value));
+	}
+}
+
+export function assertIterable<T = unknown>(value: unknown): asserts value is Iterable<T> {
+	if (!isIterable(value)) {
+		throw new TypeError(typeErrorMessage('Iterable', value));
+	}
+}
+
+export function assertNativePromise<T = unknown>(value: unknown): asserts value is Promise<T> {
+	if (!isNativePromise(value)) {
+		throw new TypeError(typeErrorMessage('native Promise', value));
+	}
+}
+
+export function assertMap<Key = unknown, Value = unknown>(value: unknown): asserts value is Map<Key, Value> {
+	if (!isMap(value)) {
+		throw new TypeError(typeErrorMessage('Map', value));
+	}
+}
+
+export function assertNan(value: unknown): asserts value is number {
+	if (!isNan(value)) {
+		throw new TypeError(typeErrorMessage('NaN', value));
+	}
+}
+
+export function assertNegativeNumber(value: unknown): asserts value is number {
+	if (!isNegativeNumber(value)) {
+		throw new TypeError(typeErrorMessage('negative number', value));
+	}
+}
+
+export function assertNodeStream(value: unknown): asserts value is NodeStream {
+	if (!isNodeStream(value)) {
+		throw new TypeError(typeErrorMessage('Node.js Stream', value));
+	}
+}
+
+export function assertNonEmptyArray<T = unknown, Item = unknown>(value: T | Item[]): asserts value is [Item, ...Item[]] {
+	if (!isNonEmptyArray(value)) {
+		throw new TypeError(typeErrorMessage('non-empty array', value));
+	}
+}
+
+export function assertNonEmptyMap<Key = unknown, Value = unknown>(value: unknown): asserts value is Map<Key, Value> {
+	if (!isNonEmptyMap(value)) {
+		throw new TypeError(typeErrorMessage('non-empty map', value));
+	}
+}
+
+export function assertNonEmptyObject<Key extends keyof any = string, Value = unknown>(value: unknown): asserts value is Record<Key, Value> {
+	if (!isNonEmptyObject(value)) {
+		throw new TypeError(typeErrorMessage('non-empty object', value));
+	}
+}
+
+export function assertNonEmptySet<T = unknown>(value: unknown): asserts value is Set<T> {
+	if (!isNonEmptySet(value)) {
+		throw new TypeError(typeErrorMessage('non-empty set', value));
+	}
+}
+
+export function assertNonEmptyString(value: unknown): asserts value is string {
+	if (!isNonEmptyString(value)) {
+		throw new TypeError(typeErrorMessage('non-empty string', value));
+	}
+}
+
+export function assertNonEmptyStringAndNotWhitespace(value: unknown): asserts value is string {
+	if (!isNonEmptyStringAndNotWhitespace(value)) {
+		throw new TypeError(typeErrorMessage('non-empty string and not whitespace', value));
+	}
+}
+
+// eslint-disable-next-line @typescript-eslint/ban-types
+export function assertNull(value: unknown): asserts value is null {
+	if (!isNull(value)) {
+		throw new TypeError(typeErrorMessage('null', value));
+	}
+}
+
+// eslint-disable-next-line @typescript-eslint/ban-types
+export function assertNullOrUndefined(value: unknown): asserts value is null | undefined {
+	if (!isNullOrUndefined(value)) {
+		throw new TypeError(typeErrorMessage('null or undefined', value));
+	}
+}
+
+export function assertNumber(value: unknown): asserts value is number {
+	if (!isNumber(value)) {
+		throw new TypeError(typeErrorMessage('number', value));
+	}
+}
+
+export function assertNumericString(value: unknown): asserts value is `${number}` {
+	if (!isNumericString(value)) {
+		throw new TypeError(typeErrorMessage('string with a number', value));
+	}
+}
+
+// eslint-disable-next-line @typescript-eslint/ban-types
+export function assertObject(value: unknown): asserts value is object {
+	if (!isObject(value)) {
+		throw new TypeError(typeErrorMessage('Object', value));
+	}
+}
+
+export function assertObservable(value: unknown): asserts value is ObservableLike {
+	if (!isObservable(value)) {
+		throw new TypeError(typeErrorMessage('Observable', value));
+	}
+}
+
+export function assertOddInteger(value: number): asserts value is number {
+	if (!isOddInteger(value)) {
+		throw new TypeError(typeErrorMessage('odd integer', value));
+	}
+}
+
+export function assertPlainObject<Value = unknown>(value: unknown): asserts value is Record<PropertyKey, Value> {
+	if (!isPlainObject(value)) {
+		throw new TypeError(typeErrorMessage('plain object', value));
+	}
+}
+
+export function assertPositiveNumber(value: unknown): asserts value is number {
+	if (!isPositiveNumber(value)) {
+		throw new TypeError(typeErrorMessage('positive number', value));
+	}
+}
+
+export function assertPrimitive(value: unknown): asserts value is Primitive {
+	if (!isPrimitive(value)) {
+		throw new TypeError(typeErrorMessage('primitive', value));
+	}
+}
+
+export function assertPromise<T = unknown>(value: unknown): asserts value is Promise<T> {
+	if (!isPromise(value)) {
+		throw new TypeError(typeErrorMessage('Promise', value));
+	}
+}
+
+export function assertPropertyKey(value: unknown): asserts value is number {
+	if (!isPropertyKey(value)) {
+		throw new TypeError(typeErrorMessage('PropertyKey', value));
+	}
+}
+
+export function assertRegExp(value: unknown): asserts value is RegExp {
+	if (!isRegExp(value)) {
+		throw new TypeError(typeErrorMessage('RegExp', value));
+	}
+}
+
+export function assertSafeInteger(value: unknown): asserts value is number {
+	if (!isSafeInteger(value)) {
+		throw new TypeError(typeErrorMessage('integer', value));
+	}
+}
+
+export function assertSet<T = unknown>(value: unknown): asserts value is Set<T> {
+	if (!isSet(value)) {
+		throw new TypeError(typeErrorMessage('Set', value));
+	}
+}
+
+export function assertSharedArrayBuffer(value: unknown): asserts value is SharedArrayBuffer {
+	if (!isSharedArrayBuffer(value)) {
+		throw new TypeError(typeErrorMessage('SharedArrayBuffer', value));
+	}
+}
+
+export function assertString(value: unknown): asserts value is string {
+	if (!isString(value)) {
+		throw new TypeError(typeErrorMessage('string', value));
+	}
+}
+
+export function assertSymbol(value: unknown): asserts value is symbol {
+	if (!isSymbol(value)) {
+		throw new TypeError(typeErrorMessage('symbol', value));
+	}
+}
+
+export function assertTruthy<T>(value: T | Falsy): asserts value is T {
+	if (!isTruthy(value)) {
+		throw new TypeError(typeErrorMessage('truthy', value));
+	}
+}
+
+export function assertTupleLike<T extends Array<TypeGuard<unknown>>>(value: unknown, guards: [...T]): asserts value is ResolveTypesOfTypeGuardsTuple<T> {
+	if (!isTupleLike(value, guards)) {
+		throw new TypeError(typeErrorMessage('tuple-like', value));
+	}
+}
+
+export function assertTypedArray(value: unknown): asserts value is TypedArray {
+	if (!isTypedArray(value)) {
+		throw new TypeError(typeErrorMessage('TypedArray', value));
+	}
+}
+
+export function assertUint16Array(value: unknown): asserts value is Uint16Array {
+	if (!isUint16Array(value)) {
+		throw new TypeError(typeErrorMessage('Uint16Array', value));
+	}
+}
+
+export function assertUint32Array(value: unknown): asserts value is Uint32Array {
+	if (!isUint32Array(value)) {
+		throw new TypeError(typeErrorMessage('Uint32Array', value));
+	}
+}
+
+export function assertUint8Array(value: unknown): asserts value is Uint8Array {
+	if (!isUint8Array(value)) {
+		throw new TypeError(typeErrorMessage('Uint8Array', value));
+	}
+}
+
+export function assertUint8ClampedArray(value: unknown): asserts value is Uint8ClampedArray {
+	if (!isUint8ClampedArray(value)) {
+		throw new TypeError(typeErrorMessage('Uint8ClampedArray', value));
+	}
+}
+
+export function assertUndefined(value: unknown): asserts value is undefined {
+	if (!isUndefined(value)) {
+		throw new TypeError(typeErrorMessage('undefined', value));
+	}
+}
+
+export function assertUrlInstance(value: unknown): asserts value is URL {
+	if (!isUrlInstance(value)) {
+		throw new TypeError(typeErrorMessage('URL', value));
+	}
+}
+
+// eslint-disable-next-line unicorn/prevent-abbreviations
+export function assertUrlSearchParams(value: unknown): asserts value is URLSearchParams {
+	if (!isUrlSearchParams(value)) {
+		throw new TypeError(typeErrorMessage('URLSearchParams', value));
+	}
+}
+
+export function assertUrlString(value: unknown): asserts value is string {
+	if (!isUrlString(value)) {
+		throw new TypeError(typeErrorMessage('string with a URL', value));
+	}
+}
+
+export function assertValidLength(value: unknown): asserts value is number {
+	if (!isValidLength(value)) {
+		throw new TypeError(typeErrorMessage('valid length', value));
+	}
+}
+
+// eslint-disable-next-line @typescript-eslint/ban-types
+export function assertWeakMap<Key extends object = object, Value = unknown>(value: unknown): asserts value is WeakMap<Key, Value> {
+	if (!isWeakMap(value)) {
+		throw new TypeError(typeErrorMessage('WeakMap', value));
+	}
+}
+
+// eslint-disable-next-line @typescript-eslint/ban-types
+export function assertWeakRef<T extends object = object>(value: unknown): asserts value is WeakRef<T> {
+	if (!isWeakRef(value)) {
+		throw new TypeError(typeErrorMessage('WeakRef', value));
+	}
+}
+
+// eslint-disable-next-line @typescript-eslint/ban-types
+export function assertWeakSet<T extends object = object>(value: unknown): asserts value is WeakSet<T> {
+	if (!isWeakSet(value)) {
+		throw new TypeError(typeErrorMessage('WeakSet', value));
+	}
+}
+
+export function assertWhitespaceString(value: unknown): asserts value is string {
+	if (!isWhitespaceString(value)) {
+		throw new TypeError(typeErrorMessage('whitespace string', value));
+	}
+}
 
 export default is;
 
-export type {Class, TypedArray, ObservableLike, Primitive} from './types.js';
+export type {
+	ArrayLike,
+	Class,
+	NodeStream,
+	ObservableLike,
+	Predicate,
+	Primitive,
+	TypedArray,
+} from './types.js';

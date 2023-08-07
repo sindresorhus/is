@@ -62,3 +62,14 @@ export type WeakRef<T extends object> = { // eslint-disable-line @typescript-esl
 	readonly [Symbol.toStringTag]: 'WeakRef';
 	deref(): T | undefined;
 };
+
+export type ArrayLike<T> = {
+	readonly [index: number]: T;
+	readonly length: number;
+};
+
+export type NodeStream = {
+	pipe<T extends NodeJS.WritableStream>(destination: T, options?: {end?: boolean}): T;
+} & NodeJS.EventEmitter;
+
+export type Predicate = (value: unknown) => boolean;

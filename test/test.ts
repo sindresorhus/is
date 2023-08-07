@@ -61,7 +61,7 @@ const types = new Map<string, Test>([
 		typename: 'undefined',
 	}],
 	['null', {
-		is: is.null_,
+		is: is.null,
 		assert: assert.null_,
 		fixtures: [
 			null,
@@ -161,7 +161,7 @@ const types = new Map<string, Test>([
 		typeDescription: 'empty array',
 	}],
 	['function', {
-		is: is.function_,
+		is: is.function,
 		assert: assert.function_,
 		fixtures: [
 			function foo() {}, // eslint-disable-line func-names
@@ -838,7 +838,7 @@ test('is.asyncFunction', t => {
 
 	const fixture = async () => {};
 	if (is.asyncFunction(fixture)) {
-		t.true(is.function_(fixture().then));
+		t.true(is.function(fixture().then));
 
 		t.notThrows(() => {
 			assert.function_(fixture().then);
@@ -857,7 +857,7 @@ test('is.asyncGenerator', t => {
 		yield 4;
 	})();
 	if (is.asyncGenerator(fixture)) {
-		t.true(is.function_(fixture.next));
+		t.true(is.function(fixture.next));
 	}
 });
 
@@ -873,7 +873,7 @@ test('is.asyncGeneratorFunction', t => {
 	};
 
 	if (is.asyncGeneratorFunction(fixture)) {
-		t.true(is.function_(fixture().next));
+		t.true(is.function(fixture().next));
 	}
 });
 
@@ -1365,7 +1365,7 @@ test('is.class', t => {
 	];
 
 	for (const classDeclaration of classDeclarations) {
-		t.true(is.class_(classDeclaration));
+		t.true(is.class(classDeclaration));
 
 		t.notThrows(() => {
 			assert.class_(classDeclaration);
@@ -1456,7 +1456,7 @@ test('is.tupleLike', t => {
 	t.false(is.tupleLike('unicorn', [is.string]));
 
 	t.false(is.tupleLike({}, []));
-	t.false(is.tupleLike(() => {}, [is.function_]));
+	t.false(is.tupleLike(() => {}, [is.function]));
 	t.false(is.tupleLike(new Map(), [is.map]));
 
 	(function () {
@@ -1476,7 +1476,7 @@ test('is.tupleLike', t => {
 		assert.tupleLike({}, [is.object]);
 	});
 	t.throws(() => {
-		assert.tupleLike(() => {}, [is.function_]);
+		assert.tupleLike(() => {}, [is.function]);
 	});
 	t.throws(() => {
 		assert.tupleLike(new Map(), [is.map]);
@@ -1496,7 +1496,7 @@ test('is.tupleLike', t => {
 	{
 		const tuple = [{isTest: true}, '1', true, null];
 
-		if (is.tupleLike(tuple, [is.nonEmptyObject, is.string, is.boolean, is.null_])) {
+		if (is.tupleLike(tuple, [is.nonEmptyObject, is.string, is.boolean, is.null])) {
 			const value = tuple[0];
 			expectTypeOf(value).toEqualTypeOf<Record<string | number | symbol, unknown>>();
 		}
@@ -1505,7 +1505,7 @@ test('is.tupleLike', t => {
 	{
 		const tuple = [1, '1', true, null, undefined];
 
-		if (is.tupleLike(tuple, [is.number, is.string, is.boolean, is.undefined, is.null_])) {
+		if (is.tupleLike(tuple, [is.number, is.string, is.boolean, is.undefined, is.null])) {
 			const numericValue = tuple[0];
 			const stringValue = tuple[1];
 			const booleanValue = tuple[2];
@@ -1540,14 +1540,17 @@ test('is.inRange', t => {
 	t.false(is.inRange(-3, -2));
 
 	t.throws(() => {
+		// @ts-expect-error invalid argument
 		is.inRange(0, []);
 	});
 
 	t.throws(() => {
+		// @ts-expect-error invalid argument
 		is.inRange(0, [5]);
 	});
 
 	t.throws(() => {
+		// @ts-expect-error invalid argument
 		is.inRange(0, [1, 2, 3]);
 	});
 
@@ -1604,14 +1607,17 @@ test('is.inRange', t => {
 	});
 
 	t.throws(() => {
+		// @ts-expect-error invalid argument
 		assert.inRange(0, []);
 	});
 
 	t.throws(() => {
+		// @ts-expect-error invalid argument
 		assert.inRange(0, [5]);
 	});
 
 	t.throws(() => {
+		// @ts-expect-error invalid argument
 		assert.inRange(0, [1, 2, 3]);
 	});
 });
@@ -2070,6 +2076,30 @@ test('is.urlSearchParams', t => {
 	t.throws(() => {
 		assert.urlSearchParams(null);
 	});
+});
+
+test('is.validLength', t => {
+	t.true(is.validLength(1));
+	t.true(is.validLength(0));
+	t.false(is.validLength(-1));
+	t.false(is.validLength(0.1));
+	t.notThrows(() => {
+		assert.validLength(1);
+	});
+	t.throws(() => {
+		assert.validLength(-1);
+	});
+});
+
+test('is.whitespaceString', t => {
+	t.true(is.whitespaceString(' '));
+	t.true(is.whitespaceString('   '));
+	t.true(is.whitespaceString(' 　 '));
+	t.true(is.whitespaceString('\u3000'));
+	t.true(is.whitespaceString('　'));
+	t.false(is.whitespaceString(''));
+	t.false(is.whitespaceString('-'));
+	t.false(is.whitespaceString(' hi '));
 });
 
 test('assert', t => {
