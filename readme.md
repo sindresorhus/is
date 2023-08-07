@@ -84,7 +84,7 @@ Example:
 - `'Function'`
 - `'Object'`
 
-This method is also exported as `detect`, you can import it like this:
+This method is also exported as `detect`. You can import it like this:
 
 ```js
 import {detect} from '@sindresorhus/is';
