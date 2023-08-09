@@ -799,28 +799,13 @@ function unique<T>(values: T[]): T[] {
 	return Array.from(new Set(values));
 }
 
-function joinWithWord(values: string[], word: 'and' | 'or'): string {
-	switch (values.length) {
-		case 0:
-		case 1: {
-			return values.join('');
-		}
-
-		case 2: {
-			return values.join(` ${word} `);
-		}
-
-		default: {
-			// TODO: Replace with .at after node v14 support is dropped
-			return `${[...values].slice(0, -1).join(', ')}, ${word} ${values[values.length - 1] ?? ''}`;
-		}
-	}
-}
+const andFormatter = new Intl.ListFormat('en', {style: 'long', type: 'conjunction'});
+const orFormatter = new Intl.ListFormat('en', {style: 'long', type: 'disjunction'});
 
 function typeErrorMessageMultipleValues(expectedType: AssertionTypeDescription | AssertionTypeDescription[], values: unknown[]): string {
 	const uniqueExpectedTypes = unique((isArray(expectedType) ? expectedType : [expectedType]).map(value => `\`${value}\``));
 	const uniqueValueTypes = unique(values.map(value => `\`${is(value)}\``));
-	return `Expected values which are ${joinWithWord(uniqueExpectedTypes, 'or')}. Received values of type${uniqueValueTypes.length > 1 ? 's' : ''} ${joinWithWord(uniqueValueTypes, 'and')}.`;
+	return `Expected values which are ${orFormatter.format(uniqueExpectedTypes)}. Received values of type${uniqueValueTypes.length > 1 ? 's' : ''} ${andFormatter.format(uniqueValueTypes)}.`;
 }
 
 // Type assertions have to be declared with an explicit type.
