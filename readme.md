@@ -411,7 +411,7 @@ An object is plain if it's created by either `{}`, `new Object()`, or `Object.cr
 ##### .asyncIterable(value)
 ##### .class(value)
 
-Returns `true` for instances created by a class.
+Returns `true` if the value is a class constructor.
 
 ##### .typedArray(value)
 
