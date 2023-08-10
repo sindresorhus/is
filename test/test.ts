@@ -23,7 +23,6 @@ class ErrorSubclassFixture extends Error {}
 
 const {window} = new JSDOM();
 const {document} = window;
-const createDomElement = (element: string) => document.createElement(element);
 
 const structuredClone = globalThis.structuredClone ?? (x => x);
 
@@ -516,9 +515,9 @@ const types = new Map<string, Test>([
 		typename: 'number',
 		typeDescription: 'integer',
 	}],
-	['domElement', {
-		is: is.domElement,
-		assert: assert.domElement,
+	['htmlElement', {
+		is: is.htmlElement,
+		assert: assert.htmlElement,
 		fixtures: [
 			'div',
 			'input',
@@ -527,14 +526,14 @@ const types = new Map<string, Test>([
 			'canvas',
 			'script',
 		]
-			.map(fixture => createDomElement(fixture)),
+			.map(fixture => document.createElement(fixture)),
 		typeDescription: 'HTMLElement',
 	}],
-	['non-domElements', {
-		is: value => !is.domElement(value),
+	['non-htmlElement', {
+		is: value => !is.htmlElement(value),
 		assert(value: unknown) {
 			invertAssertThrow('HTMLElement', () => {
-				assert.domElement(value);
+				assert.htmlElement(value);
 			}, value);
 		},
 		fixtures: [
@@ -1622,11 +1621,11 @@ test('is.inRange', t => {
 	});
 });
 
-test('is.domElement', t => {
-	testType(t, 'domElement');
-	t.false(is.domElement({nodeType: 1, nodeName: 'div'}));
+test('is.htmlElement', t => {
+	testType(t, 'htmlElement');
+	t.false(is.htmlElement({nodeType: 1, nodeName: 'div'}));
 	t.throws(() => {
-		assert.domElement({nodeType: 1, nodeName: 'div'});
+		assert.htmlElement({nodeType: 1, nodeName: 'div'});
 	});
 
 	const tagNames = [
@@ -1636,11 +1635,11 @@ test('is.domElement', t => {
 		'img',
 		'canvas',
 		'script',
-	];
+	] as const;
 
 	for (const tagName of tagNames) {
-		const domElement = createDomElement(tagName);
-		t.is(is(domElement), 'HTMLElement');
+		const element = document.createElement(tagName);
+		t.is(is(element), 'HTMLElement');
 	}
 });
 

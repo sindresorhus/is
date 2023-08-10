@@ -138,7 +138,7 @@ export type AssertionTypeDescription = typeof assertionTypeDescriptions[number];
 const getObjectType = (value: unknown): ObjectTypeName | undefined => {
 	const objectTypeName = Object.prototype.toString.call(value).slice(8, -1);
 
-	if (/HTML\w+Element/.test(objectTypeName) && isDomElement(value)) {
+	if (/HTML\w+Element/.test(objectTypeName) && isHtmlElement(value)) {
 		return 'HTMLElement';
 	}
 
@@ -240,7 +240,8 @@ const is = Object.assign(
 		date: isDate,
 		detect,
 		directInstanceOf: isDirectInstanceOf,
-		domElement: isDomElement,
+		/** @deprecated Renamed to `htmlElement` */
+		domElement: isHtmlElement,
 		emptyArray: isEmptyArray,
 		emptyMap: isEmptyMap,
 		emptyObject: isEmptyObject,
@@ -259,6 +260,7 @@ const is = Object.assign(
 		function_: isFunction,
 		generator: isGenerator,
 		generatorFunction: isGeneratorFunction,
+		htmlElement: isHtmlElement,
 		infinite: isInfinite,
 		inRange: isInRange,
 		int16Array: isInt16Array,
@@ -493,7 +495,7 @@ const DOM_PROPERTIES_TO_CHECK: Array<(keyof HTMLElement)> = [
 	'nodeValue',
 ];
 
-export function isDomElement(value: unknown): value is HTMLElement {
+export function isHtmlElement(value: unknown): value is HTMLElement {
 	return isObject(value)
 		&& (value as HTMLElement).nodeType === NODE_TYPE_ELEMENT
 		&& isString((value as HTMLElement).nodeName)
@@ -889,7 +891,9 @@ type Assert = {
 	typedArray: (value: unknown) => asserts value is TypedArray;
 	arrayLike: <T = unknown>(value: unknown) => asserts value is ArrayLike<T>;
 	tupleLike: <T extends Array<TypeGuard<unknown>>>(value: unknown, guards: [...T]) => asserts value is ResolveTypesOfTypeGuardsTuple<T>;
+	/** @deprecated Renamed to `htmlElement` */
 	domElement: (value: unknown) => asserts value is HTMLElement;
+	htmlElement: (value: unknown) => asserts value is HTMLElement;
 	observable: (value: unknown) => asserts value is ObservableLike;
 	nodeStream: (value: unknown) => asserts value is NodeStream;
 	infinite: (value: unknown) => asserts value is number;
@@ -946,7 +950,7 @@ export const assert: Assert = {
 	dataView: assertDataView,
 	date: assertDate,
 	directInstanceOf: assertDirectInstanceOf,
-	domElement: assertDomElement,
+	domElement: assertHtmlElement,
 	emptyArray: assertEmptyArray,
 	emptyMap: assertEmptyMap,
 	emptyObject: assertEmptyObject,
@@ -964,6 +968,7 @@ export const assert: Assert = {
 	function_: assertFunction,
 	generator: assertGenerator,
 	generatorFunction: assertGeneratorFunction,
+	htmlElement: assertHtmlElement,
 	infinite: assertInfinite,
 	inRange: assertInRange,
 	int16Array: assertInt16Array,
@@ -1038,6 +1043,7 @@ const methodTypeMap = {
 	isDataView: 'DataView',
 	isDate: 'Date',
 	isDirectInstanceOf: 'T',
+	/** @deprecated */
 	isDomElement: 'HTMLElement',
 	isEmptyArray: 'empty array',
 	isEmptyMap: 'empty map',
@@ -1055,6 +1061,7 @@ const methodTypeMap = {
 	isFunction: 'Function',
 	isGenerator: 'Generator',
 	isGeneratorFunction: 'GeneratorFunction',
+	isHtmlElement: 'HTMLElement',
 	isInfinite: 'infinite number',
 	isInRange: 'in range',
 	isInt16Array: 'Int16Array',
@@ -1250,12 +1257,6 @@ export function assertDirectInstanceOf<T>(instance: unknown, class_: Class<T>): 
 	}
 }
 
-export function assertDomElement(value: unknown): asserts value is HTMLElement {
-	if (!isDomElement(value)) {
-		throw new TypeError(typeErrorMessage('HTMLElement', value));
-	}
-}
-
 export function assertEmptyArray(value: unknown): asserts value is never[] {
 	if (!isEmptyArray(value)) {
 		throw new TypeError(typeErrorMessage('empty array', value));
@@ -1350,6 +1351,12 @@ export function assertGenerator(value: unknown): asserts value is Generator {
 export function assertGeneratorFunction(value: unknown): asserts value is GeneratorFunction {
 	if (!isGeneratorFunction(value)) {
 		throw new TypeError(typeErrorMessage('GeneratorFunction', value));
+	}
+}
+
+export function assertHtmlElement(value: unknown): asserts value is HTMLElement {
+	if (!isHtmlElement(value)) {
+		throw new TypeError(typeErrorMessage('HTMLElement', value));
 	}
 }
 
