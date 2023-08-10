@@ -476,7 +476,7 @@ Check if `value` (number) is in the range of `0` to `upperBound`.
 is.inRange(3, 10);
 ```
 
-##### .domElement(value)
+##### .htmlElement(value)
 
 Returns `true` if `value` is an [HTMLElement](https://developer.mozilla.org/en-US/docs/Web/API/HTMLElement).
 
