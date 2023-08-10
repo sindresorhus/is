@@ -1,13 +1,7 @@
 {
 	"extends": "@sindresorhus/tsconfig",
 	"compilerOptions": {
-		"lib": [
-			"DOM",
-			"DOM.Iterable",
-			"ES2021"
-		],
 		"outDir": "dist",
-		"target": "ES2021"
 	},
 	"include": [
 		"source"
