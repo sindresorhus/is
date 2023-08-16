@@ -18,7 +18,7 @@
 	},
 	"scripts": {
 		"build": "del dist && tsc",
-		"test": "tsc --noEmit && xo && ava",
+		"test": "tsc --noEmit && xo && NODE_OPTIONS='--loader=ts-node/esm --no-warnings=ExperimentalWarning' ava",
 		"prepare": "npm run build"
 	},
 	"files": [
@@ -68,9 +68,6 @@
 	"ava": {
 		"extensions": {
 			"ts": "module"
-		},
-		"nodeArguments": [
-			"--loader=ts-node/esm"
-		]
+		}
 	}
 }
