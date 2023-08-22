@@ -801,10 +801,25 @@ function unique<T>(values: T[]): T[] {
 	return Array.from(new Set(values));
 }
 
+function formatList(list: string[], disjunction = false) {
+	const conjunction = disjunction ? 'or' : 'and'
+    if (!list?.length) {
+        return '';
+    }
+    if (list.length === 1) {
+        return list.toString();
+    }
+    if (list.length === 2) {
+        return list.join(` ${conjunction} `);
+    }
+
+    return list.slice(0, -1).join(', ') + `, ${conjunction} ` + list.slice(-1);
+};
+
 function typeErrorMessageMultipleValues(expectedType: AssertionTypeDescription | AssertionTypeDescription[], values: unknown[]): string {
 	const uniqueExpectedTypes = unique((isArray(expectedType) ? expectedType : [expectedType]).map(value => `\`${value}\``));
 	const uniqueValueTypes = unique(values.map(value => `\`${is(value)}\``));
-	return `Expected values which are ${uniqueExpectedTypes.join(', ')}. Received values of type${uniqueValueTypes.length > 1 ? 's' : ''} ${uniqueValueTypes.join(', ')}.`;
+	return `Expected values which are ${formatList(uniqueExpectedTypes, true)}. Received values of type${uniqueValueTypes.length > 1 ? 's' : ''} ${formatList(uniqueValueTypes)}.`;
 }
 
 // Type assertions have to be declared with an explicit type.
