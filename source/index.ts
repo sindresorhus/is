@@ -804,7 +804,7 @@ function unique<T>(values: T[]): T[] {
 function typeErrorMessageMultipleValues(expectedType: AssertionTypeDescription | AssertionTypeDescription[], values: unknown[]): string {
 	const uniqueExpectedTypes = unique((isArray(expectedType) ? expectedType : [expectedType]).map(value => `\`${value}\``));
 	const uniqueValueTypes = unique(values.map(value => `\`${is(value)}\``));
-	return `Expected values which are ${uniqueExpectedTypes.join(", ")}. Received values of type${uniqueValueTypes.length > 1 ? 's' : ''} ${uniqueValueTypes.join(", ")}.`;
+	return `Expected values which are ${uniqueExpectedTypes.join(', ')}. Received values of type${uniqueValueTypes.length > 1 ? 's' : ''} ${uniqueValueTypes.join(', ')}.`;
 }
 
 // Type assertions have to be declared with an explicit type.
