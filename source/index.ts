@@ -413,6 +413,10 @@ export function isDate(value: unknown): value is Date {
 }
 
 export function isDirectInstanceOf<T>(instance: unknown, class_: Class<T>): instance is T {
+	if (instance === undefined || instance === null) {
+		return false;
+	}
+
 	return Object.getPrototypeOf(instance) === class_.prototype;
 }
 

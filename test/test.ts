@@ -986,6 +986,9 @@ test('is.directInstanceOf', t => {
 	t.throws(() => {
 		assert.directInstanceOf(errorSubclass, Error);
 	});
+
+	t.false(is.directInstanceOf(undefined, Error));
+	t.false(is.directInstanceOf(null, Error));
 });
 
 test('is.urlInstance', t => {
