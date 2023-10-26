@@ -4,6 +4,7 @@ import type {
 	Class,
 	Falsy,
 	NodeStream,
+	NonEmptyString,
 	ObservableLike,
 	Predicate,
 	Primitive,
@@ -582,12 +583,12 @@ export function isNonEmptySet<T = unknown>(value: unknown): value is Set<T> {
 }
 
 // TODO: Use `not ''` when the `not` operator is available.
-export function isNonEmptyString(value: unknown): value is string {
+export function isNonEmptyString(value: unknown): value is NonEmptyString {
 	return isString(value) && value.length > 0;
 }
 
 // TODO: Use `not ''` when the `not` operator is available.
-export function isNonEmptyStringAndNotWhitespace(value: unknown): value is string {
+export function isNonEmptyStringAndNotWhitespace(value: unknown): value is NonEmptyString {
 	return isString(value) && !isEmptyStringOrWhitespace(value);
 }
 

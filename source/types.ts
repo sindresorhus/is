@@ -73,3 +73,5 @@ export type NodeStream = {
 } & NodeJS.EventEmitter;
 
 export type Predicate = (value: unknown) => boolean;
+
+export type NonEmptyString = string & {0: string};
