@@ -450,11 +450,11 @@ function foo() {
 foo();
 ```
 
-#### .positiveNumber(value)
+##### .positiveNumber(value)
 
 Check if `value` is a number and is more than 0.
 
-#### .negativeNumber(value)
+##### .negativeNumber(value)
 
 Check if `value` is a number and is less than 0.
 
