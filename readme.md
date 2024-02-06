@@ -732,12 +732,6 @@ The most common mistakes I noticed in these modules was using `instanceof` for t
 
 `instanceof` does not work correctly for all types and it does not work across [realms](https://stackoverflow.com/a/49832343/64949). Examples of realms are iframes, windows, web workers, and the `vm` module in Node.js.
 
-## For enterprise
-
-Available as part of the Tidelift Subscription.
-
-The maintainers of @sindresorhus/is and thousands of other packages are working with Tidelift to deliver commercial support and maintenance for the open source dependencies you use to build your applications. Save time, reduce risk, and improve code health, while paying the maintainers of the exact dependencies you use. [Learn more.](https://tidelift.com/subscription/pkg/npm-sindresorhus-is?utm_source=npm-sindresorhus-is&utm_medium=referral&utm_campaign=enterprise&utm_term=repo)
-
 ## Related
 
 - [ow](https://github.com/sindresorhus/ow) - Function argument validation for humans
