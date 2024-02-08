@@ -128,6 +128,7 @@ const assertionTypeDescriptions = [
 	'in range',
 	'predicate returns truthy for any value',
 	'predicate returns truthy for all values',
+	'valid Date',
 	'valid length',
 	'whitespace string',
 	...objectTypeNames,
@@ -311,6 +312,7 @@ const is = Object.assign(
 		urlInstance: isUrlInstance,
 		urlSearchParams: isUrlSearchParams,
 		urlString: isUrlString,
+		validDate: isValidDate,
 		validLength: isValidLength,
 		weakMap: isWeakMap,
 		weakRef: isWeakRef,
@@ -760,6 +762,10 @@ export function isUrlString(value: unknown): value is string {
 	}
 }
 
+export function isValidDate(value: unknown): value is Date {
+	return isDate(value) && !isNan(Number(value));
+}
+
 export function isValidLength(value: unknown): value is number {
 	return isSafeInteger(value) && value >= 0;
 }
@@ -917,6 +923,7 @@ type Assert = {
 	propertyKey: (value: unknown) => asserts value is PropertyKey;
 	formData: (value: unknown) => asserts value is FormData;
 	urlSearchParams: (value: unknown) => asserts value is URLSearchParams;
+	validDate: (value: unknown) => asserts value is Date;
 	validLength: (value: unknown) => asserts value is number;
 	whitespaceString: (value: unknown) => asserts value is string;
 
@@ -1022,6 +1029,7 @@ export const assert: Assert = {
 	urlInstance: assertUrlInstance,
 	urlSearchParams: assertUrlSearchParams,
 	urlString: assertUrlString,
+	validDate: assertValidDate,
 	validLength: assertValidLength,
 	weakMap: assertWeakMap,
 	weakRef: assertWeakRef,
@@ -1114,6 +1122,7 @@ const methodTypeMap = {
 	isUrlInstance: 'URL',
 	isUrlSearchParams: 'URLSearchParams',
 	isUrlString: 'string with a URL',
+	isValidDate: 'valid Date',
 	isValidLength: 'valid length',
 	isWeakMap: 'WeakMap',
 	isWeakRef: 'WeakRef',
@@ -1648,6 +1657,12 @@ export function assertUrlSearchParams(value: unknown): asserts value is URLSearc
 export function assertUrlString(value: unknown): asserts value is string {
 	if (!isUrlString(value)) {
 		throw new TypeError(typeErrorMessage('string with a URL', value));
+	}
+}
+
+export function assertValidDate(value: unknown): asserts value is Date {
+	if (!isValidDate(value)) {
+		throw new TypeError(typeErrorMessage('valid Date', value));
 	}
 }
 

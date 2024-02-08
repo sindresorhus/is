@@ -574,6 +574,20 @@ is.all(is.string, '🦄', [], 'unicorns');
 //=> false
 ```
 
+##### .validDate(value)
+
+Returns `true` if the value is a valid date.
+
+`Invalid Date`s occur when an invalid value is passed to the `Date` constructor. This can be an invalid date string, a non-numeric value or a number that is outside of the expected range for a date value.
+
+```js
+is.validDate(new Date());
+//=> true
+
+is.validDate(new Date('unicorn'));
+//=> false
+```
+
 ##### .validLength(value)
 
 Returns `true` if the value is a safe integer that is greater than or equal to zero.
