@@ -578,13 +578,29 @@ is.all(is.string, '🦄', [], 'unicorns');
 
 Returns `true` if the value is a valid date.
 
-`Invalid Date`s occur when an invalid value is passed to the `Date` constructor. This can be an invalid date string, a non-numeric value or a number that is outside of the expected range for a date value.
+All [`Date`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date/Date) objects have an internal timestamp value which is the number of milliseconds since the [Unix epoch](https://developer.mozilla.org/en-US/docs/Glossary/Unix_time). When a new `Date` is constructed with bad inputs, no error is thrown. Instead, a new `Date` object is returned. But the internal timestamp value is set to `NaN`, which is an _'Invalid Date'_. Bad inputs can be an non-parsable date string, a non-numeric value or a number that is outside of the expected range for a date value.
 
 ```js
-is.validDate(new Date());
+const valid = new Date('2000-01-01');
+
+is.date(valid);
+//=> true
+valid.getTime();
+//=> 946684800000
+valid.toUTCString();
+//=> 'Sat, 01 Jan 2000 00:00:00 GMT'
+is.validDate(valid);
 //=> true
 
-is.validDate(new Date('unicorn'));
+const invalid = new Date('Not a parsable date string');
+
+is.date(invalid);
+//=> true
+invalid.getTime();
+//=> NaN
+invalid.toUTCString();
+//=> 'Invalid Date'
+is.validDate(invalid);
 //=> false
 ```
 
