@@ -2101,6 +2101,17 @@ test('is.urlSearchParams', t => {
 	});
 });
 
+test('is.validDate', t => {
+	t.true(is.validDate(new Date()));
+	t.false(is.validDate(new Date('x')));
+	t.notThrows(() => {
+		assert.validDate(new Date());
+	});
+	t.throws(() => {
+		assert.validDate(new Date('x'));
+	});
+});
+
 test('is.validLength', t => {
 	t.true(is.validLength(1));
 	t.true(is.validLength(0));
