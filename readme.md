@@ -578,7 +578,7 @@ is.all(is.string, '🦄', [], 'unicorns');
 
 Returns `true` if the value is a valid date.
 
-All [`Date`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date/Date) objects have an internal timestamp value which is the number of milliseconds since the [Unix epoch](https://developer.mozilla.org/en-US/docs/Glossary/Unix_time). When a new `Date` is constructed with bad inputs, no error is thrown. Instead, a new `Date` object is returned. But the internal timestamp value is set to `NaN`, which is an _'Invalid Date'_. Bad inputs can be an non-parsable date string, a non-numeric value or a number that is outside of the expected range for a date value.
+All [`Date`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date/Date) objects have an internal timestamp value which is the number of milliseconds since the [Unix epoch](https://developer.mozilla.org/en-US/docs/Glossary/Unix_time). When a new `Date` is constructed with bad inputs, no error is thrown. Instead, a new `Date` object is returned. But the internal timestamp value is set to `NaN`, which is an `'Invalid Date'`. Bad inputs can be an non-parsable date string, a non-numeric value or a number that is outside of the expected range for a date value.
 
 ```js
 const valid = new Date('2000-01-01');
