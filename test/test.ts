@@ -2174,3 +2174,360 @@ test('assert', t => {
 		t.true(is.string(badlyTypedVariable));
 	}
 });
+
+test('custom assertion message', t => {
+	const message = 'Custom error message';
+
+	t.throws(() => {
+		assert.array(undefined, undefined, message);
+	}, {instanceOf: TypeError, message});
+
+	t.throws(() => {
+		assert.arrayBuffer(undefined, message);
+	}, {instanceOf: TypeError, message});
+
+	t.throws(() => {
+		assert.arrayLike(undefined, message);
+	}, {instanceOf: TypeError, message});
+
+	t.throws(() => {
+		assert.asyncFunction(undefined, message);
+	}, {instanceOf: TypeError, message});
+
+	t.throws(() => {
+		assert.asyncGenerator(undefined, message);
+	}, {instanceOf: TypeError, message});
+
+	t.throws(() => {
+		assert.asyncGeneratorFunction(undefined, message);
+	}, {instanceOf: TypeError, message});
+
+	t.throws(() => {
+		assert.asyncIterable(undefined, message);
+	}, {instanceOf: TypeError, message});
+
+	t.throws(() => {
+		assert.bigInt64Array(undefined, message);
+	}, {instanceOf: TypeError, message});
+
+	t.throws(() => {
+		assert.bigUint64Array(undefined, message);
+	}, {instanceOf: TypeError, message});
+
+	t.throws(() => {
+		assert.bigint(undefined, message);
+	}, {instanceOf: TypeError, message});
+
+	t.throws(() => {
+		assert.blob(undefined, message);
+	}, {instanceOf: TypeError, message});
+
+	t.throws(() => {
+		assert.boolean(undefined, message);
+	}, {instanceOf: TypeError, message});
+
+	t.throws(() => {
+		assert.boundFunction(undefined, message);
+	}, {instanceOf: TypeError, message});
+
+	t.throws(() => {
+		assert.buffer(undefined, message);
+	}, {instanceOf: TypeError, message});
+
+	t.throws(() => {
+		assert.class(undefined, message);
+	}, {instanceOf: TypeError, message});
+
+	t.throws(() => {
+		assert.dataView(undefined, message);
+	}, {instanceOf: TypeError, message});
+
+	t.throws(() => {
+		assert.date(undefined, message);
+	}, {instanceOf: TypeError, message});
+
+	t.throws(() => {
+		assert.directInstanceOf(undefined, Error, message);
+	}, {instanceOf: TypeError, message});
+
+	t.throws(() => {
+		assert.emptyArray(undefined, message);
+	}, {instanceOf: TypeError, message});
+
+	t.throws(() => {
+		assert.emptyMap(undefined, message);
+	}, {instanceOf: TypeError, message});
+
+	t.throws(() => {
+		assert.emptyObject(undefined, message);
+	}, {instanceOf: TypeError, message});
+
+	t.throws(() => {
+		assert.emptySet(undefined, message);
+	}, {instanceOf: TypeError, message});
+
+	t.throws(() => {
+		assert.emptyString(undefined, message);
+	}, {instanceOf: TypeError, message});
+
+	t.throws(() => {
+		assert.emptyStringOrWhitespace(undefined, message);
+	}, {instanceOf: TypeError, message});
+
+	t.throws(() => {
+		enum Enum {}
+		assert.enumCase('invalid', Enum, message);
+	}, {instanceOf: TypeError, message});
+
+	t.throws(() => {
+		assert.error(undefined, message);
+	}, {instanceOf: TypeError, message});
+
+	t.throws(() => {
+		assert.evenInteger(33, message);
+	}, {instanceOf: TypeError, message});
+
+	t.throws(() => {
+		assert.falsy(true, message);
+	}, {instanceOf: TypeError, message});
+
+	t.throws(() => {
+		assert.float32Array(undefined, message);
+	}, {instanceOf: TypeError, message});
+
+	t.throws(() => {
+		assert.float64Array(undefined, message);
+	}, {instanceOf: TypeError, message});
+
+	t.throws(() => {
+		assert.formData(undefined, message);
+	}, {instanceOf: TypeError, message});
+
+	t.throws(() => {
+		assert.function(undefined, message);
+	}, {instanceOf: TypeError, message});
+
+	t.throws(() => {
+		assert.generator(undefined, message);
+	}, {instanceOf: TypeError, message});
+
+	t.throws(() => {
+		assert.generatorFunction(undefined, message);
+	}, {instanceOf: TypeError, message});
+
+	t.throws(() => {
+		assert.htmlElement(undefined, message);
+	}, {instanceOf: TypeError, message});
+
+	t.throws(() => {
+		assert.inRange(5, [1, 2], message);
+	}, {instanceOf: TypeError, message});
+
+	t.throws(() => {
+		assert.infinite(undefined, message);
+	}, {instanceOf: TypeError, message});
+
+	t.throws(() => {
+		assert.int16Array(undefined, message);
+	}, {instanceOf: TypeError, message});
+
+	t.throws(() => {
+		assert.int32Array(undefined, message);
+	}, {instanceOf: TypeError, message});
+
+	t.throws(() => {
+		assert.int8Array(undefined, message);
+	}, {instanceOf: TypeError, message});
+
+	t.throws(() => {
+		assert.integer(undefined, message);
+	}, {instanceOf: TypeError, message});
+
+	t.throws(() => {
+		assert.iterable(undefined, message);
+	}, {instanceOf: TypeError, message});
+
+	t.throws(() => {
+		assert.map(undefined, message);
+	}, {instanceOf: TypeError, message});
+
+	t.throws(() => {
+		assert.nan(undefined, message);
+	}, {instanceOf: TypeError, message});
+
+	t.throws(() => {
+		assert.nativePromise(undefined, message);
+	}, {instanceOf: TypeError, message});
+
+	t.throws(() => {
+		assert.negativeNumber(undefined, message);
+	}, {instanceOf: TypeError, message});
+
+	t.throws(() => {
+		assert.nodeStream(undefined, message);
+	}, {instanceOf: TypeError, message});
+
+	t.throws(() => {
+		assert.nonEmptyArray(undefined, message);
+	}, {instanceOf: TypeError, message});
+
+	t.throws(() => {
+		assert.nonEmptyMap(undefined, message);
+	}, {instanceOf: TypeError, message});
+
+	t.throws(() => {
+		assert.nonEmptyObject(undefined, message);
+	}, {instanceOf: TypeError, message});
+
+	t.throws(() => {
+		assert.nonEmptySet(undefined, message);
+	}, {instanceOf: TypeError, message});
+
+	t.throws(() => {
+		assert.nonEmptyString(undefined, message);
+	}, {instanceOf: TypeError, message});
+
+	t.throws(() => {
+		assert.nonEmptyStringAndNotWhitespace(undefined, message);
+	}, {instanceOf: TypeError, message});
+
+	t.throws(() => {
+		assert.null(undefined, message);
+	}, {instanceOf: TypeError, message});
+
+	t.throws(() => {
+		assert.nullOrUndefined(false, message);
+	}, {instanceOf: TypeError, message});
+
+	t.throws(() => {
+		assert.number(undefined, message);
+	}, {instanceOf: TypeError, message});
+
+	t.throws(() => {
+		assert.numericString(undefined, message);
+	}, {instanceOf: TypeError, message});
+
+	t.throws(() => {
+		assert.object(undefined, message);
+	}, {instanceOf: TypeError, message});
+
+	t.throws(() => {
+		assert.observable(undefined, message);
+	}, {instanceOf: TypeError, message});
+
+	t.throws(() => {
+		assert.oddInteger(42, message);
+	}, {instanceOf: TypeError, message});
+
+	t.throws(() => {
+		assert.plainObject(undefined, message);
+	}, {instanceOf: TypeError, message});
+
+	t.throws(() => {
+		assert.positiveNumber(undefined, message);
+	}, {instanceOf: TypeError, message});
+
+	t.throws(() => {
+		assert.primitive([], message);
+	}, {instanceOf: TypeError, message});
+
+	t.throws(() => {
+		assert.promise(undefined, message);
+	}, {instanceOf: TypeError, message});
+
+	t.throws(() => {
+		assert.propertyKey(undefined, message);
+	}, {instanceOf: TypeError, message});
+
+	t.throws(() => {
+		assert.regExp(undefined, message);
+	}, {instanceOf: TypeError, message});
+
+	t.throws(() => {
+		assert.safeInteger(undefined, message);
+	}, {instanceOf: TypeError, message});
+
+	t.throws(() => {
+		assert.set(undefined, message);
+	}, {instanceOf: TypeError, message});
+
+	t.throws(() => {
+		assert.sharedArrayBuffer(undefined, message);
+	}, {instanceOf: TypeError, message});
+
+	t.throws(() => {
+		assert.string(undefined, message);
+	}, {instanceOf: TypeError, message});
+
+	t.throws(() => {
+		assert.symbol(undefined, message);
+	}, {instanceOf: TypeError, message});
+
+	t.throws(() => {
+		assert.truthy(undefined, message);
+	}, {instanceOf: TypeError, message});
+
+	t.throws(() => {
+		assert.tupleLike(undefined, [], message);
+	}, {instanceOf: TypeError, message});
+
+	t.throws(() => {
+		assert.typedArray(undefined, message);
+	}, {instanceOf: TypeError, message});
+
+	t.throws(() => {
+		assert.uint16Array(undefined, message);
+	}, {instanceOf: TypeError, message});
+
+	t.throws(() => {
+		assert.uint32Array(undefined, message);
+	}, {instanceOf: TypeError, message});
+
+	t.throws(() => {
+		assert.uint8Array(undefined, message);
+	}, {instanceOf: TypeError, message});
+
+	t.throws(() => {
+		assert.uint8ClampedArray(undefined, message);
+	}, {instanceOf: TypeError, message});
+
+	t.throws(() => {
+		assert.undefined(false, message);
+	}, {instanceOf: TypeError, message});
+
+	t.throws(() => {
+		assert.urlInstance(undefined, message);
+	}, {instanceOf: TypeError, message});
+
+	t.throws(() => {
+		assert.urlSearchParams(undefined, message);
+	}, {instanceOf: TypeError, message});
+
+	t.throws(() => {
+		assert.urlString(undefined, message);
+	}, {instanceOf: TypeError, message});
+
+	t.throws(() => {
+		assert.validDate(undefined, message);
+	}, {instanceOf: TypeError, message});
+
+	t.throws(() => {
+		assert.validLength(undefined, message);
+	}, {instanceOf: TypeError, message});
+
+	t.throws(() => {
+		assert.weakMap(undefined, message);
+	}, {instanceOf: TypeError, message});
+
+	t.throws(() => {
+		assert.weakRef(undefined, message);
+	}, {instanceOf: TypeError, message});
+
+	t.throws(() => {
+		assert.weakSet(undefined, message);
+	}, {instanceOf: TypeError, message});
+
+	t.throws(() => {
+		assert.whitespaceString(undefined, message);
+	}, {instanceOf: TypeError, message});
+});
