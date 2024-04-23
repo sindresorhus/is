@@ -45,13 +45,13 @@ assert.string(2);
 //=> Error: Expected value which is `string`, received value of type `number`.
 ```
 
-Most assertions also support an optional custom error message.
+Assertions (except `assertAll` and `assertAny`) also support an optional custom error message.
 
 ```js
 import {assert} from '@sindresorhus/is';
 
-assert.nonEmptyString(process.env.API_URL, 'API_URL env variable is required.');
-//=> Error: API_URL env variable is required.
+assert.nonEmptyString(process.env.API_URL, 'The API_URL environment variable is required.');
+//=> Error: The API_URL environment variable is required.
 ```
 
 And with TypeScript:
