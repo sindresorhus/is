@@ -824,116 +824,116 @@ function typeErrorMessageMultipleValues(expectedType: AssertionTypeDescription |
 // Type assertions have to be declared with an explicit type.
 type Assert = {
 	// Unknowns.
-	undefined: (value: unknown) => asserts value is undefined;
-	string: (value: unknown) => asserts value is string;
-	number: (value: unknown) => asserts value is number;
-	positiveNumber: (value: unknown) => asserts value is number;
-	negativeNumber: (value: unknown) => asserts value is number;
-	bigint: (value: unknown) => asserts value is bigint;
+	undefined: (value: unknown, message?: string) => asserts value is undefined;
+	string: (value: unknown, message?: string) => asserts value is string;
+	number: (value: unknown, message?: string) => asserts value is number;
+	positiveNumber: (value: unknown, message?: string) => asserts value is number;
+	negativeNumber: (value: unknown, message?: string) => asserts value is number;
+	bigint: (value: unknown, message?: string) => asserts value is bigint;
 	// eslint-disable-next-line @typescript-eslint/ban-types
-	function: (value: unknown) => asserts value is Function;
+	function: (value: unknown, message?: string) => asserts value is Function;
 	/** @deprecated Renamed to `function`. */
 	// eslint-disable-next-line @typescript-eslint/ban-types
-	function_: (value: unknown) => asserts value is Function;
+	function_: (value: unknown, message?: string) => asserts value is Function;
 	// eslint-disable-next-line @typescript-eslint/ban-types
-	null: (value: unknown) => asserts value is null;
+	null: (value: unknown, message?: string) => asserts value is null;
 	/** @deprecated Renamed to `null`. */
 	// eslint-disable-next-line @typescript-eslint/ban-types
-	null_: (value: unknown) => asserts value is null;
-	class: (value: unknown) => asserts value is Class;
+	null_: (value: unknown, message?: string) => asserts value is null;
+	class: (value: unknown, message?: string) => asserts value is Class;
 	/** @deprecated Renamed to `class`. */
-	class_: (value: unknown) => asserts value is Class;
-	boolean: (value: unknown) => asserts value is boolean;
-	symbol: (value: unknown) => asserts value is symbol;
-	numericString: (value: unknown) => asserts value is `${number}`;
-	array: <T = unknown>(value: unknown, assertion?: (element: unknown) => asserts element is T) => asserts value is T[];
-	buffer: (value: unknown) => asserts value is Buffer;
-	blob: (value: unknown) => asserts value is Blob;
+	class_: (value: unknown, message?: string) => asserts value is Class;
+	boolean: (value: unknown, message?: string) => asserts value is boolean;
+	symbol: (value: unknown, message?: string) => asserts value is symbol;
+	numericString: (value: unknown, message?: string) => asserts value is `${number}`;
+	array: <T = unknown>(value: unknown, assertion?: (element: unknown) => asserts element is T, message?: string) => asserts value is T[];
+	buffer: (value: unknown, message?: string) => asserts value is Buffer;
+	blob: (value: unknown, message?: string) => asserts value is Blob;
 	// eslint-disable-next-line @typescript-eslint/ban-types
-	nullOrUndefined: (value: unknown) => asserts value is null | undefined;
-	object: <Key extends keyof any = string, Value = unknown>(value: unknown) => asserts value is Record<Key, Value>;
-	iterable: <T = unknown>(value: unknown) => asserts value is Iterable<T>;
-	asyncIterable: <T = unknown>(value: unknown) => asserts value is AsyncIterable<T>;
-	generator: (value: unknown) => asserts value is Generator;
-	asyncGenerator: (value: unknown) => asserts value is AsyncGenerator;
-	nativePromise: <T = unknown>(value: unknown) => asserts value is Promise<T>;
-	promise: <T = unknown>(value: unknown) => asserts value is Promise<T>;
-	generatorFunction: (value: unknown) => asserts value is GeneratorFunction;
-	asyncGeneratorFunction: (value: unknown) => asserts value is AsyncGeneratorFunction;
+	nullOrUndefined: (value: unknown, message?: string) => asserts value is null | undefined;
+	object: <Key extends keyof any = string, Value = unknown>(value: unknown, message?: string) => asserts value is Record<Key, Value>;
+	iterable: <T = unknown>(value: unknown, message?: string) => asserts value is Iterable<T>;
+	asyncIterable: <T = unknown>(value: unknown, message?: string) => asserts value is AsyncIterable<T>;
+	generator: (value: unknown, message?: string) => asserts value is Generator;
+	asyncGenerator: (value: unknown, message?: string) => asserts value is AsyncGenerator;
+	nativePromise: <T = unknown>(value: unknown, message?: string) => asserts value is Promise<T>;
+	promise: <T = unknown>(value: unknown, message?: string) => asserts value is Promise<T>;
+	generatorFunction: (value: unknown, message?: string) => asserts value is GeneratorFunction;
+	asyncGeneratorFunction: (value: unknown, message?: string) => asserts value is AsyncGeneratorFunction;
 	// eslint-disable-next-line @typescript-eslint/ban-types
-	asyncFunction: (value: unknown) => asserts value is Function;
+	asyncFunction: (value: unknown, message?: string) => asserts value is Function;
 	// eslint-disable-next-line @typescript-eslint/ban-types
-	boundFunction: (value: unknown) => asserts value is Function;
-	regExp: (value: unknown) => asserts value is RegExp;
-	date: (value: unknown) => asserts value is Date;
-	error: (value: unknown) => asserts value is Error;
-	map: <Key = unknown, Value = unknown>(value: unknown) => asserts value is Map<Key, Value>;
-	set: <T = unknown>(value: unknown) => asserts value is Set<T>;
+	boundFunction: (value: unknown, message?: string) => asserts value is Function;
+	regExp: (value: unknown, message?: string) => asserts value is RegExp;
+	date: (value: unknown, message?: string) => asserts value is Date;
+	error: (value: unknown, message?: string) => asserts value is Error;
+	map: <Key = unknown, Value = unknown>(value: unknown, message?: string) => asserts value is Map<Key, Value>;
+	set: <T = unknown>(value: unknown, message?: string) => asserts value is Set<T>;
 	// eslint-disable-next-line @typescript-eslint/ban-types
-	weakMap: <Key extends object = object, Value = unknown>(value: unknown) => asserts value is WeakMap<Key, Value>;
+	weakMap: <Key extends object = object, Value = unknown>(value: unknown, message?: string) => asserts value is WeakMap<Key, Value>;
 	// eslint-disable-next-line @typescript-eslint/ban-types
-	weakSet: <T extends object = object>(value: unknown) => asserts value is WeakSet<T>;
+	weakSet: <T extends object = object>(value: unknown, message?: string) => asserts value is WeakSet<T>;
 	// eslint-disable-next-line @typescript-eslint/ban-types
-	weakRef: <T extends object = object>(value: unknown) => asserts value is WeakRef<T>;
-	int8Array: (value: unknown) => asserts value is Int8Array;
-	uint8Array: (value: unknown) => asserts value is Uint8Array;
-	uint8ClampedArray: (value: unknown) => asserts value is Uint8ClampedArray;
-	int16Array: (value: unknown) => asserts value is Int16Array;
-	uint16Array: (value: unknown) => asserts value is Uint16Array;
-	int32Array: (value: unknown) => asserts value is Int32Array;
-	uint32Array: (value: unknown) => asserts value is Uint32Array;
-	float32Array: (value: unknown) => asserts value is Float32Array;
-	float64Array: (value: unknown) => asserts value is Float64Array;
-	bigInt64Array: (value: unknown) => asserts value is BigInt64Array;
-	bigUint64Array: (value: unknown) => asserts value is BigUint64Array;
-	arrayBuffer: (value: unknown) => asserts value is ArrayBuffer;
-	sharedArrayBuffer: (value: unknown) => asserts value is SharedArrayBuffer;
-	dataView: (value: unknown) => asserts value is DataView;
-	enumCase: <T = unknown>(value: unknown, targetEnum: T) => asserts value is T[keyof T];
-	urlInstance: (value: unknown) => asserts value is URL;
-	urlString: (value: unknown) => asserts value is string;
-	truthy: <T>(value: T | Falsy) => asserts value is T;
-	falsy: (value: unknown) => asserts value is Falsy;
-	nan: (value: unknown) => asserts value is number;
-	primitive: (value: unknown) => asserts value is Primitive;
-	integer: (value: unknown) => asserts value is number;
-	safeInteger: (value: unknown) => asserts value is number;
-	plainObject: <Value = unknown>(value: unknown) => asserts value is Record<PropertyKey, Value>;
-	typedArray: (value: unknown) => asserts value is TypedArray;
-	arrayLike: <T = unknown>(value: unknown) => asserts value is ArrayLike<T>;
-	tupleLike: <T extends Array<TypeGuard<unknown>>>(value: unknown, guards: [...T]) => asserts value is ResolveTypesOfTypeGuardsTuple<T>;
+	weakRef: <T extends object = object>(value: unknown, message?: string) => asserts value is WeakRef<T>;
+	int8Array: (value: unknown, message?: string) => asserts value is Int8Array;
+	uint8Array: (value: unknown, message?: string) => asserts value is Uint8Array;
+	uint8ClampedArray: (value: unknown, message?: string) => asserts value is Uint8ClampedArray;
+	int16Array: (value: unknown, message?: string) => asserts value is Int16Array;
+	uint16Array: (value: unknown, message?: string) => asserts value is Uint16Array;
+	int32Array: (value: unknown, message?: string) => asserts value is Int32Array;
+	uint32Array: (value: unknown, message?: string) => asserts value is Uint32Array;
+	float32Array: (value: unknown, message?: string) => asserts value is Float32Array;
+	float64Array: (value: unknown, message?: string) => asserts value is Float64Array;
+	bigInt64Array: (value: unknown, message?: string) => asserts value is BigInt64Array;
+	bigUint64Array: (value: unknown, message?: string) => asserts value is BigUint64Array;
+	arrayBuffer: (value: unknown, message?: string) => asserts value is ArrayBuffer;
+	sharedArrayBuffer: (value: unknown, message?: string) => asserts value is SharedArrayBuffer;
+	dataView: (value: unknown, message?: string) => asserts value is DataView;
+	enumCase: <T = unknown>(value: unknown, targetEnum: T, message?: string) => asserts value is T[keyof T];
+	urlInstance: (value: unknown, message?: string) => asserts value is URL;
+	urlString: (value: unknown, message?: string) => asserts value is string;
+	truthy: <T>(value: T | Falsy, message?: string) => asserts value is T;
+	falsy: (value: unknown, message?: string) => asserts value is Falsy;
+	nan: (value: unknown, message?: string) => asserts value is number;
+	primitive: (value: unknown, message?: string) => asserts value is Primitive;
+	integer: (value: unknown, message?: string) => asserts value is number;
+	safeInteger: (value: unknown, message?: string) => asserts value is number;
+	plainObject: <Value = unknown>(value: unknown, message?: string) => asserts value is Record<PropertyKey, Value>;
+	typedArray: (value: unknown, message?: string) => asserts value is TypedArray;
+	arrayLike: <T = unknown>(value: unknown, message?: string) => asserts value is ArrayLike<T>;
+	tupleLike: <T extends Array<TypeGuard<unknown>>>(value: unknown, guards: [...T], message?: string) => asserts value is ResolveTypesOfTypeGuardsTuple<T>;
 	/** @deprecated Renamed to `htmlElement` */
-	domElement: (value: unknown) => asserts value is HTMLElement;
-	htmlElement: (value: unknown) => asserts value is HTMLElement;
-	observable: (value: unknown) => asserts value is ObservableLike;
-	nodeStream: (value: unknown) => asserts value is NodeStream;
-	infinite: (value: unknown) => asserts value is number;
-	emptyArray: (value: unknown) => asserts value is never[];
-	nonEmptyArray: <T = unknown, Item = unknown>(value: T | Item[]) => asserts value is [Item, ...Item[]];
-	emptyString: (value: unknown) => asserts value is '';
-	emptyStringOrWhitespace: (value: unknown) => asserts value is string;
-	nonEmptyString: (value: unknown) => asserts value is string;
-	nonEmptyStringAndNotWhitespace: (value: unknown) => asserts value is string;
-	emptyObject: <Key extends keyof any = string>(value: unknown) => asserts value is Record<Key, never>;
-	nonEmptyObject: <Key extends keyof any = string, Value = unknown>(value: unknown) => asserts value is Record<Key, Value>;
-	emptySet: (value: unknown) => asserts value is Set<never>;
-	nonEmptySet: <T = unknown>(value: unknown) => asserts value is Set<T>;
-	emptyMap: (value: unknown) => asserts value is Map<never, never>;
-	nonEmptyMap: <Key = unknown, Value = unknown>(value: unknown) => asserts value is Map<Key, Value>;
-	propertyKey: (value: unknown) => asserts value is PropertyKey;
-	formData: (value: unknown) => asserts value is FormData;
-	urlSearchParams: (value: unknown) => asserts value is URLSearchParams;
-	validDate: (value: unknown) => asserts value is Date;
-	validLength: (value: unknown) => asserts value is number;
-	whitespaceString: (value: unknown) => asserts value is string;
+	domElement: (value: unknown, message?: string) => asserts value is HTMLElement;
+	htmlElement: (value: unknown, message?: string) => asserts value is HTMLElement;
+	observable: (value: unknown, message?: string) => asserts value is ObservableLike;
+	nodeStream: (value: unknown, message?: string) => asserts value is NodeStream;
+	infinite: (value: unknown, message?: string) => asserts value is number;
+	emptyArray: (value: unknown, message?: string) => asserts value is never[];
+	nonEmptyArray: <T = unknown, Item = unknown>(value: T | Item[], message?: string) => asserts value is [Item, ...Item[]];
+	emptyString: (value: unknown, message?: string) => asserts value is '';
+	emptyStringOrWhitespace: (value: unknown, message?: string) => asserts value is string;
+	nonEmptyString: (value: unknown, message?: string) => asserts value is string;
+	nonEmptyStringAndNotWhitespace: (value: unknown, message?: string) => asserts value is string;
+	emptyObject: <Key extends keyof any = string>(value: unknown, message?: string) => asserts value is Record<Key, never>;
+	nonEmptyObject: <Key extends keyof any = string, Value = unknown>(value: unknown, message?: string) => asserts value is Record<Key, Value>;
+	emptySet: (value: unknown, message?: string) => asserts value is Set<never>;
+	nonEmptySet: <T = unknown>(value: unknown, message?: string) => asserts value is Set<T>;
+	emptyMap: (value: unknown, message?: string) => asserts value is Map<never, never>;
+	nonEmptyMap: <Key = unknown, Value = unknown>(value: unknown, message?: string) => asserts value is Map<Key, Value>;
+	propertyKey: (value: unknown, message?: string) => asserts value is PropertyKey;
+	formData: (value: unknown, message?: string) => asserts value is FormData;
+	urlSearchParams: (value: unknown, message?: string) => asserts value is URLSearchParams;
+	validDate: (value: unknown, message?: string) => asserts value is Date;
+	validLength: (value: unknown, message?: string) => asserts value is number;
+	whitespaceString: (value: unknown, message?: string) => asserts value is string;
 
 	// Numbers.
-	evenInteger: (value: number) => asserts value is number;
-	oddInteger: (value: number) => asserts value is number;
+	evenInteger: (value: number, message?: string) => asserts value is number;
+	oddInteger: (value: number, message?: string) => asserts value is number;
 
 	// Two arguments.
-	directInstanceOf: <T>(instance: unknown, class_: Class<T>) => asserts instance is T;
-	inRange: (value: number, range: number | [number, number]) => asserts value is number;
+	directInstanceOf: <T>(instance: unknown, class_: Class<T>, message?: string) => asserts instance is T;
+	inRange: (value: number, range: number | [number, number], message?: string) => asserts value is number;
 
 	// Variadic functions.
 	any: (predicate: Predicate | Predicate[], ...values: unknown[]) => void | never;
@@ -1156,9 +1156,9 @@ export function assertAny(predicate: Predicate | Predicate[], ...values: unknown
 	}
 }
 
-export function assertArray<T = unknown>(value: unknown, assertion?: (element: unknown) => asserts element is T): asserts value is T[] {
+export function assertArray<T = unknown>(value: unknown, assertion?: (element: unknown) => asserts element is T, message?: string): asserts value is T[] {
 	if (!isArray(value)) {
-		throw new TypeError(typeErrorMessage('Array', value));
+		throw new TypeError(message ?? typeErrorMessage('Array', value));
 	}
 
 	if (assertion) {
@@ -1167,535 +1167,535 @@ export function assertArray<T = unknown>(value: unknown, assertion?: (element: u
 	}
 }
 
-export function assertArrayBuffer(value: unknown): asserts value is ArrayBuffer {
+export function assertArrayBuffer(value: unknown, message?: string): asserts value is ArrayBuffer {
 	if (!isArrayBuffer(value)) {
-		throw new TypeError(typeErrorMessage('ArrayBuffer', value));
+		throw new TypeError(message ?? typeErrorMessage('ArrayBuffer', value));
 	}
 }
 
-export function assertArrayLike<T = unknown>(value: unknown): asserts value is ArrayLike<T> {
+export function assertArrayLike<T = unknown>(value: unknown, message?: string): asserts value is ArrayLike<T> {
 	if (!isArrayLike(value)) {
-		throw new TypeError(typeErrorMessage('array-like', value));
+		throw new TypeError(message ?? typeErrorMessage('array-like', value));
 	}
 }
 
 // eslint-disable-next-line @typescript-eslint/ban-types
-export function assertAsyncFunction(value: unknown): asserts value is Function {
+export function assertAsyncFunction(value: unknown, message?: string): asserts value is Function {
 	if (!isAsyncFunction(value)) {
-		throw new TypeError(typeErrorMessage('AsyncFunction', value));
+		throw new TypeError(message ?? typeErrorMessage('AsyncFunction', value));
 	}
 }
 
-export function assertAsyncGenerator(value: unknown): asserts value is AsyncGenerator {
+export function assertAsyncGenerator(value: unknown, message?: string): asserts value is AsyncGenerator {
 	if (!isAsyncGenerator(value)) {
-		throw new TypeError(typeErrorMessage('AsyncGenerator', value));
+		throw new TypeError(message ?? typeErrorMessage('AsyncGenerator', value));
 	}
 }
 
-export function assertAsyncGeneratorFunction(value: unknown): asserts value is AsyncGeneratorFunction {
+export function assertAsyncGeneratorFunction(value: unknown, message?: string): asserts value is AsyncGeneratorFunction {
 	if (!isAsyncGeneratorFunction(value)) {
-		throw new TypeError(typeErrorMessage('AsyncGeneratorFunction', value));
+		throw new TypeError(message ?? typeErrorMessage('AsyncGeneratorFunction', value));
 	}
 }
 
-export function assertAsyncIterable<T = unknown>(value: unknown): asserts value is AsyncIterable<T> {
+export function assertAsyncIterable<T = unknown>(value: unknown, message?: string): asserts value is AsyncIterable<T> {
 	if (!isAsyncIterable(value)) {
-		throw new TypeError(typeErrorMessage('AsyncIterable', value));
+		throw new TypeError(message ?? typeErrorMessage('AsyncIterable', value));
 	}
 }
 
-export function assertBigint(value: unknown): asserts value is bigint {
+export function assertBigint(value: unknown, message?: string): asserts value is bigint {
 	if (!isBigint(value)) {
-		throw new TypeError(typeErrorMessage('bigint', value));
+		throw new TypeError(message ?? typeErrorMessage('bigint', value));
 	}
 }
 
-export function assertBigInt64Array(value: unknown): asserts value is BigInt64Array {
+export function assertBigInt64Array(value: unknown, message?: string): asserts value is BigInt64Array {
 	if (!isBigInt64Array(value)) {
-		throw new TypeError(typeErrorMessage('BigInt64Array', value));
+		throw new TypeError(message ?? typeErrorMessage('BigInt64Array', value));
 	}
 }
 
-export function assertBigUint64Array(value: unknown): asserts value is BigUint64Array {
+export function assertBigUint64Array(value: unknown, message?: string): asserts value is BigUint64Array {
 	if (!isBigUint64Array(value)) {
-		throw new TypeError(typeErrorMessage('BigUint64Array', value));
+		throw new TypeError(message ?? typeErrorMessage('BigUint64Array', value));
 	}
 }
 
-export function assertBlob(value: unknown): asserts value is Blob {
+export function assertBlob(value: unknown, message?: string): asserts value is Blob {
 	if (!isBlob(value)) {
-		throw new TypeError(typeErrorMessage('Blob', value));
+		throw new TypeError(message ?? typeErrorMessage('Blob', value));
 	}
 }
 
-export function assertBoolean(value: unknown): asserts value is boolean {
+export function assertBoolean(value: unknown, message?: string): asserts value is boolean {
 	if (!isBoolean(value)) {
-		throw new TypeError(typeErrorMessage('boolean', value));
+		throw new TypeError(message ?? typeErrorMessage('boolean', value));
 	}
 }
 
 // eslint-disable-next-line @typescript-eslint/ban-types
-export function assertBoundFunction(value: unknown): asserts value is Function {
+export function assertBoundFunction(value: unknown, message?: string): asserts value is Function {
 	if (!isBoundFunction(value)) {
-		throw new TypeError(typeErrorMessage('Function', value));
+		throw new TypeError(message ?? typeErrorMessage('Function', value));
 	}
 }
 
-export function assertBuffer(value: unknown): asserts value is Buffer {
+export function assertBuffer(value: unknown, message?: string): asserts value is Buffer {
 	if (!isBuffer(value)) {
-		throw new TypeError(typeErrorMessage('Buffer', value));
+		throw new TypeError(message ?? typeErrorMessage('Buffer', value));
 	}
 }
 
-export function assertClass(value: unknown): asserts value is Class {
+export function assertClass(value: unknown, message?: string): asserts value is Class {
 	if (!isClass(value)) {
-		throw new TypeError(typeErrorMessage('Class', value));
+		throw new TypeError(message ?? typeErrorMessage('Class', value));
 	}
 }
 
-export function assertDataView(value: unknown): asserts value is DataView {
+export function assertDataView(value: unknown, message?: string): asserts value is DataView {
 	if (!isDataView(value)) {
-		throw new TypeError(typeErrorMessage('DataView', value));
+		throw new TypeError(message ?? typeErrorMessage('DataView', value));
 	}
 }
 
-export function assertDate(value: unknown): asserts value is Date {
+export function assertDate(value: unknown, message?: string): asserts value is Date {
 	if (!isDate(value)) {
-		throw new TypeError(typeErrorMessage('Date', value));
+		throw new TypeError(message ?? typeErrorMessage('Date', value));
 	}
 }
 
-export function assertDirectInstanceOf<T>(instance: unknown, class_: Class<T>): asserts instance is T {
+export function assertDirectInstanceOf<T>(instance: unknown, class_: Class<T>, message?: string): asserts instance is T {
 	if (!isDirectInstanceOf(instance, class_)) {
-		throw new TypeError(typeErrorMessage('T', instance));
+		throw new TypeError(message ?? typeErrorMessage('T', instance));
 	}
 }
 
-export function assertEmptyArray(value: unknown): asserts value is never[] {
+export function assertEmptyArray(value: unknown, message?: string): asserts value is never[] {
 	if (!isEmptyArray(value)) {
-		throw new TypeError(typeErrorMessage('empty array', value));
+		throw new TypeError(message ?? typeErrorMessage('empty array', value));
 	}
 }
 
-export function assertEmptyMap(value: unknown): asserts value is Map<never, never> {
+export function assertEmptyMap(value: unknown, message?: string): asserts value is Map<never, never> {
 	if (!isEmptyMap(value)) {
-		throw new TypeError(typeErrorMessage('empty map', value));
+		throw new TypeError(message ?? typeErrorMessage('empty map', value));
 	}
 }
 
-export function assertEmptyObject<Key extends keyof any = string>(value: unknown): asserts value is Record<Key, never> {
+export function assertEmptyObject<Key extends keyof any = string>(value: unknown, message?: string): asserts value is Record<Key, never> {
 	if (!isEmptyObject(value)) {
-		throw new TypeError(typeErrorMessage('empty object', value));
+		throw new TypeError(message ?? typeErrorMessage('empty object', value));
 	}
 }
 
-export function assertEmptySet(value: unknown): asserts value is Set<never> {
+export function assertEmptySet(value: unknown, message?: string): asserts value is Set<never> {
 	if (!isEmptySet(value)) {
-		throw new TypeError(typeErrorMessage('empty set', value));
+		throw new TypeError(message ?? typeErrorMessage('empty set', value));
 	}
 }
 
-export function assertEmptyString(value: unknown): asserts value is '' {
+export function assertEmptyString(value: unknown, message?: string): asserts value is '' {
 	if (!isEmptyString(value)) {
-		throw new TypeError(typeErrorMessage('empty string', value));
+		throw new TypeError(message ?? typeErrorMessage('empty string', value));
 	}
 }
 
-export function assertEmptyStringOrWhitespace(value: unknown): asserts value is string {
+export function assertEmptyStringOrWhitespace(value: unknown, message?: string): asserts value is string {
 	if (!isEmptyStringOrWhitespace(value)) {
-		throw new TypeError(typeErrorMessage('empty string or whitespace', value));
+		throw new TypeError(message ?? typeErrorMessage('empty string or whitespace', value));
 	}
 }
 
-export function assertEnumCase<T = unknown>(value: unknown, targetEnum: T): asserts value is T[keyof T] {
+export function assertEnumCase<T = unknown>(value: unknown, targetEnum: T, message?: string): asserts value is T[keyof T] {
 	if (!isEnumCase(value, targetEnum)) {
-		throw new TypeError(typeErrorMessage('EnumCase', value));
+		throw new TypeError(message ?? typeErrorMessage('EnumCase', value));
 	}
 }
 
-export function assertError(value: unknown): asserts value is Error {
+export function assertError(value: unknown, message?: string): asserts value is Error {
 	if (!isError(value)) {
-		throw new TypeError(typeErrorMessage('Error', value));
+		throw new TypeError(message ?? typeErrorMessage('Error', value));
 	}
 }
 
-export function assertEvenInteger(value: number): asserts value is number {
+export function assertEvenInteger(value: number, message?: string): asserts value is number {
 	if (!isEvenInteger(value)) {
-		throw new TypeError(typeErrorMessage('even integer', value));
+		throw new TypeError(message ?? typeErrorMessage('even integer', value));
 	}
 }
 
-export function assertFalsy(value: unknown): asserts value is Falsy {
+export function assertFalsy(value: unknown, message?: string): asserts value is Falsy {
 	if (!isFalsy(value)) {
-		throw new TypeError(typeErrorMessage('falsy', value));
+		throw new TypeError(message ?? typeErrorMessage('falsy', value));
 	}
 }
 
-export function assertFloat32Array(value: unknown): asserts value is Float32Array {
+export function assertFloat32Array(value: unknown, message?: string): asserts value is Float32Array {
 	if (!isFloat32Array(value)) {
-		throw new TypeError(typeErrorMessage('Float32Array', value));
+		throw new TypeError(message ?? typeErrorMessage('Float32Array', value));
 	}
 }
 
-export function assertFloat64Array(value: unknown): asserts value is Float64Array {
+export function assertFloat64Array(value: unknown, message?: string): asserts value is Float64Array {
 	if (!isFloat64Array(value)) {
-		throw new TypeError(typeErrorMessage('Float64Array', value));
+		throw new TypeError(message ?? typeErrorMessage('Float64Array', value));
 	}
 }
 
-export function assertFormData(value: unknown): asserts value is FormData {
+export function assertFormData(value: unknown, message?: string): asserts value is FormData {
 	if (!isFormData(value)) {
-		throw new TypeError(typeErrorMessage('FormData', value));
+		throw new TypeError(message ?? typeErrorMessage('FormData', value));
 	}
 }
 
 // eslint-disable-next-line @typescript-eslint/ban-types
-export function assertFunction(value: unknown): asserts value is Function {
+export function assertFunction(value: unknown, message?: string): asserts value is Function {
 	if (!isFunction(value)) {
-		throw new TypeError(typeErrorMessage('Function', value));
+		throw new TypeError(message ?? typeErrorMessage('Function', value));
 	}
 }
 
-export function assertGenerator(value: unknown): asserts value is Generator {
+export function assertGenerator(value: unknown, message?: string): asserts value is Generator {
 	if (!isGenerator(value)) {
-		throw new TypeError(typeErrorMessage('Generator', value));
+		throw new TypeError(message ?? typeErrorMessage('Generator', value));
 	}
 }
 
-export function assertGeneratorFunction(value: unknown): asserts value is GeneratorFunction {
+export function assertGeneratorFunction(value: unknown, message?: string): asserts value is GeneratorFunction {
 	if (!isGeneratorFunction(value)) {
-		throw new TypeError(typeErrorMessage('GeneratorFunction', value));
+		throw new TypeError(message ?? typeErrorMessage('GeneratorFunction', value));
 	}
 }
 
-export function assertHtmlElement(value: unknown): asserts value is HTMLElement {
+export function assertHtmlElement(value: unknown, message?: string): asserts value is HTMLElement {
 	if (!isHtmlElement(value)) {
-		throw new TypeError(typeErrorMessage('HTMLElement', value));
+		throw new TypeError(message ?? typeErrorMessage('HTMLElement', value));
 	}
 }
 
-export function assertInfinite(value: unknown): asserts value is number {
+export function assertInfinite(value: unknown, message?: string): asserts value is number {
 	if (!isInfinite(value)) {
-		throw new TypeError(typeErrorMessage('infinite number', value));
+		throw new TypeError(message ?? typeErrorMessage('infinite number', value));
 	}
 }
 
-export function assertInRange(value: number, range: number | [number, number]): asserts value is number {
+export function assertInRange(value: number, range: number | [number, number], message?: string): asserts value is number {
 	if (!isInRange(value, range)) {
-		throw new TypeError(typeErrorMessage('in range', value));
+		throw new TypeError(message ?? typeErrorMessage('in range', value));
 	}
 }
 
-export function assertInt16Array(value: unknown): asserts value is Int16Array {
+export function assertInt16Array(value: unknown, message?: string): asserts value is Int16Array {
 	if (!isInt16Array(value)) {
-		throw new TypeError(typeErrorMessage('Int16Array', value));
+		throw new TypeError(message ?? typeErrorMessage('Int16Array', value));
 	}
 }
 
-export function assertInt32Array(value: unknown): asserts value is Int32Array {
+export function assertInt32Array(value: unknown, message?: string): asserts value is Int32Array {
 	if (!isInt32Array(value)) {
-		throw new TypeError(typeErrorMessage('Int32Array', value));
+		throw new TypeError(message ?? typeErrorMessage('Int32Array', value));
 	}
 }
 
-export function assertInt8Array(value: unknown): asserts value is Int8Array {
+export function assertInt8Array(value: unknown, message?: string): asserts value is Int8Array {
 	if (!isInt8Array(value)) {
-		throw new TypeError(typeErrorMessage('Int8Array', value));
+		throw new TypeError(message ?? typeErrorMessage('Int8Array', value));
 	}
 }
 
-export function assertInteger(value: unknown): asserts value is number {
+export function assertInteger(value: unknown, message?: string): asserts value is number {
 	if (!isInteger(value)) {
-		throw new TypeError(typeErrorMessage('integer', value));
+		throw new TypeError(message ?? typeErrorMessage('integer', value));
 	}
 }
 
-export function assertIterable<T = unknown>(value: unknown): asserts value is Iterable<T> {
+export function assertIterable<T = unknown>(value: unknown, message?: string): asserts value is Iterable<T> {
 	if (!isIterable(value)) {
-		throw new TypeError(typeErrorMessage('Iterable', value));
+		throw new TypeError(message ?? typeErrorMessage('Iterable', value));
 	}
 }
 
-export function assertMap<Key = unknown, Value = unknown>(value: unknown): asserts value is Map<Key, Value> {
+export function assertMap<Key = unknown, Value = unknown>(value: unknown, message?: string): asserts value is Map<Key, Value> {
 	if (!isMap(value)) {
-		throw new TypeError(typeErrorMessage('Map', value));
+		throw new TypeError(message ?? typeErrorMessage('Map', value));
 	}
 }
 
-export function assertNan(value: unknown): asserts value is number {
+export function assertNan(value: unknown, message?: string): asserts value is number {
 	if (!isNan(value)) {
-		throw new TypeError(typeErrorMessage('NaN', value));
+		throw new TypeError(message ?? typeErrorMessage('NaN', value));
 	}
 }
 
-export function assertNativePromise<T = unknown>(value: unknown): asserts value is Promise<T> {
+export function assertNativePromise<T = unknown>(value: unknown, message?: string): asserts value is Promise<T> {
 	if (!isNativePromise(value)) {
-		throw new TypeError(typeErrorMessage('native Promise', value));
+		throw new TypeError(message ?? typeErrorMessage('native Promise', value));
 	}
 }
 
-export function assertNegativeNumber(value: unknown): asserts value is number {
+export function assertNegativeNumber(value: unknown, message?: string): asserts value is number {
 	if (!isNegativeNumber(value)) {
-		throw new TypeError(typeErrorMessage('negative number', value));
+		throw new TypeError(message ?? typeErrorMessage('negative number', value));
 	}
 }
 
-export function assertNodeStream(value: unknown): asserts value is NodeStream {
+export function assertNodeStream(value: unknown, message?: string): asserts value is NodeStream {
 	if (!isNodeStream(value)) {
-		throw new TypeError(typeErrorMessage('Node.js Stream', value));
+		throw new TypeError(message ?? typeErrorMessage('Node.js Stream', value));
 	}
 }
 
-export function assertNonEmptyArray<T = unknown, Item = unknown>(value: T | Item[]): asserts value is [Item, ...Item[]] {
+export function assertNonEmptyArray<T = unknown, Item = unknown>(value: T | Item[], message?: string): asserts value is [Item, ...Item[]] {
 	if (!isNonEmptyArray(value)) {
-		throw new TypeError(typeErrorMessage('non-empty array', value));
+		throw new TypeError(message ?? typeErrorMessage('non-empty array', value));
 	}
 }
 
-export function assertNonEmptyMap<Key = unknown, Value = unknown>(value: unknown): asserts value is Map<Key, Value> {
+export function assertNonEmptyMap<Key = unknown, Value = unknown>(value: unknown, message?: string): asserts value is Map<Key, Value> {
 	if (!isNonEmptyMap(value)) {
-		throw new TypeError(typeErrorMessage('non-empty map', value));
+		throw new TypeError(message ?? typeErrorMessage('non-empty map', value));
 	}
 }
 
-export function assertNonEmptyObject<Key extends keyof any = string, Value = unknown>(value: unknown): asserts value is Record<Key, Value> {
+export function assertNonEmptyObject<Key extends keyof any = string, Value = unknown>(value: unknown, message?: string): asserts value is Record<Key, Value> {
 	if (!isNonEmptyObject(value)) {
-		throw new TypeError(typeErrorMessage('non-empty object', value));
+		throw new TypeError(message ?? typeErrorMessage('non-empty object', value));
 	}
 }
 
-export function assertNonEmptySet<T = unknown>(value: unknown): asserts value is Set<T> {
+export function assertNonEmptySet<T = unknown>(value: unknown, message?: string): asserts value is Set<T> {
 	if (!isNonEmptySet(value)) {
-		throw new TypeError(typeErrorMessage('non-empty set', value));
+		throw new TypeError(message ?? typeErrorMessage('non-empty set', value));
 	}
 }
 
-export function assertNonEmptyString(value: unknown): asserts value is string {
+export function assertNonEmptyString(value: unknown, message?: string): asserts value is string {
 	if (!isNonEmptyString(value)) {
-		throw new TypeError(typeErrorMessage('non-empty string', value));
+		throw new TypeError(message ?? typeErrorMessage('non-empty string', value));
 	}
 }
 
-export function assertNonEmptyStringAndNotWhitespace(value: unknown): asserts value is string {
+export function assertNonEmptyStringAndNotWhitespace(value: unknown, message?: string): asserts value is string {
 	if (!isNonEmptyStringAndNotWhitespace(value)) {
-		throw new TypeError(typeErrorMessage('non-empty string and not whitespace', value));
+		throw new TypeError(message ?? typeErrorMessage('non-empty string and not whitespace', value));
 	}
 }
 
 // eslint-disable-next-line @typescript-eslint/ban-types
-export function assertNull(value: unknown): asserts value is null {
+export function assertNull(value: unknown, message?: string): asserts value is null {
 	if (!isNull(value)) {
-		throw new TypeError(typeErrorMessage('null', value));
+		throw new TypeError(message ?? typeErrorMessage('null', value));
 	}
 }
 
 // eslint-disable-next-line @typescript-eslint/ban-types
-export function assertNullOrUndefined(value: unknown): asserts value is null | undefined {
+export function assertNullOrUndefined(value: unknown, message?: string): asserts value is null | undefined {
 	if (!isNullOrUndefined(value)) {
-		throw new TypeError(typeErrorMessage('null or undefined', value));
+		throw new TypeError(message ?? typeErrorMessage('null or undefined', value));
 	}
 }
 
-export function assertNumber(value: unknown): asserts value is number {
+export function assertNumber(value: unknown, message?: string): asserts value is number {
 	if (!isNumber(value)) {
-		throw new TypeError(typeErrorMessage('number', value));
+		throw new TypeError(message ?? typeErrorMessage('number', value));
 	}
 }
 
-export function assertNumericString(value: unknown): asserts value is `${number}` {
+export function assertNumericString(value: unknown, message?: string): asserts value is `${number}` {
 	if (!isNumericString(value)) {
-		throw new TypeError(typeErrorMessage('string with a number', value));
+		throw new TypeError(message ?? typeErrorMessage('string with a number', value));
 	}
 }
 
 // eslint-disable-next-line @typescript-eslint/ban-types
-export function assertObject(value: unknown): asserts value is object {
+export function assertObject(value: unknown, message?: string): asserts value is object {
 	if (!isObject(value)) {
-		throw new TypeError(typeErrorMessage('Object', value));
+		throw new TypeError(message ?? typeErrorMessage('Object', value));
 	}
 }
 
-export function assertObservable(value: unknown): asserts value is ObservableLike {
+export function assertObservable(value: unknown, message?: string): asserts value is ObservableLike {
 	if (!isObservable(value)) {
-		throw new TypeError(typeErrorMessage('Observable', value));
+		throw new TypeError(message ?? typeErrorMessage('Observable', value));
 	}
 }
 
-export function assertOddInteger(value: number): asserts value is number {
+export function assertOddInteger(value: number, message?: string): asserts value is number {
 	if (!isOddInteger(value)) {
-		throw new TypeError(typeErrorMessage('odd integer', value));
+		throw new TypeError(message ?? typeErrorMessage('odd integer', value));
 	}
 }
 
-export function assertPlainObject<Value = unknown>(value: unknown): asserts value is Record<PropertyKey, Value> {
+export function assertPlainObject<Value = unknown>(value: unknown, message?: string): asserts value is Record<PropertyKey, Value> {
 	if (!isPlainObject(value)) {
-		throw new TypeError(typeErrorMessage('plain object', value));
+		throw new TypeError(message ?? typeErrorMessage('plain object', value));
 	}
 }
 
-export function assertPositiveNumber(value: unknown): asserts value is number {
+export function assertPositiveNumber(value: unknown, message?: string): asserts value is number {
 	if (!isPositiveNumber(value)) {
-		throw new TypeError(typeErrorMessage('positive number', value));
+		throw new TypeError(message ?? typeErrorMessage('positive number', value));
 	}
 }
 
-export function assertPrimitive(value: unknown): asserts value is Primitive {
+export function assertPrimitive(value: unknown, message?: string): asserts value is Primitive {
 	if (!isPrimitive(value)) {
-		throw new TypeError(typeErrorMessage('primitive', value));
+		throw new TypeError(message ?? typeErrorMessage('primitive', value));
 	}
 }
 
-export function assertPromise<T = unknown>(value: unknown): asserts value is Promise<T> {
+export function assertPromise<T = unknown>(value: unknown, message?: string): asserts value is Promise<T> {
 	if (!isPromise(value)) {
-		throw new TypeError(typeErrorMessage('Promise', value));
+		throw new TypeError(message ?? typeErrorMessage('Promise', value));
 	}
 }
 
-export function assertPropertyKey(value: unknown): asserts value is number {
+export function assertPropertyKey(value: unknown, message?: string): asserts value is number {
 	if (!isPropertyKey(value)) {
-		throw new TypeError(typeErrorMessage('PropertyKey', value));
+		throw new TypeError(message ?? typeErrorMessage('PropertyKey', value));
 	}
 }
 
-export function assertRegExp(value: unknown): asserts value is RegExp {
+export function assertRegExp(value: unknown, message?: string): asserts value is RegExp {
 	if (!isRegExp(value)) {
-		throw new TypeError(typeErrorMessage('RegExp', value));
+		throw new TypeError(message ?? typeErrorMessage('RegExp', value));
 	}
 }
 
-export function assertSafeInteger(value: unknown): asserts value is number {
+export function assertSafeInteger(value: unknown, message?: string): asserts value is number {
 	if (!isSafeInteger(value)) {
-		throw new TypeError(typeErrorMessage('integer', value));
+		throw new TypeError(message ?? typeErrorMessage('integer', value));
 	}
 }
 
-export function assertSet<T = unknown>(value: unknown): asserts value is Set<T> {
+export function assertSet<T = unknown>(value: unknown, message?: string): asserts value is Set<T> {
 	if (!isSet(value)) {
-		throw new TypeError(typeErrorMessage('Set', value));
+		throw new TypeError(message ?? typeErrorMessage('Set', value));
 	}
 }
 
-export function assertSharedArrayBuffer(value: unknown): asserts value is SharedArrayBuffer {
+export function assertSharedArrayBuffer(value: unknown, message?: string): asserts value is SharedArrayBuffer {
 	if (!isSharedArrayBuffer(value)) {
-		throw new TypeError(typeErrorMessage('SharedArrayBuffer', value));
+		throw new TypeError(message ?? typeErrorMessage('SharedArrayBuffer', value));
 	}
 }
 
-export function assertString(value: unknown): asserts value is string {
+export function assertString(value: unknown, message?: string): asserts value is string {
 	if (!isString(value)) {
-		throw new TypeError(typeErrorMessage('string', value));
+		throw new TypeError(message ?? typeErrorMessage('string', value));
 	}
 }
 
-export function assertSymbol(value: unknown): asserts value is symbol {
+export function assertSymbol(value: unknown, message?: string): asserts value is symbol {
 	if (!isSymbol(value)) {
-		throw new TypeError(typeErrorMessage('symbol', value));
+		throw new TypeError(message ?? typeErrorMessage('symbol', value));
 	}
 }
 
-export function assertTruthy<T>(value: T | Falsy): asserts value is T {
+export function assertTruthy<T>(value: T | Falsy, message?: string): asserts value is T {
 	if (!isTruthy(value)) {
-		throw new TypeError(typeErrorMessage('truthy', value));
+		throw new TypeError(message ?? typeErrorMessage('truthy', value));
 	}
 }
 
-export function assertTupleLike<T extends Array<TypeGuard<unknown>>>(value: unknown, guards: [...T]): asserts value is ResolveTypesOfTypeGuardsTuple<T> {
+export function assertTupleLike<T extends Array<TypeGuard<unknown>>>(value: unknown, guards: [...T], message?: string): asserts value is ResolveTypesOfTypeGuardsTuple<T> {
 	if (!isTupleLike(value, guards)) {
-		throw new TypeError(typeErrorMessage('tuple-like', value));
+		throw new TypeError(message ?? typeErrorMessage('tuple-like', value));
 	}
 }
 
-export function assertTypedArray(value: unknown): asserts value is TypedArray {
+export function assertTypedArray(value: unknown, message?: string): asserts value is TypedArray {
 	if (!isTypedArray(value)) {
-		throw new TypeError(typeErrorMessage('TypedArray', value));
+		throw new TypeError(message ?? typeErrorMessage('TypedArray', value));
 	}
 }
 
-export function assertUint16Array(value: unknown): asserts value is Uint16Array {
+export function assertUint16Array(value: unknown, message?: string): asserts value is Uint16Array {
 	if (!isUint16Array(value)) {
-		throw new TypeError(typeErrorMessage('Uint16Array', value));
+		throw new TypeError(message ?? typeErrorMessage('Uint16Array', value));
 	}
 }
 
-export function assertUint32Array(value: unknown): asserts value is Uint32Array {
+export function assertUint32Array(value: unknown, message?: string): asserts value is Uint32Array {
 	if (!isUint32Array(value)) {
-		throw new TypeError(typeErrorMessage('Uint32Array', value));
+		throw new TypeError(message ?? typeErrorMessage('Uint32Array', value));
 	}
 }
 
-export function assertUint8Array(value: unknown): asserts value is Uint8Array {
+export function assertUint8Array(value: unknown, message?: string): asserts value is Uint8Array {
 	if (!isUint8Array(value)) {
-		throw new TypeError(typeErrorMessage('Uint8Array', value));
+		throw new TypeError(message ?? typeErrorMessage('Uint8Array', value));
 	}
 }
 
-export function assertUint8ClampedArray(value: unknown): asserts value is Uint8ClampedArray {
+export function assertUint8ClampedArray(value: unknown, message?: string): asserts value is Uint8ClampedArray {
 	if (!isUint8ClampedArray(value)) {
-		throw new TypeError(typeErrorMessage('Uint8ClampedArray', value));
+		throw new TypeError(message ?? typeErrorMessage('Uint8ClampedArray', value));
 	}
 }
 
-export function assertUndefined(value: unknown): asserts value is undefined {
+export function assertUndefined(value: unknown, message?: string): asserts value is undefined {
 	if (!isUndefined(value)) {
-		throw new TypeError(typeErrorMessage('undefined', value));
+		throw new TypeError(message ?? typeErrorMessage('undefined', value));
 	}
 }
 
-export function assertUrlInstance(value: unknown): asserts value is URL {
+export function assertUrlInstance(value: unknown, message?: string): asserts value is URL {
 	if (!isUrlInstance(value)) {
-		throw new TypeError(typeErrorMessage('URL', value));
+		throw new TypeError(message ?? typeErrorMessage('URL', value));
 	}
 }
 
 // eslint-disable-next-line unicorn/prevent-abbreviations
-export function assertUrlSearchParams(value: unknown): asserts value is URLSearchParams {
+export function assertUrlSearchParams(value: unknown, message?: string): asserts value is URLSearchParams {
 	if (!isUrlSearchParams(value)) {
-		throw new TypeError(typeErrorMessage('URLSearchParams', value));
+		throw new TypeError(message ?? typeErrorMessage('URLSearchParams', value));
 	}
 }
 
-export function assertUrlString(value: unknown): asserts value is string {
+export function assertUrlString(value: unknown, message?: string): asserts value is string {
 	if (!isUrlString(value)) {
-		throw new TypeError(typeErrorMessage('string with a URL', value));
+		throw new TypeError(message ?? typeErrorMessage('string with a URL', value));
 	}
 }
 
-export function assertValidDate(value: unknown): asserts value is Date {
+export function assertValidDate(value: unknown, message?: string): asserts value is Date {
 	if (!isValidDate(value)) {
-		throw new TypeError(typeErrorMessage('valid Date', value));
+		throw new TypeError(message ?? typeErrorMessage('valid Date', value));
 	}
 }
 
-export function assertValidLength(value: unknown): asserts value is number {
+export function assertValidLength(value: unknown, message?: string): asserts value is number {
 	if (!isValidLength(value)) {
-		throw new TypeError(typeErrorMessage('valid length', value));
+		throw new TypeError(message ?? typeErrorMessage('valid length', value));
 	}
 }
 
 // eslint-disable-next-line @typescript-eslint/ban-types
-export function assertWeakMap<Key extends object = object, Value = unknown>(value: unknown): asserts value is WeakMap<Key, Value> {
+export function assertWeakMap<Key extends object = object, Value = unknown>(value: unknown, message?: string): asserts value is WeakMap<Key, Value> {
 	if (!isWeakMap(value)) {
-		throw new TypeError(typeErrorMessage('WeakMap', value));
+		throw new TypeError(message ?? typeErrorMessage('WeakMap', value));
 	}
 }
 
 // eslint-disable-next-line @typescript-eslint/ban-types
-export function assertWeakRef<T extends object = object>(value: unknown): asserts value is WeakRef<T> {
+export function assertWeakRef<T extends object = object>(value: unknown, message?: string): asserts value is WeakRef<T> {
 	if (!isWeakRef(value)) {
-		throw new TypeError(typeErrorMessage('WeakRef', value));
+		throw new TypeError(message ?? typeErrorMessage('WeakRef', value));
 	}
 }
 
 // eslint-disable-next-line @typescript-eslint/ban-types
-export function assertWeakSet<T extends object = object>(value: unknown): asserts value is WeakSet<T> {
+export function assertWeakSet<T extends object = object>(value: unknown, message?: string): asserts value is WeakSet<T> {
 	if (!isWeakSet(value)) {
-		throw new TypeError(typeErrorMessage('WeakSet', value));
+		throw new TypeError(message ?? typeErrorMessage('WeakSet', value));
 	}
 }
 
-export function assertWhitespaceString(value: unknown): asserts value is string {
+export function assertWhitespaceString(value: unknown, message?: string): asserts value is string {
 	if (!isWhitespaceString(value)) {
-		throw new TypeError(typeErrorMessage('whitespace string', value));
+		throw new TypeError(message ?? typeErrorMessage('whitespace string', value));
 	}
 }
 
