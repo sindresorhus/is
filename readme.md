@@ -743,7 +743,7 @@ The most common mistakes I noticed in these modules was using `instanceof` for t
 
 ## Related
 
-- [ow](https://github.com/sindresorhus/ow) - Function argument validation for humans
+- [environment](https://github.com/sindresorhus/environment) - Check which JavaScript environment your code is running in at runtime
 - [is-stream](https://github.com/sindresorhus/is-stream) - Check if something is a Node.js stream
 - [is-observable](https://github.com/sindresorhus/is-observable) - Check if a value is an Observable
 - [file-type](https://github.com/sindresorhus/file-type) - Detect the file type of a Buffer/Uint8Array
