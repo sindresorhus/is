@@ -447,7 +447,7 @@ export function isEmptyStringOrWhitespace(value: unknown): value is string {
 	return isEmptyString(value) || isWhitespaceString(value);
 }
 
-export function isEnumCase<T = unknown>(value: unknown, targetEnum: T): boolean {
+export function isEnumCase<T = unknown>(value: unknown, targetEnum: T): value is T[keyof T] {
 	// eslint-disable-next-line @typescript-eslint/no-unsafe-argument
 	return Object.values(targetEnum as any).includes(value as string);
 }
