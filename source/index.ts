@@ -10,6 +10,7 @@ import type {
 	Primitive,
 	TypedArray,
 	WeakRef,
+	Whitespace,
 } from './types.js';
 
 const typedArrayTypeNames = [
@@ -443,7 +444,7 @@ export function isEmptyString(value: unknown): value is '' {
 	return isString(value) && value.length === 0;
 }
 
-export function isEmptyStringOrWhitespace(value: unknown): value is string {
+export function isEmptyStringOrWhitespace(value: unknown): value is '' | Whitespace {
 	return isEmptyString(value) || isWhitespaceString(value);
 }
 
@@ -785,7 +786,7 @@ export function isWeakSet(value: unknown): value is WeakSet<object> {
 	return getObjectType(value) === 'WeakSet';
 }
 
-export function isWhitespaceString(value: unknown): value is string {
+export function isWhitespaceString(value: unknown): value is Whitespace {
 	return isString(value) && /^\s+$/.test(value);
 }
 
@@ -911,7 +912,7 @@ type Assert = {
 	emptyArray: (value: unknown, message?: string) => asserts value is never[];
 	nonEmptyArray: <T = unknown, Item = unknown>(value: T | Item[], message?: string) => asserts value is [Item, ...Item[]];
 	emptyString: (value: unknown, message?: string) => asserts value is '';
-	emptyStringOrWhitespace: (value: unknown, message?: string) => asserts value is string;
+	emptyStringOrWhitespace: (value: unknown, message?: string) => asserts value is '' | Whitespace;
 	nonEmptyString: (value: unknown, message?: string) => asserts value is string;
 	nonEmptyStringAndNotWhitespace: (value: unknown, message?: string) => asserts value is string;
 	emptyObject: <Key extends keyof any = string>(value: unknown, message?: string) => asserts value is Record<Key, never>;
@@ -1301,7 +1302,7 @@ export function assertEmptyString(value: unknown, message?: string): asserts val
 	}
 }
 
-export function assertEmptyStringOrWhitespace(value: unknown, message?: string): asserts value is string {
+export function assertEmptyStringOrWhitespace(value: unknown, message?: string): asserts value is '' | Whitespace {
 	if (!isEmptyStringOrWhitespace(value)) {
 		throw new TypeError(message ?? typeErrorMessage('empty string or whitespace', value));
 	}
