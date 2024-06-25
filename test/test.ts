@@ -764,13 +764,13 @@ test('is.array', t => {
 	t.notThrows(() => {
 		const x: unknown[] = [1, 2, 3];
 		assert.array(x, assert.number);
-		x[0].toFixed(0);
+		x[0]?.toFixed(0);
 	});
 
 	t.notThrows(() => {
 		const x: unknown[] = [1, 2, 3];
 		if (is.array<number>(x, is.number)) {
-			x[0].toFixed(0);
+			x[0]?.toFixed(0);
 		}
 	});
 });
@@ -1174,7 +1174,7 @@ test('is.falsy', t => {
 	// Checks that `assert.falsy` narrow downs boolean type to `false`.
 	{
 		const booleans = [false, true];
-		const function_ = (value: false) => value;
+		const function_ = (value?: false) => value;
 		assert.falsy(booleans[0]);
 		function_(booleans[0]);
 	}
@@ -1182,7 +1182,7 @@ test('is.falsy', t => {
 	// Checks that `assert.falsy` narrow downs number type to `0`.
 	{
 		const bits = [0, -0, 1];
-		const function_ = (value: 0) => value;
+		const function_ = (value?: 0) => value;
 		assert.falsy(bits[0]);
 		function_(bits[0]);
 		assert.falsy(bits[1]);
@@ -1192,7 +1192,7 @@ test('is.falsy', t => {
 	// Checks that `assert.falsy` narrow downs bigint type to `0n`.
 	{
 		const bits = [0n, -0n, 1n];
-		const function_ = (value: 0n) => value;
+		const function_ = (value?: 0n) => value;
 		assert.falsy(bits[0]);
 		function_(bits[0]);
 		assert.falsy(bits[1]);
@@ -1202,7 +1202,7 @@ test('is.falsy', t => {
 	// Checks that `assert.falsy` narrow downs string type to empty string.
 	{
 		const strings = ['', 'nonEmpty'];
-		const function_ = (value: '') => value;
+		const function_ = (value?: '') => value;
 		assert.falsy(strings[0]);
 		function_(strings[0]);
 	}
@@ -1219,7 +1219,7 @@ test('is.falsy', t => {
 	{
 		const maybeNulls = [null, Symbol('🦄')];
 		// eslint-disable-next-line @typescript-eslint/ban-types
-		const function_ = (value: null) => value;
+		const function_ = (value?: null) => value;
 		assert.falsy(maybeNulls[0]);
 		function_(maybeNulls[0]);
 	}
