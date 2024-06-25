@@ -236,14 +236,10 @@ const is = Object.assign(
 		boundFunction: isBoundFunction,
 		buffer: isBuffer,
 		class: isClass,
-		/** @deprecated Renamed to `class`. */
-		class_: isClass,
 		dataView: isDataView,
 		date: isDate,
 		detect,
 		directInstanceOf: isDirectInstanceOf,
-		/** @deprecated Renamed to `htmlElement` */
-		domElement: isHtmlElement,
 		emptyArray: isEmptyArray,
 		emptyMap: isEmptyMap,
 		emptyObject: isEmptyObject,
@@ -258,8 +254,6 @@ const is = Object.assign(
 		float64Array: isFloat64Array,
 		formData: isFormData,
 		function: isFunction,
-		/** @deprecated Renamed to `function`. */
-		function_: isFunction,
 		generator: isGenerator,
 		generatorFunction: isGeneratorFunction,
 		htmlElement: isHtmlElement,
@@ -282,8 +276,6 @@ const is = Object.assign(
 		nonEmptyString: isNonEmptyString,
 		nonEmptyStringAndNotWhitespace: isNonEmptyStringAndNotWhitespace,
 		null: isNull,
-		/** @deprecated Renamed to `null`. */
-		null_: isNull,
 		nullOrUndefined: isNullOrUndefined,
 		number: isNumber,
 		numericString: isNumericString,
@@ -403,7 +395,7 @@ export function isBuffer(value: unknown): value is Buffer {
 	return (value as any)?.constructor?.isBuffer?.(value) ?? false;
 }
 
-export function isClass(value: unknown): value is Class {
+export function isClass<T = unknown>(value: unknown): value is Class<T> {
 	return isFunction(value) && value.toString().startsWith('class ');
 }
 
@@ -832,17 +824,9 @@ type Assert = {
 	bigint: (value: unknown, message?: string) => asserts value is bigint;
 	// eslint-disable-next-line @typescript-eslint/ban-types
 	function: (value: unknown, message?: string) => asserts value is Function;
-	/** @deprecated Renamed to `function`. */
-	// eslint-disable-next-line @typescript-eslint/ban-types
-	function_: (value: unknown, message?: string) => asserts value is Function;
 	// eslint-disable-next-line @typescript-eslint/ban-types
 	null: (value: unknown, message?: string) => asserts value is null;
-	/** @deprecated Renamed to `null`. */
-	// eslint-disable-next-line @typescript-eslint/ban-types
-	null_: (value: unknown, message?: string) => asserts value is null;
-	class: (value: unknown, message?: string) => asserts value is Class;
-	/** @deprecated Renamed to `class`. */
-	class_: (value: unknown, message?: string) => asserts value is Class;
+	class: <T = unknown>(value: unknown, message?: string) => asserts value is Class<T>;
 	boolean: (value: unknown, message?: string) => asserts value is boolean;
 	symbol: (value: unknown, message?: string) => asserts value is symbol;
 	numericString: (value: unknown, message?: string) => asserts value is `${number}`;
@@ -902,8 +886,6 @@ type Assert = {
 	typedArray: (value: unknown, message?: string) => asserts value is TypedArray;
 	arrayLike: <T = unknown>(value: unknown, message?: string) => asserts value is ArrayLike<T>;
 	tupleLike: <T extends Array<TypeGuard<unknown>>>(value: unknown, guards: [...T], message?: string) => asserts value is ResolveTypesOfTypeGuardsTuple<T>;
-	/** @deprecated Renamed to `htmlElement` */
-	domElement: (value: unknown, message?: string) => asserts value is HTMLElement;
 	htmlElement: (value: unknown, message?: string) => asserts value is HTMLElement;
 	observable: (value: unknown, message?: string) => asserts value is ObservableLike;
 	nodeStream: (value: unknown, message?: string) => asserts value is NodeStream;
@@ -958,11 +940,9 @@ export const assert: Assert = {
 	boundFunction: assertBoundFunction,
 	buffer: assertBuffer,
 	class: assertClass,
-	class_: assertClass,
 	dataView: assertDataView,
 	date: assertDate,
 	directInstanceOf: assertDirectInstanceOf,
-	domElement: assertHtmlElement,
 	emptyArray: assertEmptyArray,
 	emptyMap: assertEmptyMap,
 	emptyObject: assertEmptyObject,
@@ -977,7 +957,6 @@ export const assert: Assert = {
 	float64Array: assertFloat64Array,
 	formData: assertFormData,
 	function: assertFunction,
-	function_: assertFunction,
 	generator: assertGenerator,
 	generatorFunction: assertGeneratorFunction,
 	htmlElement: assertHtmlElement,
@@ -1000,7 +979,6 @@ export const assert: Assert = {
 	nonEmptyString: assertNonEmptyString,
 	nonEmptyStringAndNotWhitespace: assertNonEmptyStringAndNotWhitespace,
 	null: assertNull,
-	null_: assertNull,
 	nullOrUndefined: assertNullOrUndefined,
 	number: assertNumber,
 	numericString: assertNumericString,
@@ -1056,8 +1034,6 @@ const methodTypeMap = {
 	isDataView: 'DataView',
 	isDate: 'Date',
 	isDirectInstanceOf: 'T',
-	/** @deprecated */
-	isDomElement: 'HTMLElement',
 	isEmptyArray: 'empty array',
 	isEmptyMap: 'empty map',
 	isEmptyObject: 'empty object',
@@ -1247,7 +1223,7 @@ export function assertBuffer(value: unknown, message?: string): asserts value is
 	}
 }
 
-export function assertClass(value: unknown, message?: string): asserts value is Class {
+export function assertClass<T>(value: unknown, message?: string): asserts value is Class<T> {
 	if (!isClass(value)) {
 		throw new TypeError(message ?? typeErrorMessage('Class', value));
 	}
