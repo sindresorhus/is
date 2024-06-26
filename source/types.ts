@@ -15,14 +15,12 @@ export type Primitive =
 /**
 Matches a [`class` constructor](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Classes).
 */
-/// type Constructor<T, Arguments extends unknown[] = any[]> = new(...arguments_: Arguments) => T;
+type Constructor<T, Arguments extends unknown[] = any[]> = new(...arguments_: Arguments) => T;
 
 /**
 Matches a [`class`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Classes).
 */
-// TODO: Use the below in the next major version.
-// export type Class<T, Arguments extends unknown[] = any[]> = Constructor<T, Arguments> & {prototype: T};
-export type Class<T = unknown, Arguments extends any[] = any[]> = new (...arguments_: Arguments) => T;
+export type Class<T, Arguments extends unknown[] = any[]> = Constructor<T, Arguments> & {prototype: T};
 
 /**
 Matches any [typed array](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/TypedArray), like `Uint8Array` or `Float64Array`.

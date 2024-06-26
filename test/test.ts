@@ -61,7 +61,7 @@ const types = new Map<string, Test>([
 	}],
 	['null', {
 		is: is.null,
-		assert: assert.null_,
+		assert: assert.null,
 		fixtures: [
 			null,
 		],
@@ -161,7 +161,7 @@ const types = new Map<string, Test>([
 	}],
 	['function', {
 		is: is.function,
-		assert: assert.function_,
+		assert: assert.function,
 		fixtures: [
 			function foo() {}, // eslint-disable-line func-names
 			function () {},
@@ -840,7 +840,7 @@ test('is.asyncFunction', t => {
 		t.true(is.function(fixture().then));
 
 		t.notThrows(() => {
-			assert.function_(fixture().then);
+			assert.function(fixture().then);
 		});
 	}
 });
@@ -1370,7 +1370,7 @@ test('is.class', t => {
 		t.true(is.class(classDeclaration));
 
 		t.notThrows(() => {
-			assert.class_(classDeclaration);
+			assert.class(classDeclaration);
 		});
 	}
 });
