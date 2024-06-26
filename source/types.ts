@@ -73,3 +73,5 @@ export type NodeStream = {
 export type Predicate = (value: unknown) => boolean;
 
 export type NonEmptyString = string & {0: string};
+
+export type Whitespace = ' ';

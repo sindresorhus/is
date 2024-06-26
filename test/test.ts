@@ -1793,6 +1793,13 @@ test('is.emptyStringOrWhitespace', t => {
 	t.throws(() => {
 		assert.emptyStringOrWhitespace('unicorn');
 	});
+
+	let value = 'test'; // eslint-disable-line prefer-const -- can't use `const` here because then it will be inferred as `never` in the `if` block
+	if (is.emptyStringOrWhitespace(value)) {
+		value.charAt(0); // Should be inferred as `'' | Whitespace` and not `never`
+	} else {
+		value.charAt(0); // Should be inferred as `string` and not `never`
+	}
 });
 
 test('is.nonEmptyString', t => {
