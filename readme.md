@@ -133,6 +133,10 @@ is.array(value, is.number); // Validate `value` is an array and all of its items
 ##### .function(value)
 
 ##### .buffer(value)
+
+> [!NOTE]
+> [Prefer using `Uint8Array` instead of `Buffer`.](https://sindresorhus.com/blog/goodbye-nodejs-buffer)
+
 ##### .blob(value)
 ##### .object(value)
 

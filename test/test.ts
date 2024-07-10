@@ -27,18 +27,18 @@ const {document} = window;
 const structuredClone = globalThis.structuredClone ?? (x => x);
 
 type Test = {
-	assert: (...args: any[]) => void | never;
+	assert: (...arguments_: any[]) => void | never;
 	fixtures: unknown[];
 	typename?: TypeName;
 	typeDescription?: AssertionTypeDescription;
 	is(value: unknown): boolean;
 };
 
-const invertAssertThrow = (description: AssertionTypeDescription, fn: () => void | never, value: unknown): void | never => {
+const invertAssertThrow = (description: AssertionTypeDescription, function_: () => void | never, value: unknown): void | never => {
 	const expectedAssertErrorMessage = `Expected value which is \`${description}\`, received value of type \`${is(value)}\`.`;
 
 	try {
-		fn();
+		function_();
 	} catch (error: unknown) {
 		if (error instanceof TypeError && error.message.includes(expectedAssertErrorMessage)) {
 			return;
@@ -488,10 +488,10 @@ const types = new Map<string, Test>([
 		fixtures: [
 			{x: 1},
 			Object.create(null),
-			new Object(), // eslint-disable-line no-new-object
+			new Object(), // eslint-disable-line no-object-constructor
 			structuredClone({x: 1}),
 			structuredClone(Object.create(null)),
-			structuredClone(new Object()), // eslint-disable-line no-new-object
+			structuredClone(new Object()), // eslint-disable-line no-object-constructor
 		],
 		typename: 'Object',
 		typeDescription: 'plain object',
@@ -1841,14 +1841,14 @@ test('is.nonEmptyStringAndNotWhitespace', t => {
 
 test('is.emptyObject', t => {
 	t.true(is.emptyObject({}));
-	t.true(is.emptyObject(new Object())); // eslint-disable-line no-new-object
+	t.true(is.emptyObject(new Object())); // eslint-disable-line no-object-constructor
 	t.false(is.emptyObject({unicorn: '🦄'}));
 
 	t.notThrows(() => {
 		assert.emptyObject({});
 	});
 	t.notThrows(() => {
-		assert.emptyObject(new Object()); // eslint-disable-line no-new-object
+		assert.emptyObject(new Object()); // eslint-disable-line no-object-constructor
 	});
 	t.throws(() => {
 		assert.emptyObject({unicorn: '🦄'});
@@ -1860,14 +1860,14 @@ test('is.nonEmptyObject', t => {
 	is.nonEmptyObject(foo);
 
 	t.false(is.nonEmptyObject({}));
-	t.false(is.nonEmptyObject(new Object())); // eslint-disable-line no-new-object
+	t.false(is.nonEmptyObject(new Object())); // eslint-disable-line no-object-constructor
 	t.true(is.nonEmptyObject({unicorn: '🦄'}));
 
 	t.throws(() => {
 		assert.nonEmptyObject({});
 	});
 	t.throws(() => {
-		assert.nonEmptyObject(new Object()); // eslint-disable-line no-new-object
+		assert.nonEmptyObject(new Object()); // eslint-disable-line no-object-constructor
 	});
 	t.notThrows(() => {
 		assert.nonEmptyObject({unicorn: '🦄'});

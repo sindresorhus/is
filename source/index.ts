@@ -1,4 +1,3 @@
-import type {Buffer} from 'node:buffer';
 import type {
 	ArrayLike,
 	Class,
@@ -12,6 +11,14 @@ import type {
 	WeakRef,
 	Whitespace,
 } from './types.js';
+
+// From type-fest.
+type ExtractFromGlobalConstructors<Name extends string> =
+	Name extends string
+		? typeof globalThis extends Record<Name, new (...arguments_: any[]) => infer T> ? T : never
+		: never;
+
+type NodeBuffer = ExtractFromGlobalConstructors<'Buffer'>;
 
 const typedArrayTypeNames = [
 	'Int8Array',
@@ -314,7 +321,7 @@ const is = Object.assign(
 	},
 );
 
-function isAbsoluteMod2(remainder: 0 | 1) {
+function isAbsoluteModule2(remainder: 0 | 1) {
 	return (value: unknown): value is number => isInteger(value) && Math.abs(value % 2) === remainder;
 }
 
@@ -350,7 +357,7 @@ export function isArrayLike<T = unknown>(value: unknown): value is ArrayLike<T> 
 	return !isNullOrUndefined(value) && !isFunction(value) && isValidLength((value as ArrayLike<T>).length);
 }
 
-export function isAsyncFunction<T = unknown>(value: unknown): value is ((...args: any[]) => Promise<T>) {
+export function isAsyncFunction<T = unknown>(value: unknown): value is ((...arguments_: any[]) => Promise<T>) {
 	return getObjectType(value) === 'AsyncFunction';
 }
 
@@ -358,7 +365,7 @@ export function isAsyncGenerator(value: unknown): value is AsyncGenerator {
 	return isAsyncIterable(value) && isFunction((value as AsyncGenerator).next) && isFunction((value as AsyncGenerator).throw);
 }
 
-export function isAsyncGeneratorFunction(value: unknown): value is ((...args: any[]) => Promise<unknown>) {
+export function isAsyncGeneratorFunction(value: unknown): value is ((...arguments_: any[]) => Promise<unknown>) {
 	return getObjectType(value) === 'AsyncGeneratorFunction';
 }
 
@@ -388,10 +395,13 @@ export function isBoolean(value: unknown): value is boolean {
 
 // eslint-disable-next-line @typescript-eslint/ban-types
 export function isBoundFunction(value: unknown): value is Function {
-	return isFunction(value) && !Object.prototype.hasOwnProperty.call(value, 'prototype');
+	return isFunction(value) && !Object.hasOwn(value, 'prototype');
 }
 
-export function isBuffer(value: unknown): value is Buffer {
+/**
+Note: [Prefer using `Uint8Array` instead of `Buffer`.](https://sindresorhus.com/blog/goodbye-nodejs-buffer)
+*/
+export function isBuffer(value: unknown): value is NodeBuffer {
 	// eslint-disable-next-line @typescript-eslint/no-unsafe-return, @typescript-eslint/no-unsafe-call
 	return (value as any)?.constructor?.isBuffer?.(value) ?? false;
 }
@@ -450,7 +460,7 @@ export function isError(value: unknown): value is Error {
 }
 
 export function isEvenInteger(value: unknown): value is number {
-	return isAbsoluteMod2(0)(value);
+	return isAbsoluteModule2(0)(value);
 }
 
 // Example: `is.falsy = (value: unknown): value is (not true | 0 | '' | undefined | null) => Boolean(value);`
@@ -629,7 +639,7 @@ export function isObservable(value: unknown): value is ObservableLike {
 }
 
 export function isOddInteger(value: unknown): value is number {
-	return isAbsoluteMod2(1)(value);
+	return isAbsoluteModule2(1)(value);
 }
 
 export function isPlainObject<Value = unknown>(value: unknown): value is Record<PropertyKey, Value> {
@@ -768,7 +778,7 @@ export function isWeakMap<Key extends object = object, Value = unknown>(value: u
 	return getObjectType(value) === 'WeakMap';
 }
 
-// eslint-disable-next-line @typescript-eslint/ban-types
+// eslint-disable-next-line @typescript-eslint/ban-types, unicorn/prevent-abbreviations
 export function isWeakRef(value: unknown): value is WeakRef<object> {
 	return getObjectType(value) === 'WeakRef';
 }
@@ -782,7 +792,7 @@ export function isWhitespaceString(value: unknown): value is Whitespace {
 	return isString(value) && /^\s+$/.test(value);
 }
 
-type ArrayMethod = (fn: (value: unknown, index: number, array: unknown[]) => boolean, thisArg?: unknown) => boolean;
+type ArrayMethod = (function_: (value: unknown, index: number, array: unknown[]) => boolean, thisArgument?: unknown) => boolean;
 
 function predicateOnArray(method: ArrayMethod, predicate: Predicate, values: unknown[]) {
 	if (!isFunction(predicate)) {
@@ -832,7 +842,7 @@ type Assert = {
 	symbol: (value: unknown, message?: string) => asserts value is symbol;
 	numericString: (value: unknown, message?: string) => asserts value is `${number}`;
 	array: <T = unknown>(value: unknown, assertion?: (element: unknown) => asserts element is T, message?: string) => asserts value is T[];
-	buffer: (value: unknown, message?: string) => asserts value is Buffer;
+	buffer: (value: unknown, message?: string) => asserts value is NodeBuffer;
 	blob: (value: unknown, message?: string) => asserts value is Blob;
 	// eslint-disable-next-line @typescript-eslint/ban-types
 	nullOrUndefined: (value: unknown, message?: string) => asserts value is null | undefined;
@@ -1218,7 +1228,10 @@ export function assertBoundFunction(value: unknown, message?: string): asserts v
 	}
 }
 
-export function assertBuffer(value: unknown, message?: string): asserts value is Buffer {
+/**
+Note: [Prefer using `Uint8Array` instead of `Buffer`.](https://sindresorhus.com/blog/goodbye-nodejs-buffer)
+*/
+export function assertBuffer(value: unknown, message?: string): asserts value is NodeBuffer {
 	if (!isBuffer(value)) {
 		throw new TypeError(message ?? typeErrorMessage('Buffer', value));
 	}
@@ -1656,7 +1669,7 @@ export function assertWeakMap<Key extends object = object, Value = unknown>(valu
 	}
 }
 
-// eslint-disable-next-line @typescript-eslint/ban-types
+// eslint-disable-next-line @typescript-eslint/ban-types, unicorn/prevent-abbreviations
 export function assertWeakRef<T extends object = object>(value: unknown, message?: string): asserts value is WeakRef<T> {
 	if (!isWeakRef(value)) {
 		throw new TypeError(message ?? typeErrorMessage('WeakRef', value));

@@ -56,7 +56,7 @@ export type ObservableLike = {
 // eslint-disable-next-line @typescript-eslint/ban-types
 export type Falsy = false | 0 | 0n | '' | null | undefined;
 
-export type WeakRef<T extends object> = { // eslint-disable-line @typescript-eslint/ban-types
+export type WeakRef<T extends object> = { // eslint-disable-line @typescript-eslint/ban-types, unicorn/prevent-abbreviations
 	readonly [Symbol.toStringTag]: 'WeakRef';
 	deref(): T | undefined;
 };
