@@ -1143,14 +1143,16 @@ export function assertAny(predicate: Predicate | Predicate[], ...values: unknown
 	}
 }
 
-export function assertArray<T = unknown>(value: unknown, assertion?: (element: unknown) => asserts element is T, message?: string): asserts value is T[] {
+export function assertArray<T = unknown>(value: unknown, assertion?: (element: unknown, message?: string) => asserts element is T, message?: string): asserts value is T[] {
 	if (!isArray(value)) {
 		throw new TypeError(message ?? typeErrorMessage('Array', value));
 	}
 
 	if (assertion) {
-		// eslint-disable-next-line unicorn/no-array-for-each, unicorn/no-array-callback-reference
-		value.forEach(assertion);
+		for (const element of value) {
+			// @ts-expect-error: "Assertions require every name in the call target to be declared with an explicit type annotation."
+			assertion(element, message);
+		}
 	}
 }
 

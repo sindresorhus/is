@@ -773,6 +773,10 @@ test('is.array', t => {
 			x[0]?.toFixed(0);
 		}
 	});
+
+	t.throws(() => {
+		assert.array([1, '2'], assert.number, 'Expected numbers');
+	}, {message: /Expected numbers/});
 });
 
 test('is.function', t => {
