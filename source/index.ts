@@ -1149,11 +1149,10 @@ export function assertArray<T = unknown>(value: unknown, assertion?: (element: u
 	}
 
 	if (assertion) {
-		// eslint-disable-next-line unicorn/no-array-for-each
-		value.forEach(v => {
+		for (const element of value) {
 			// @ts-expect-error: "Assertions require every name in the call target to be declared with an explicit type annotation."
-			assertion(v, message);
-		});
+			assertion(element, message);
+		}
 	}
 }
 
