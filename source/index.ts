@@ -456,6 +456,7 @@ export function isEnumCase<T = unknown>(value: unknown, targetEnum: T): value is
 }
 
 export function isError(value: unknown): value is Error {
+	// TODO: Use `Error.isError` when targeting Node.js 24.`
 	return getObjectType(value) === 'Error';
 }
 
@@ -467,6 +468,8 @@ export function isEvenInteger(value: unknown): value is number {
 export function isFalsy(value: unknown): value is Falsy {
 	return !value;
 }
+
+// TODO: Support detecting Float16Array when targeting Node.js 24.
 
 export function isFloat32Array(value: unknown): value is Float32Array {
 	return getObjectType(value) === 'Float32Array';
