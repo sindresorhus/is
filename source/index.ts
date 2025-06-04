@@ -629,7 +629,7 @@ export function isObservable(value: unknown): value is ObservableLike {
 	}
 
 	// eslint-disable-next-line no-use-extend-native/no-use-extend-native, @typescript-eslint/no-unsafe-call
-	if (value === (value as any)[Symbol.observable]?.()) {
+	if (Symbol.observable !== undefined && value === (value as any)[Symbol.observable]?.()) {
 		return true;
 	}
 

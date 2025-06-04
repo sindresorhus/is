@@ -62,8 +62,8 @@
 		"jsdom": "^24.1.0",
 		"rxjs": "^7.8.1",
 		"tempy": "^3.1.0",
-		"tsimp": "^2.0.11",
-		"typescript": "^5.5.3",
+		"tsimp": "2.0.11",
+		"typescript": "5.5.3",
 		"xo": "^0.58.0",
 		"zen-observable": "^0.10.0"
 	},
