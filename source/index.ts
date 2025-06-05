@@ -209,8 +209,12 @@ function detect(value: unknown): TypeName {
 	}
 
 	const tagType = getObjectType(value);
-	if (tagType) {
+	if (tagType && tagType !== 'Object') {
 		return tagType;
+	}
+
+	if (hasPromiseApi(value)) {
+		return 'Promise';
 	}
 
 	if (value instanceof String || value instanceof Boolean || value instanceof Number) {
@@ -1120,7 +1124,7 @@ const methodTypeMap = {
 	isWhitespaceString: 'whitespace string',
 } as const;
 
-function keysOf<T extends Record<PropertyKey, unknown>>(value: T): Array<keyof T> {
+export function keysOf<T extends Record<PropertyKey, unknown>>(value: T): Array<keyof T> {
 	return Object.keys(value) as Array<keyof T>;
 }
 

@@ -12,7 +12,9 @@ import {expectTypeOf} from 'expect-type';
 import ZenObservable from 'zen-observable';
 import is, {
 	assert,
+	keysOf,
 	type AssertionTypeDescription,
+	type Predicate,
 	type Primitive,
 	type TypedArray,
 	type TypeName,
@@ -26,498 +28,385 @@ const {document} = window;
 
 const structuredClone = globalThis.structuredClone ?? (x => x);
 
-type Test = {
-	assert: (...arguments_: any[]) => void | never;
+type Test = Readonly<{
 	fixtures: unknown[];
 	typename?: TypeName;
 	typeDescription?: AssertionTypeDescription;
-	is(value: unknown): boolean;
-};
+}>;
 
-const invertAssertThrow = (description: AssertionTypeDescription, function_: () => void | never, value: unknown): void | never => {
-	const expectedAssertErrorMessage = `Expected value which is \`${description}\`, received value of type \`${is(value)}\`.`;
+// Every entry should be unique and belongs in the most specific type for that entry
+const reusableFixtures = {
+	asyncFunction: [async function () {}, async () => {}],
+	asyncGeneratorFunction: [
+		async function * () {},
+		async function * () {
+			yield 4;
+		},
+	],
+	boundFunction: [() => {}, function () {}.bind(null)], // eslint-disable-line no-extra-bind
+	buffer: [Buffer.from('🦄')],
+	emptyArray: [[], new Array()], // eslint-disable-line @typescript-eslint/no-array-constructor
+	emptyMap: [new Map()],
+	emptySet: [new Set()],
+	emptyString: ['', String()],
+	function: [
+		function foo() {}, // eslint-disable-line func-names
+		function () {},
+	],
+	generatorFunction: [
+		function * () {},
+		function * () {
+			yield 4;
+		},
+	],
+	infinite: [Number.POSITIVE_INFINITY, Number.NEGATIVE_INFINITY],
+	integer: [0, -0, 6],
+	nativePromise: [Promise.resolve(), PromiseSubclassFixture.resolve()],
+	number: [1.4],
+	numericString: ['5', '-3.2', 'Infinity', '0x56'],
+	plainObject: [
+		{x: 1},
+		Object.create(null),
+		new Object(), // eslint-disable-line no-object-constructor
+		structuredClone({x: 1}),
+		structuredClone(Object.create(null)),
+		structuredClone(new Object()), // eslint-disable-line no-object-constructor
+	],
+	promise: [Object.create({then() {}, catch() {}})], // eslint-disable-line unicorn/no-thenable
+	safeInteger: [(2 ** 53) - 1, -(2 ** 53) + 1],
+} as const satisfies Partial<{[K in keyof typeof is]: unknown[]}>;
 
-	try {
-		function_();
-	} catch (error: unknown) {
-		if (error instanceof TypeError && error.message.includes(expectedAssertErrorMessage)) {
-			return;
-		}
-
-		throw error;
-	}
-
-	throw new Error(`Function did not throw any error, expected: ${expectedAssertErrorMessage}`);
-};
-
-const types = new Map<string, Test>([
-	['undefined', {
-		is: is.undefined,
-		assert: assert.undefined,
+const primitiveTypes = {
+	undefined: {
 		fixtures: [
 			undefined,
 		],
 		typename: 'undefined',
-	}],
-	['null', {
-		is: is.null,
-		assert: assert.null,
+	},
+	null: {
 		fixtures: [
 			null,
 		],
 		typename: 'null',
-	}],
-	['string', {
-		is: is.string,
-		assert: assert.string,
+	},
+	string: {
 		fixtures: [
 			'🦄',
 			'hello world',
-			'',
+			...reusableFixtures.emptyString,
+			...reusableFixtures.numericString,
 		],
 		typename: 'string',
-	}],
-	['emptyString', {
-		is: is.emptyString,
-		assert: assert.emptyString,
-		fixtures: [
-			'',
-			String(),
-		],
+	},
+	emptyString: {
+		fixtures: [...reusableFixtures.emptyString],
 		typename: 'string',
 		typeDescription: 'empty string',
-	}],
-	['number', {
-		is: is.number,
-		assert: assert.number,
+	},
+	number: {
 		fixtures: [
-			6,
-			1.4,
-			0,
-			-0,
-			Number.POSITIVE_INFINITY,
-			Number.NEGATIVE_INFINITY,
+			...reusableFixtures.number,
+			...reusableFixtures.infinite,
+			...reusableFixtures.integer,
+			...reusableFixtures.safeInteger,
 		],
 		typename: 'number',
-	}],
-	['bigint', {
-		is: is.bigint,
-		assert: assert.bigint,
+	},
+	bigint: {
 		fixtures: [
-			// Disabled until TS supports it for an ESnnnn target.
-			// 1n,
-			// 0n,
-			// -0n,
+			1n,
+			0n,
+			-0n,
 			BigInt('1234'),
 		],
 		typename: 'bigint',
-	}],
-	['boolean', {
-		is: is.boolean,
-		assert: assert.boolean,
+	},
+	boolean: {
 		fixtures: [
 			true, false,
 		],
 		typename: 'boolean',
-	}],
-	['symbol', {
-		is: is.symbol,
-		assert: assert.symbol,
-		fixtures: [
-			Symbol('🦄'),
-		],
-		typename: 'symbol',
-	}],
-	['numericString', {
-		is: is.numericString,
-		assert: assert.numericString,
-		fixtures: [
-			'5',
-			'-3.2',
-			'Infinity',
-			'0x56',
-		],
+	},
+	numericString: {
+		fixtures: [...reusableFixtures.numericString],
 		typename: 'string',
 		typeDescription: 'string with a number',
-	}],
-	['array', {
-		is: is.array,
-		assert: assert.array,
-		fixtures: [
-			[1, 2],
-			Array.from({length: 2}),
-		],
-		typename: 'Array',
-	}],
-	['emptyArray', {
-		is: is.emptyArray,
-		assert: assert.emptyArray,
-		fixtures: [
-			[],
-			new Array(), // eslint-disable-line @typescript-eslint/no-array-constructor
-		],
-		typename: 'Array',
-		typeDescription: 'empty array',
-	}],
-	['function', {
-		is: is.function,
-		assert: assert.function,
-		fixtures: [
-			function foo() {}, // eslint-disable-line func-names
-			function () {},
-			() => {},
-			async function () {},
-			function * (): unknown {},
-			async function * (): unknown {},
-		],
-		typename: 'Function',
-	}],
-	['buffer', {
-		is: is.buffer,
-		assert: assert.buffer,
-		fixtures: [
-			Buffer.from('🦄'),
-		],
-		typename: 'Buffer',
-	}],
-	['blob', {
-		is: is.blob,
-		assert: assert.blob,
-		fixtures: [
-			new window.Blob(),
-		],
-		typename: 'Blob',
-	}],
-	['object', {
-		is: is.object,
-		assert: assert.object,
-		fixtures: [
-			{x: 1},
-			Object.create({x: 1}),
-		],
-		typename: 'Object',
-	}],
-	['regExp', {
-		is: is.regExp,
-		assert: assert.regExp,
-		fixtures: [
-			/\w/,
-			new RegExp('\\w'), // eslint-disable-line prefer-regex-literals
-		],
-		typename: 'RegExp',
-	}],
-	['date', {
-		is: is.date,
-		assert: assert.date,
-		fixtures: [
-			new Date(),
-		],
-		typename: 'Date',
-	}],
-	['error', {
-		is: is.error,
-		assert: assert.error,
-		fixtures: [
-			new Error('🦄'),
-			new ErrorSubclassFixture(),
-		],
-		typename: 'Error',
-	}],
-	['nativePromise', {
-		is: is.nativePromise,
-		assert: assert.nativePromise,
-		fixtures: [
-			Promise.resolve(),
-			PromiseSubclassFixture.resolve(),
-		],
-		typename: 'Promise',
-		typeDescription: 'native Promise',
-	}],
-	['promise', {
-		is: is.promise,
-		assert: assert.promise,
-		fixtures: [
-			{then() {}, catch() {}}, // eslint-disable-line unicorn/no-thenable
-		],
-		typename: 'Object',
-		typeDescription: 'Promise',
-	}],
-	['generator', {
-		is: is.generator,
-		assert: assert.generator,
-		fixtures: [
-			(function * () {
-				yield 4;
-			})(),
-		],
-		typename: 'Generator',
-	}],
-	['asyncGenerator', {
-		is: is.asyncGenerator,
-		assert: assert.asyncGenerator,
-		fixtures: [
-			(async function * () {
-				yield 4;
-			})(),
-		],
-		typename: 'AsyncGenerator',
-	}],
-	['generatorFunction', {
-		is: is.generatorFunction,
-		assert: assert.generatorFunction,
-		fixtures: [
-			function * () {
-				yield 4;
-			},
-		],
-		typename: 'Function',
-		typeDescription: 'GeneratorFunction',
-	}],
-	['asyncGeneratorFunction', {
-		is: is.asyncGeneratorFunction,
-		assert: assert.asyncGeneratorFunction,
-		fixtures: [
-			async function * () {
-				yield 4;
-			},
-		],
-		typename: 'Function',
-		typeDescription: 'AsyncGeneratorFunction',
-	}],
-	['asyncFunction', {
-		is: is.asyncFunction,
-		assert: assert.asyncFunction,
-		fixtures: [
-			async function () {},
-			async () => {},
-		],
-		typename: 'Function',
-		typeDescription: 'AsyncFunction',
-	}],
-	['boundFunction', {
-		is: is.boundFunction,
-		assert: assert.boundFunction,
-		fixtures: [
-			() => {},
-			function () {}.bind(null), // eslint-disable-line no-extra-bind
-		],
-		typename: 'Function',
-	}],
-	['map', {
-		is: is.map,
-		assert: assert.map,
-		fixtures: [
-			new Map([['one', '1']]),
-		],
-		typename: 'Map',
-	}],
-	['emptyMap', {
-		is: is.emptyMap,
-		assert: assert.emptyMap,
-		fixtures: [
-			new Map(),
-		],
-		typename: 'Map',
-		typeDescription: 'empty map',
-	}],
-	['set', {
-		is: is.set,
-		assert: assert.set,
-		fixtures: [
-			new Set(['one']),
-		],
-		typename: 'Set',
-	}],
-	['emptySet', {
-		is: is.emptySet,
-		assert: assert.emptySet,
-		fixtures: [
-			new Set(),
-		],
-		typename: 'Set',
-		typeDescription: 'empty set',
-	}],
-	['weakSet', {
-		is: is.weakSet,
-		assert: assert.weakSet,
-		fixtures: [
-			new WeakSet(),
-		],
-		typename: 'WeakSet',
-	}],
-	['weakRef', {
-		is: is.weakRef,
-		assert: assert.weakRef,
-		fixtures: window.WeakRef ? [new window.WeakRef({})] : [],
-		typename: 'WeakRef',
-	}],
-	['weakMap', {
-		is: is.weakMap,
-		assert: assert.weakMap,
-		fixtures: [
-			new WeakMap(),
-		],
-		typename: 'WeakMap',
-	}],
-	['int8Array', {
-		is: is.int8Array,
-		assert: assert.int8Array,
-		fixtures: [
-			new Int8Array(),
-		],
-		typename: 'Int8Array',
-	}],
-	['uint8Array', {
-		is: is.uint8Array,
-		assert: assert.uint8Array,
-		fixtures: [
-			new Uint8Array(),
-		],
-		typename: 'Uint8Array',
-	}],
-	['uint8ClampedArray', {
-		is: is.uint8ClampedArray,
-		assert: assert.uint8ClampedArray,
-		fixtures: [
-			new Uint8ClampedArray(),
-		],
-		typename: 'Uint8ClampedArray',
-	}],
-	['int16Array', {
-		is: is.int16Array,
-		assert: assert.int16Array,
-		fixtures: [
-			new Int16Array(),
-		],
-		typename: 'Int16Array',
-	}],
-	['uint16Array', {
-		is: is.uint16Array,
-		assert: assert.uint16Array,
-		fixtures: [
-			new Uint16Array(),
-		],
-		typename: 'Uint16Array',
-	}],
-	['int32Array', {
-		is: is.int32Array,
-		assert: assert.int32Array,
-		fixtures: [
-			new Int32Array(),
-		],
-		typename: 'Int32Array',
-	}],
-	['uint32Array', {
-		is: is.uint32Array,
-		assert: assert.uint32Array,
-		fixtures: [
-			new Uint32Array(),
-		],
-		typename: 'Uint32Array',
-	}],
-	['float32Array', {
-		is: is.float32Array,
-		assert: assert.float32Array,
-		fixtures: [
-			new Float32Array(),
-		],
-		typename: 'Float32Array',
-	}],
-	['float64Array', {
-		is: is.float64Array,
-		assert: assert.float64Array,
-		fixtures: [
-			new Float64Array(),
-		],
-		typename: 'Float64Array',
-	}],
-	['bigInt64Array', {
-		is: is.bigInt64Array,
-		assert: assert.bigInt64Array,
-		fixtures: [
-			new BigInt64Array(),
-		],
-		typename: 'BigInt64Array',
-	}],
-	['bigUint64Array', {
-		is: is.bigUint64Array,
-		assert: assert.bigUint64Array,
-		fixtures: [
-			new BigUint64Array(),
-		],
-		typename: 'BigUint64Array',
-	}],
-	['arrayBuffer', {
-		is: is.arrayBuffer,
-		assert: assert.arrayBuffer,
-		fixtures: [
-			new ArrayBuffer(10),
-		],
-		typename: 'ArrayBuffer',
-	}],
-	['dataView', {
-		is: is.dataView,
-		assert: assert.dataView,
-		fixtures: [
-			new DataView(new ArrayBuffer(10)),
-		],
-		typename: 'DataView',
-	}],
-	['nan', {
-		is: is.nan,
-		assert: assert.nan,
+	},
+	nan: {
 		fixtures: [
 			NaN, // eslint-disable-line unicorn/prefer-number-properties
 			Number.NaN,
 		],
 		typename: 'NaN',
 		typeDescription: 'NaN',
-	}],
-	['nullOrUndefined', {
-		is: is.nullOrUndefined,
-		assert: assert.nullOrUndefined,
+	},
+	nullOrUndefined: {
 		fixtures: [
 			null,
 			undefined,
 		],
 		typeDescription: 'null or undefined',
-	}],
-	['plainObject', {
-		is: is.plainObject,
-		assert: assert.plainObject,
+	},
+	integer: {
+		fixtures: [...reusableFixtures.integer, ...reusableFixtures.safeInteger],
+		typename: 'number',
+		typeDescription: 'integer',
+	},
+	safeInteger: {
+		fixtures: [...reusableFixtures.integer, ...reusableFixtures.safeInteger],
+		typename: 'number',
+		typeDescription: 'integer',
+	},
+	infinite: {
+		fixtures: [...reusableFixtures.infinite],
+		typename: 'number',
+		typeDescription: 'infinite number',
+	},
+} as const satisfies Partial<{[K in keyof typeof is]: Test}>;
+
+const objectTypes = {
+	symbol: {
 		fixtures: [
-			{x: 1},
-			Object.create(null),
-			new Object(), // eslint-disable-line no-object-constructor
-			structuredClone({x: 1}),
-			structuredClone(Object.create(null)),
-			structuredClone(new Object()), // eslint-disable-line no-object-constructor
+			Symbol('🦄'),
+		],
+		typename: 'symbol',
+	},
+	array: {
+		fixtures: [
+			[1, 2],
+			Array.from({length: 2}),
+			...reusableFixtures.emptyArray,
+		],
+		typename: 'Array',
+	},
+	emptyArray: {
+		fixtures: [...reusableFixtures.emptyArray],
+		typename: 'Array',
+		typeDescription: 'empty array',
+	},
+	function: {
+		fixtures: [
+			...reusableFixtures.asyncFunction,
+			...reusableFixtures.asyncGeneratorFunction,
+			...reusableFixtures.boundFunction,
+			...reusableFixtures.function,
+			...reusableFixtures.generatorFunction,
+		],
+		typename: 'Function',
+	},
+	buffer: {
+		fixtures: [...reusableFixtures.buffer],
+		typename: 'Buffer',
+	},
+	blob: {
+		fixtures: [
+			new window.Blob(),
+		],
+		typename: 'Blob',
+	},
+	object: {
+		fixtures: [
+			Object.create({x: 1}),
+			...reusableFixtures.plainObject,
+		],
+		typename: 'Object',
+	},
+	regExp: {
+		fixtures: [
+			/\w/,
+			new RegExp('\\w'), // eslint-disable-line prefer-regex-literals
+		],
+		typename: 'RegExp',
+	},
+	date: {
+		fixtures: [
+			new Date(),
+		],
+		typename: 'Date',
+	},
+	error: {
+		fixtures: [
+			new Error('🦄'),
+			new ErrorSubclassFixture(),
+		],
+		typename: 'Error',
+	},
+	nativePromise: {
+		fixtures: [...reusableFixtures.nativePromise],
+		typename: 'Promise',
+		typeDescription: 'native Promise',
+	},
+	promise: {
+		fixtures: [
+			...reusableFixtures.nativePromise,
+			...reusableFixtures.promise,
+		],
+		typename: 'Promise',
+		typeDescription: 'Promise',
+	},
+	generator: {
+		fixtures: [
+			(function * () {
+				yield 4;
+			})(),
+		],
+		typename: 'Generator',
+	},
+	asyncGenerator: {
+		fixtures: [
+			(async function * () {
+				yield 4;
+			})(),
+		],
+		typename: 'AsyncGenerator',
+	},
+	generatorFunction: {
+		fixtures: [...reusableFixtures.generatorFunction],
+		typename: 'Function',
+		typeDescription: 'GeneratorFunction',
+	},
+	asyncGeneratorFunction: {
+		fixtures: [...reusableFixtures.asyncGeneratorFunction],
+		typename: 'Function',
+		typeDescription: 'AsyncGeneratorFunction',
+	},
+	asyncFunction: {
+		fixtures: [...reusableFixtures.asyncFunction],
+		typename: 'Function',
+		typeDescription: 'AsyncFunction',
+	},
+	boundFunction: {
+		fixtures: [...reusableFixtures.boundFunction, ...reusableFixtures.asyncFunction],
+		typename: 'Function',
+	},
+	map: {
+		fixtures: [
+			new Map([['one', '1']]),
+			...reusableFixtures.emptyMap,
+		],
+		typename: 'Map',
+	},
+	emptyMap: {
+		fixtures: [...reusableFixtures.emptyMap],
+		typename: 'Map',
+		typeDescription: 'empty map',
+	},
+	set: {
+		fixtures: [
+			new Set(['one']),
+			...reusableFixtures.emptySet,
+		],
+		typename: 'Set',
+	},
+	emptySet: {
+		fixtures: [...reusableFixtures.emptySet],
+		typename: 'Set',
+		typeDescription: 'empty set',
+	},
+	weakSet: {
+		fixtures: [
+			new WeakSet(),
+		],
+		typename: 'WeakSet',
+	},
+	weakRef: {
+		fixtures: [
+			new window.WeakRef({}),
+		],
+		typename: 'WeakRef',
+	},
+	weakMap: {
+		fixtures: [
+			new WeakMap(),
+		],
+		typename: 'WeakMap',
+	},
+	int8Array: {
+		fixtures: [
+			new Int8Array(),
+		],
+		typename: 'Int8Array',
+	},
+	uint8Array: {
+		fixtures: [
+			new Uint8Array(),
+		],
+		typename: 'Uint8Array',
+	},
+	uint8ClampedArray: {
+		fixtures: [
+			new Uint8ClampedArray(),
+		],
+		typename: 'Uint8ClampedArray',
+	},
+	int16Array: {
+		fixtures: [
+			new Int16Array(),
+		],
+		typename: 'Int16Array',
+	},
+	uint16Array: {
+		fixtures: [
+			new Uint16Array(),
+		],
+		typename: 'Uint16Array',
+	},
+	int32Array: {
+		fixtures: [
+			new Int32Array(),
+		],
+		typename: 'Int32Array',
+	},
+	uint32Array: {
+		fixtures: [
+			new Uint32Array(),
+		],
+		typename: 'Uint32Array',
+	},
+	float32Array: {
+		fixtures: [
+			new Float32Array(),
+		],
+		typename: 'Float32Array',
+	},
+	float64Array: {
+		fixtures: [
+			new Float64Array(),
+		],
+		typename: 'Float64Array',
+	},
+	bigInt64Array: {
+		fixtures: [
+			new BigInt64Array(),
+		],
+		typename: 'BigInt64Array',
+	},
+	bigUint64Array: {
+		fixtures: [
+			new BigUint64Array(),
+		],
+		typename: 'BigUint64Array',
+	},
+	arrayBuffer: {
+		fixtures: [
+			new ArrayBuffer(10),
+		],
+		typename: 'ArrayBuffer',
+	},
+	dataView: {
+		fixtures: [
+			new DataView(new ArrayBuffer(10)),
+		],
+		typename: 'DataView',
+	},
+	plainObject: {
+		fixtures: [
+			...reusableFixtures.plainObject,
 		],
 		typename: 'Object',
 		typeDescription: 'plain object',
-	}],
-	['integer', {
-		is: is.integer,
-		assert: assert.integer,
-		fixtures: [
-			6,
-		],
-		typename: 'number',
-		typeDescription: 'integer',
-	}],
-	['safeInteger', {
-		is: is.safeInteger,
-		assert: assert.safeInteger,
-		fixtures: [
-			(2 ** 53) - 1,
-			-(2 ** 53) + 1,
-		],
-		typename: 'number',
-		typeDescription: 'integer',
-	}],
-	['htmlElement', {
-		is: is.htmlElement,
-		assert: assert.htmlElement,
+	},
+	htmlElement: {
 		fixtures: [
 			'div',
 			'input',
@@ -528,36 +417,16 @@ const types = new Map<string, Test>([
 		]
 			.map(fixture => document.createElement(fixture)),
 		typeDescription: 'HTMLElement',
-	}],
-	['non-htmlElement', {
-		is: value => !is.htmlElement(value),
-		assert(value: unknown) {
-			invertAssertThrow('HTMLElement', () => {
-				assert.htmlElement(value);
-			}, value);
-		},
-		fixtures: [
-			document.createTextNode('data'),
-			document.createProcessingInstruction('xml-stylesheet', 'href="mycss.css" type="text/css"'),
-			document.createComment('This is a comment'),
-			document,
-			document.implementation.createDocumentType('svg:svg', '-//W3C//DTD SVG 1.1//EN', 'https://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd'),
-			document.createDocumentFragment(),
-		],
-	}],
-	['observable', {
-		is: is.observable,
-		assert: assert.observable,
+	},
+	observable: {
 		fixtures: [
 			new Observable(),
 			new Subject(),
 			new ZenObservable(() => {}),
 		],
 		typename: 'Observable',
-	}],
-	['nodeStream', {
-		is: is.nodeStream,
-		assert: assert.nodeStream,
+	},
+	nodeStream: {
 		fixtures: [
 			fs.createReadStream('readme.md'),
 			fs.createWriteStream(temporaryFile()),
@@ -571,79 +440,76 @@ const types = new Map<string, Test>([
 		],
 		typename: 'Object',
 		typeDescription: 'Node.js Stream',
-	}],
-	['infinite', {
-		is: is.infinite,
-		assert: assert.infinite,
+	},
+	formData: {
 		fixtures: [
-			Number.POSITIVE_INFINITY,
-			Number.NEGATIVE_INFINITY,
+			new window.FormData(),
 		],
-		typename: 'number',
-		typeDescription: 'infinite number',
-	}],
+		typename: 'FormData',
+	},
+} as const satisfies Partial<{[K in keyof typeof is]: Test}>;
+
+const types = {
+	...objectTypes,
+	...primitiveTypes,
+} as const satisfies Partial<{[K in keyof typeof is]: Test}>;
+
+type TypeNameWithFixture = keyof typeof types;
+
+const subClasses = new Map<TypeNameWithFixture, TypeNameWithFixture[]>([
+	['uint8Array', ['buffer']], // It's too hard to differentiate the two
+	['object', keysOf(objectTypes)],
 ]);
 
 // This ensures a certain method matches only the types it's supposed to and none of the other methods' types
-const testType = (t: ExecutionContext, type: string, exclude?: string[]) => {
-	const testData = types.get(type);
+const exclusivelyTyped = test.macro({
+	exec(t: ExecutionContext, type: TypeNameWithFixture) {
+		const {fixtures, typeDescription, typename} = types[type] as Test;
+		const valueType = typeDescription ?? typename ?? 'unspecified';
 
-	if (testData === undefined) {
-		t.fail(`is.${type} not defined`);
-
-		return;
-	}
-
-	const {is: testIs, assert: testAssert, typename, typeDescription} = testData;
-
-	for (const [key, {fixtures}] of types) {
-		// TODO: Automatically exclude value types in other tests that we have in the current one.
-		// Could reduce the use of `exclude`.
-		if (exclude?.includes(key)) {
-			continue;
-		}
-
-		const isTypeUnderTest = key === type;
-		const assertIs = isTypeUnderTest ? t.true : t.false;
+		const testAssert: (value: unknown) => never | void = assert[type];
+		const testIs: Predicate = is[type];
 
 		for (const fixture of fixtures) {
-			assertIs(testIs(fixture), `Value: ${inspect(fixture)}`);
-			const valueType = typeDescription ?? typename ?? 'unspecified';
+			t.true(testIs(fixture), `Value: ${inspect(fixture)}`);
+			t.notThrows(() => {
+				testAssert(fixture);
+			});
 
-			if (isTypeUnderTest) {
-				t.notThrows(() => {
-					testAssert(fixture);
-				});
-			} else {
+			if (typename) {
+				t.is<TypeName, TypeName>(is(fixture), typename);
+			}
+		}
+
+		for (const key of keysOf(types).filter(key => key !== type)) {
+			if (subClasses.has(type) && subClasses.get(type)?.includes(key)) {
+				continue;
+			}
+
+			for (let i = 0; i < types[key].fixtures.length; i += 1) {
+				const fixture: unknown = types[key].fixtures[i];
+
+				if (fixtures.includes(fixture)) {
+					continue;
+				}
+
+				t.false(testIs(fixture), `${key}.fixture[${i}]: ${inspect(fixture)} should not be ${type}`);
 				t.throws(() => {
 					testAssert(fixture);
 				}, {
 					message: `Expected value which is \`${valueType}\`, received value of type \`${is(fixture)}\`.`,
 				});
 			}
-
-			if (isTypeUnderTest && typename) {
-				t.is<TypeName, TypeName>(is(fixture), typename);
-			}
 		}
-	}
-};
-
-test('is.undefined', t => {
-	testType(t, 'undefined', ['nullOrUndefined']);
+	},
+	title(_, type: TypeNameWithFixture) {
+		return `is.${type}`;
+	},
 });
 
-test('is.null', t => {
-	testType(t, 'null', ['nullOrUndefined']);
-});
-
-test('is.string', t => {
-	testType(t, 'string', ['emptyString', 'numericString']);
-});
-
-test('is.number', t => {
-	testType(t, 'number', ['integer', 'safeInteger', 'infinite']);
-});
+for (const type of keysOf(types)) {
+	test(exclusivelyTyped, type);
+}
 
 test('is.positiveNumber', t => {
 	t.true(is.positiveNumber(6));
@@ -721,20 +587,7 @@ test('is.negativeNumber', t => {
 	});
 });
 
-test('is.bigint', t => {
-	testType(t, 'bigint');
-});
-
-test('is.boolean', t => {
-	testType(t, 'boolean');
-});
-
-test('is.symbol', t => {
-	testType(t, 'symbol');
-});
-
-test('is.numericString', t => {
-	testType(t, 'numericString');
+test('is.numericString supplemental', t => {
 	t.false(is.numericString(''));
 	t.false(is.numericString(' '));
 	t.false(is.numericString(' \t\t\n'));
@@ -747,9 +600,7 @@ test('is.numericString', t => {
 	});
 });
 
-test('is.array', t => {
-	testType(t, 'array', ['emptyArray']);
-
+test('is.array supplemental', t => {
 	t.true(is.array([1, 2, 3], is.number));
 	t.false(is.array([1, '2', 3], is.number));
 
@@ -779,11 +630,7 @@ test('is.array', t => {
 	}, {message: /Expected numbers/});
 });
 
-test('is.function', t => {
-	testType(t, 'function', ['generatorFunction', 'asyncGeneratorFunction', 'asyncFunction', 'boundFunction']);
-});
-
-test('is.boundFunction', t => {
+test('is.boundFunction supplemental', t => {
 	t.false(is.boundFunction(function () {})); // eslint-disable-line prefer-arrow-callback
 
 	t.throws(() => {
@@ -791,54 +638,7 @@ test('is.boundFunction', t => {
 	});
 });
 
-test('is.buffer', t => {
-	testType(t, 'buffer');
-});
-
-test('is.blob', t => {
-	testType(t, 'blob');
-});
-
-test('is.object', t => {
-	const testData = types.get('object');
-
-	if (testData === undefined) {
-		t.fail('is.object not defined');
-
-		return;
-	}
-
-	for (const element of testData.fixtures) {
-		t.true(is.object(element));
-		t.notThrows(() => {
-			assert.object(element);
-		});
-	}
-});
-
-test('is.regExp', t => {
-	testType(t, 'regExp');
-});
-
-test('is.date', t => {
-	testType(t, 'date');
-});
-
-test('is.error', t => {
-	testType(t, 'error');
-});
-
-test('is.nativePromise', t => {
-	testType(t, 'nativePromise');
-});
-
-test('is.promise', t => {
-	testType(t, 'promise', ['nativePromise']);
-});
-
-test('is.asyncFunction', t => {
-	testType(t, 'asyncFunction', ['function']);
-
+test('is.asyncFunction supplemental', t => {
 	const fixture = async () => {};
 	if (is.asyncFunction(fixture)) {
 		t.true(is.function(fixture().then));
@@ -849,13 +649,7 @@ test('is.asyncFunction', t => {
 	}
 });
 
-test('is.generator', t => {
-	testType(t, 'generator');
-});
-
-test('is.asyncGenerator', t => {
-	testType(t, 'asyncGenerator');
-
+test('is.asyncGenerator supplemental', t => {
 	const fixture = (async function * () {
 		yield 4;
 	})();
@@ -864,13 +658,7 @@ test('is.asyncGenerator', t => {
 	}
 });
 
-test('is.generatorFunction', t => {
-	testType(t, 'generatorFunction', ['function']);
-});
-
-test('is.asyncGeneratorFunction', t => {
-	testType(t, 'asyncGeneratorFunction', ['function']);
-
+test('is.asyncGeneratorFunction supplemental', t => {
 	const fixture = async function * () {
 		yield 4;
 	};
@@ -878,78 +666,6 @@ test('is.asyncGeneratorFunction', t => {
 	if (is.asyncGeneratorFunction(fixture)) {
 		t.true(is.function(fixture().next));
 	}
-});
-
-test('is.map', t => {
-	testType(t, 'map', ['emptyMap']);
-});
-
-test('is.set', t => {
-	testType(t, 'set', ['emptySet']);
-});
-
-test('is.weakMap', t => {
-	testType(t, 'weakMap');
-});
-
-test('is.weakSet', t => {
-	testType(t, 'weakSet');
-});
-
-test('is.weakRef', t => {
-	testType(t, 'weakRef');
-});
-
-test('is.int8Array', t => {
-	testType(t, 'int8Array');
-});
-
-test('is.uint8Array', t => {
-	testType(t, 'uint8Array', ['buffer']);
-});
-
-test('is.uint8ClampedArray', t => {
-	testType(t, 'uint8ClampedArray');
-});
-
-test('is.int16Array', t => {
-	testType(t, 'int16Array');
-});
-
-test('is.uint16Array', t => {
-	testType(t, 'uint16Array');
-});
-
-test('is.int32Array', t => {
-	testType(t, 'int32Array');
-});
-
-test('is.uint32Array', t => {
-	testType(t, 'uint32Array');
-});
-
-test('is.float32Array', t => {
-	testType(t, 'float32Array');
-});
-
-test('is.float64Array', t => {
-	testType(t, 'float64Array');
-});
-
-test('is.bigInt64Array', t => {
-	testType(t, 'bigInt64Array');
-});
-
-test('is.bigUint64Array', t => {
-	testType(t, 'bigUint64Array');
-});
-
-test('is.arrayBuffer', t => {
-	testType(t, 'arrayBuffer');
-});
-
-test('is.dataView', t => {
-	testType(t, 'dataView');
 });
 
 test('is.enumCase', t => {
@@ -1048,8 +764,7 @@ test('is.truthy', t => {
 	t.true(is.truthy(Symbol('🦄')));
 	t.true(is.truthy(true));
 	t.true(is.truthy(1));
-	// Disabled until TS supports it for an ESnnnn target.
-	// t.true(is.truthy(1n));
+	t.true(is.truthy(1n));
 	t.true(is.truthy(BigInt(1)));
 
 	t.notThrows(() => {
@@ -1229,14 +944,6 @@ test('is.falsy', t => {
 	}
 });
 
-test('is.nan', t => {
-	testType(t, 'nan');
-});
-
-test('is.nullOrUndefined', t => {
-	testType(t, 'nullOrUndefined', ['undefined', 'null']);
-});
-
 test('is.primitive', t => {
 	const primitives: Primitive[] = [
 		undefined,
@@ -1248,8 +955,7 @@ test('is.primitive', t => {
 		true,
 		false,
 		Symbol('🦄'),
-		// Disabled until TS supports it for an ESnnnn target.
-		// 6n
+		6n,
 	];
 
 	for (const element of primitives) {
@@ -1260,16 +966,14 @@ test('is.primitive', t => {
 	}
 });
 
-test('is.integer', t => {
-	testType(t, 'integer', ['number', 'safeInteger']);
+test('is.integer supplemental', t => {
 	t.false(is.integer(1.4));
 	t.throws(() => {
 		assert.integer(1.4);
 	});
 });
 
-test('is.safeInteger', t => {
-	testType(t, 'safeInteger', ['number', 'integer']);
+test('is.safeInteger supplemental', t => {
 	t.false(is.safeInteger(2 ** 53));
 	t.false(is.safeInteger(-(2 ** 53)));
 	t.throws(() => {
@@ -1278,10 +982,6 @@ test('is.safeInteger', t => {
 	t.throws(() => {
 		assert.safeInteger(-(2 ** 53));
 	});
-});
-
-test('is.plainObject', t => {
-	testType(t, 'plainObject', ['object', 'promise']);
 });
 
 test('is.iterable', t => {
@@ -1628,8 +1328,7 @@ test('is.inRange', t => {
 	});
 });
 
-test('is.htmlElement', t => {
-	testType(t, 'htmlElement');
+test('is.htmlElement supplemental', t => {
 	t.false(is.htmlElement({nodeType: 1, nodeName: 'div'}));
 	t.throws(() => {
 		assert.htmlElement({nodeType: 1, nodeName: 'div'});
@@ -1648,18 +1347,21 @@ test('is.htmlElement', t => {
 		const element = document.createElement(tagName);
 		t.is(is(element), 'HTMLElement');
 	}
-});
 
-test('is.observable', t => {
-	testType(t, 'observable');
-});
+	const nonHtmlElements = [
+		document.createTextNode('data'),
+		document.createProcessingInstruction('xml-stylesheet', 'href="mycss.css" type="text/css"'),
+		document.createComment('This is a comment'),
+		document,
+		document.implementation.createDocumentType('svg:svg', '-//W3C//DTD SVG 1.1//EN', 'https://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd'),
+		document.createDocumentFragment(),
+	] as const;
 
-test('is.nodeStream', t => {
-	testType(t, 'nodeStream');
-});
-
-test('is.infinite', t => {
-	testType(t, 'infinite', ['number']);
+	for (const element of nonHtmlElements) {
+		t.throws(() => {
+			assert.htmlElement(element);
+		});
+	}
 });
 
 test('is.evenInteger', t => {
@@ -1692,10 +1394,6 @@ test('is.oddInteger', t => {
 			assert.oddInteger(element);
 		});
 	}
-});
-
-test('is.emptyArray', t => {
-	testType(t, 'emptyArray');
 });
 
 test('is.nonEmptyArray', t => {
@@ -1774,16 +1472,14 @@ test('is.nonEmptyArray', t => {
 	}
 });
 
-test('is.emptyString', t => {
-	testType(t, 'emptyString', ['string']);
+test('is.emptyString supplemental', t => {
 	t.false(is.emptyString('🦄'));
 	t.throws(() => {
 		assert.emptyString('🦄');
 	});
 });
 
-test('is.emptyStringOrWhitespace', t => {
-	testType(t, 'emptyString', ['string']);
+test('is.emptyStringOrWhitespace supplemental', t => {
 	t.true(is.emptyStringOrWhitespace('  '));
 	t.false(is.emptyStringOrWhitespace('🦄'));
 	t.false(is.emptyStringOrWhitespace('unicorn'));
@@ -1878,10 +1574,6 @@ test('is.nonEmptyObject', t => {
 	});
 });
 
-test('is.emptySet', t => {
-	testType(t, 'emptySet');
-});
-
 test('is.nonEmptySet', t => {
 	const temporarySet = new Set();
 	t.false(is.nonEmptySet(temporarySet));
@@ -1894,10 +1586,6 @@ test('is.nonEmptySet', t => {
 	t.notThrows(() => {
 		assert.nonEmptySet(temporarySet);
 	});
-});
-
-test('is.emptyMap', t => {
-	testType(t, 'emptyMap');
 });
 
 test('is.nonEmptyMap', t => {
@@ -2070,7 +1758,7 @@ test('is.all', t => {
 	});
 });
 
-test('is.formData', t => {
+test('is.formData supplemental', t => {
 	const data = new window.FormData();
 	t.true(is.formData(data));
 	t.false(is.formData({}));
