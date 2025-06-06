@@ -12,13 +12,13 @@ import {expectTypeOf} from 'expect-type';
 import ZenObservable from 'zen-observable';
 import is, {
 	assert,
-	keysOf,
 	type AssertionTypeDescription,
 	type Predicate,
 	type Primitive,
 	type TypedArray,
 	type TypeName,
 } from '../source/index.js';
+import {keysOf} from '../source/utilities.js';
 
 class PromiseSubclassFixture<T> extends Promise<T> {}
 class ErrorSubclassFixture extends Error {}

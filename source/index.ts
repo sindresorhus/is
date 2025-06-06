@@ -11,6 +11,7 @@ import type {
 	WeakRef,
 	Whitespace,
 } from './types.js';
+import {keysOf} from './utilities.js';
 
 // From type-fest.
 type ExtractFromGlobalConstructors<Name extends string> =
@@ -1123,10 +1124,6 @@ const methodTypeMap = {
 	isWeakSet: 'WeakSet',
 	isWhitespaceString: 'whitespace string',
 } as const;
-
-export function keysOf<T extends Record<PropertyKey, unknown>>(value: T): Array<keyof T> {
-	return Object.keys(value) as Array<keyof T>;
-}
 
 type IsMethodName = keyof typeof methodTypeMap;
 const isMethodNames: IsMethodName[] = keysOf(methodTypeMap);
