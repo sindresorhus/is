@@ -74,4 +74,4 @@ export type Predicate = (value: unknown) => boolean;
 
 export type NonEmptyString = string & {0: string};
 
-export type Whitespace = ' ';
+export type Whitespace = string & {_whitespace: true}; // String containing only whitespace characters

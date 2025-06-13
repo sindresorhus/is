@@ -326,7 +326,7 @@ const is = Object.assign(
 	},
 );
 
-function isAbsoluteModule2(remainder: 0 | 1) {
+function createModuloChecker(remainder: 0 | 1) {
 	return (value: unknown): value is number => isInteger(value) && Math.abs(value % 2) === remainder;
 }
 
@@ -466,7 +466,7 @@ export function isError(value: unknown): value is Error {
 }
 
 export function isEvenInteger(value: unknown): value is number {
-	return isAbsoluteModule2(0)(value);
+	return createModuloChecker(0)(value);
 }
 
 // Example: `is.falsy = (value: unknown): value is (not true | 0 | '' | undefined | null) => Boolean(value);`
@@ -647,7 +647,7 @@ export function isObservable(value: unknown): value is ObservableLike {
 }
 
 export function isOddInteger(value: unknown): value is number {
-	return isAbsoluteModule2(1)(value);
+	return createModuloChecker(1)(value);
 }
 
 export function isPlainObject<Value = unknown>(value: unknown): value is Record<PropertyKey, Value> {
