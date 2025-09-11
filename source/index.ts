@@ -8,6 +8,7 @@ import type {
 	Predicate,
 	Primitive,
 	TypedArray,
+	UrlString,
 	WeakRef,
 	Whitespace,
 } from './types.js';
@@ -760,7 +761,7 @@ export function isUrlSearchParams(value: unknown): value is URLSearchParams {
 	return getObjectType(value) === 'URLSearchParams';
 }
 
-export function isUrlString(value: unknown): value is string {
+export function isUrlString(value: unknown): value is UrlString {
 	if (!isString(value)) {
 		return false;
 	}
@@ -894,7 +895,7 @@ type Assert = {
 	dataView: (value: unknown, message?: string) => asserts value is DataView;
 	enumCase: <T = unknown>(value: unknown, targetEnum: T, message?: string) => asserts value is T[keyof T];
 	urlInstance: (value: unknown, message?: string) => asserts value is URL;
-	urlString: (value: unknown, message?: string) => asserts value is string;
+	urlString: (value: unknown, message?: string) => asserts value is UrlString;
 	truthy: <T>(value: T | Falsy, message?: string) => asserts value is T;
 	falsy: (value: unknown, message?: string) => asserts value is Falsy;
 	nan: (value: unknown, message?: string) => asserts value is number;
@@ -1650,7 +1651,7 @@ export function assertUrlSearchParams(value: unknown, message?: string): asserts
 	}
 }
 
-export function assertUrlString(value: unknown, message?: string): asserts value is string {
+export function assertUrlString(value: unknown, message?: string): asserts value is UrlString {
 	if (!isUrlString(value)) {
 		throw new TypeError(message ?? typeErrorMessage('string with a URL', value));
 	}
@@ -1705,4 +1706,5 @@ export type {
 	Predicate,
 	Primitive,
 	TypedArray,
+	UrlString,
 } from './types.js';

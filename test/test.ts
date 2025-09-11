@@ -17,6 +17,7 @@ import is, {
 	type Primitive,
 	type TypedArray,
 	type TypeName,
+	type UrlString,
 } from '../source/index.js';
 import {keysOf} from '../source/utilities.js';
 
@@ -756,6 +757,26 @@ test('is.urlString', t => {
 		assert.urlString(null);
 	});
 });
+
+// Type test for urlString narrowing fix (issue #212)
+// This test demonstrates that the fix allows proper type narrowing in both branches
+(() => {
+	const value: unknown = 'test';
+
+	if (is.urlString(value)) {
+		// ✅ In true branch: value is narrowed to UrlString
+		expectTypeOf(value).toEqualTypeOf<UrlString>();
+		expectTypeOf(value).toMatchTypeOf<string>();
+	} else {
+		// ✅ In false branch: value remains unknown (not incorrectly narrowed)
+		expectTypeOf(value).toEqualTypeOf<unknown>();
+
+		// ✅ Manual narrowing to string still works
+		if (typeof value === 'string') {
+			expectTypeOf(value).toEqualTypeOf<string>();
+		}
+	}
+})();
 
 test('is.truthy', t => {
 	t.true(is.truthy('unicorn'));

@@ -75,3 +75,10 @@ export type Predicate = (value: unknown) => boolean;
 export type NonEmptyString = string & {0: string};
 
 export type Whitespace = ' ';
+
+/**
+A string that represents a valid URL.
+
+This is a branded type to prevent incorrect TypeScript type narrowing.
+*/
+export type UrlString = string & {readonly __brand: 'UrlString'};
