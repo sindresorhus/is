@@ -587,6 +587,21 @@ is.all(is.string, '🦄', [], 'unicorns');
 //=> false
 ```
 
+##### .optional(value, predicate)
+
+Returns `true` if `value` is `undefined` or satisfies the given `predicate`.
+
+```js
+is.optional(undefined, is.string);
+//=> true
+
+is.optional('🦄', is.string);
+//=> true
+
+is.optional(123, is.string);
+//=> false
+```
+
 ##### .validDate(value)
 
 Returns `true` if the value is a valid date.
@@ -680,6 +695,23 @@ handleMovieRatingApiResponse({rating: 0.87, title: 'The Matrix'});
 
 // This throws an error.
 handleMovieRatingApiResponse({rating: '🦄'});
+```
+
+### Optional assertion
+
+Asserts that `value` is `undefined` or satisfies the provided `assertion`.
+
+```ts
+import {assert} from '@sindresorhus/is';
+
+assert.optional(undefined, assert.string);
+// Passes without throwing
+
+assert.optional('🦄', assert.string);
+// Passes without throwing
+
+assert.optional(123, assert.string);
+// Throws: Expected value which is `string`, received value of type `number`
 ```
 
 ## Generic type parameters

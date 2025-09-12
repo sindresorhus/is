@@ -318,6 +318,7 @@ const is = Object.assign(
 		urlInstance: isUrlInstance,
 		urlSearchParams: isUrlSearchParams,
 		urlString: isUrlString,
+		optional: isOptional,
 		validDate: isValidDate,
 		validLength: isValidLength,
 		weakMap: isWeakMap,
@@ -340,6 +341,10 @@ export function isAny(predicate: Predicate | Predicate[], ...values: unknown[]):
 	return predicates.some(singlePredicate =>
 		predicateOnArray(Array.prototype.some, singlePredicate, values),
 	);
+}
+
+export function isOptional<T>(value: unknown, predicate: (value: unknown) => value is T): value is T | undefined {
+	return isUndefined(value) || predicate(value);
 }
 
 export function isArray<T = unknown>(value: unknown, assertion?: (value: T) => value is T): value is T[] {
@@ -940,11 +945,19 @@ type Assert = {
 	// Variadic functions.
 	any: (predicate: Predicate | Predicate[], ...values: unknown[]) => void | never;
 	all: (predicate: Predicate, ...values: unknown[]) => void | never;
+
+	/**
+	Asserts that `value` is `undefined` or satisfies the provided `assertion`.
+
+	Useful for optional inputs.
+	*/
+	optional: <T>(value: unknown, assertion: (value: unknown, message?: string) => asserts value is T, message?: string) => asserts value is T | undefined;
 };
 
 export const assert: Assert = {
 	all: assertAll,
 	any: assertAny,
+	optional: assertOptional,
 	array: assertArray,
 	arrayBuffer: assertArrayBuffer,
 	arrayLike: assertArrayLike,
@@ -1145,6 +1158,12 @@ export function assertAny(predicate: Predicate | Predicate[], ...values: unknown
 		const predicates = isArray(predicate) ? predicate : [predicate];
 		const expectedTypes = predicates.map(predicate => isIsMethodName(predicate.name) ? methodTypeMap[predicate.name] : 'predicate returns truthy for any value');
 		throw new TypeError(typeErrorMessageMultipleValues(expectedTypes, values));
+	}
+}
+
+export function assertOptional<T>(value: unknown, assertion: (value: unknown, message?: string) => asserts value is T, message?: string): asserts value is T | undefined {
+	if (!isUndefined(value)) {
+		assertion(value, message);
 	}
 }
 

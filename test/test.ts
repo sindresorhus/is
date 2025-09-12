@@ -2251,3 +2251,28 @@ test('custom assertion message', t => {
 		assert.whitespaceString(undefined, message);
 	}, {instanceOf: TypeError, message});
 });
+
+test('is.optional', t => {
+	t.true(is.optional(undefined, is.string));
+	t.true(is.optional('🦄', is.string));
+	t.false(is.optional(123, is.string));
+	t.false(is.optional(null, is.string));
+});
+
+test('assert.optional', t => {
+	t.notThrows(() => {
+		assert.optional(undefined, assert.string);
+	});
+
+	t.notThrows(() => {
+		assert.optional('🦄', assert.string);
+	});
+
+	t.throws(() => {
+		assert.optional(123, assert.string);
+	});
+
+	t.throws(() => {
+		assert.optional(null, assert.string);
+	});
+});
