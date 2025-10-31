@@ -1086,9 +1086,13 @@ test('is.asyncIterable', t => {
 test('is.class', t => {
 	class Foo {} // eslint-disable-line @typescript-eslint/no-extraneous-class
 
+	// Note: Using new Function to prevent whitespace modifications in tsimp
+	const minifiedClass = new Function('return class{};'); // eslint-disable-line no-new-func
+
 	const classDeclarations = [
 		Foo,
 		class Bar extends Foo {},
+		minifiedClass(),
 	];
 
 	for (const classDeclaration of classDeclarations) {
