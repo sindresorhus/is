@@ -21,7 +21,7 @@
 	},
 	"scripts": {
 		"build": "del distribution && tsc",
-		"test": "tsc --noEmit && xo && ava",
+		"test": "tsc --noEmit && xo && ava && node test/test-node.js",
 		"prepare": "npm run build"
 	},
 	"files": [
