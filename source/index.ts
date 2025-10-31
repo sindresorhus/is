@@ -418,7 +418,7 @@ export function isBuffer(value: unknown): value is NodeBuffer {
 }
 
 export function isClass<T = unknown>(value: unknown): value is Class<T> {
-	return isFunction(value) && value.toString().startsWith('class ');
+	return isFunction(value) && /^class(\s|{)/.test(value.toString());
 }
 
 export function isDataView(value: unknown): value is DataView {
