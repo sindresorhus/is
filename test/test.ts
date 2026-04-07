@@ -587,6 +587,10 @@ test('is.numericString supplemental', () => {
 	assert.strictEqual(is.numericString(' '), false);
 	assert.strictEqual(is.numericString(' \t\t\n'), false);
 	assert.strictEqual(is.numericString(1), false);
+	assert.strictEqual(is.numericString(' 5'), false);
+	assert.strictEqual(is.numericString('5 '), false);
+	assert.strictEqual(is.numericString(' 5 '), false);
+	assert.strictEqual(is.numericString('\t3'), false);
 	assert.throws(() => {
 		isAssert.numericString('');
 	});

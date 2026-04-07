@@ -688,7 +688,7 @@ export function isNumber(value: unknown): value is number {
 }
 
 export function isNumericString(value: unknown): value is `${number}` {
-	return isString(value) && !isEmptyStringOrWhitespace(value) && !Number.isNaN(Number(value));
+	return isString(value) && !isEmptyStringOrWhitespace(value) && value === value.trim() && !Number.isNaN(Number(value));
 }
 
 // eslint-disable-next-line @typescript-eslint/no-restricted-types
