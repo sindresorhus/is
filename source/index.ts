@@ -11,8 +11,8 @@ import type {
 	UrlString,
 	WeakRef,
 	Whitespace,
-} from './types.js';
-import {keysOf} from './utilities.js';
+} from './types.ts';
+import {keysOf} from './utilities.ts';
 
 // From type-fest.
 type ExtractFromGlobalConstructors<Name extends string> =
@@ -150,7 +150,7 @@ export type AssertionTypeDescription = typeof assertionTypeDescriptions[number];
 const getObjectType = (value: unknown): ObjectTypeName | undefined => {
 	const objectTypeName = Object.prototype.toString.call(value).slice(8, -1);
 
-	if (/HTML\w+Element/.test(objectTypeName) && isHtmlElement(value)) {
+	if (/HTML\w+Element/v.test(objectTypeName) && isHtmlElement(value)) {
 		return 'HTMLElement';
 	}
 
@@ -166,6 +166,7 @@ function detect(value: unknown): TypeName {
 		return 'null';
 	}
 
+	// eslint-disable-next-line @typescript-eslint/switch-exhaustiveness-check
 	switch (typeof value) {
 		case 'undefined': {
 			return 'undefined';
@@ -211,7 +212,7 @@ function detect(value: unknown): TypeName {
 	}
 
 	const tagType = getObjectType(value);
-	if (tagType && tagType !== 'Object') {
+	if (tagType !== undefined && tagType !== 'Object') {
 		return tagType;
 	}
 
@@ -219,7 +220,8 @@ function detect(value: unknown): TypeName {
 		return 'Promise';
 	}
 
-	if (value instanceof String || value instanceof Boolean || value instanceof Number) {
+	const objectTag = Object.prototype.toString.call(value).slice(8, -1);
+	if (objectTag === 'String' || objectTag === 'Boolean' || objectTag === 'Number') {
 		throw new TypeError('Please don\'t use object wrappers for primitive types');
 	}
 
@@ -466,7 +468,7 @@ export function isBoolean(value: unknown): value is boolean {
 	return value === true || value === false;
 }
 
-// eslint-disable-next-line @typescript-eslint/ban-types
+// eslint-disable-next-line @typescript-eslint/no-unsafe-function-type
 export function isBoundFunction(value: unknown): value is Function {
 	return isFunction(value) && !Object.hasOwn(value, 'prototype');
 }
@@ -475,12 +477,12 @@ export function isBoundFunction(value: unknown): value is Function {
 Note: [Prefer using `Uint8Array` instead of `Buffer`.](https://sindresorhus.com/blog/goodbye-nodejs-buffer)
 */
 export function isBuffer(value: unknown): value is NodeBuffer {
-	// eslint-disable-next-line @typescript-eslint/no-unsafe-return, @typescript-eslint/no-unsafe-call
+	// eslint-disable-next-line @typescript-eslint/no-unsafe-return, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
 	return (value as any)?.constructor?.isBuffer?.(value) ?? false;
 }
 
 export function isClass<T = unknown>(value: unknown): value is Class<T> {
-	return isFunction(value) && /^class(\s+|{)/.test(value.toString());
+	return isFunction(value) && /^class(?:\s+|\{)/v.test(value.toString());
 }
 
 export function isDataView(value: unknown): value is DataView {
@@ -556,7 +558,7 @@ export function isFormData(value: unknown): value is FormData {
 	return getObjectType(value) === 'FormData';
 }
 
-// eslint-disable-next-line @typescript-eslint/ban-types
+// eslint-disable-next-line @typescript-eslint/no-unsafe-function-type
 export function isFunction(value: unknown): value is Function {
 	return typeof value === 'function';
 }
@@ -569,11 +571,9 @@ export function isGeneratorFunction(value: unknown): value is GeneratorFunction 
 	return getObjectType(value) === 'GeneratorFunction';
 }
 
-// eslint-disable-next-line @typescript-eslint/naming-convention
-const NODE_TYPE_ELEMENT = 1;
+const NODE_TYPE_ELEMENT = 1; // eslint-disable-line @typescript-eslint/naming-convention
 
-// eslint-disable-next-line @typescript-eslint/naming-convention
-const DOM_PROPERTIES_TO_CHECK: Array<(keyof HTMLElement)> = [
+const DOM_PROPERTIES_TO_CHECK: Array<(keyof HTMLElement)> = [ // eslint-disable-line @typescript-eslint/naming-convention
 	'innerHTML',
 	'ownerDocument',
 	'style',
@@ -673,12 +673,12 @@ export function isNonEmptyStringAndNotWhitespace(value: unknown): value is NonEm
 	return isString(value) && !isEmptyStringOrWhitespace(value);
 }
 
-// eslint-disable-next-line @typescript-eslint/ban-types
+// eslint-disable-next-line @typescript-eslint/no-restricted-types
 export function isNull(value: unknown): value is null {
 	return value === null;
 }
 
-// eslint-disable-next-line @typescript-eslint/ban-types
+// eslint-disable-next-line @typescript-eslint/no-restricted-types
 export function isNullOrUndefined(value: unknown): value is null | undefined {
 	return isNull(value) || isUndefined(value);
 }
@@ -691,7 +691,7 @@ export function isNumericString(value: unknown): value is `${number}` {
 	return isString(value) && !isEmptyStringOrWhitespace(value) && !Number.isNaN(Number(value));
 }
 
-// eslint-disable-next-line @typescript-eslint/ban-types
+// eslint-disable-next-line @typescript-eslint/no-restricted-types
 export function isObject(value: unknown): value is object {
 	return !isNull(value) && (typeof value === 'object' || isFunction(value));
 }
@@ -701,12 +701,12 @@ export function isObservable(value: unknown): value is ObservableLike {
 		return false;
 	}
 
-	// eslint-disable-next-line no-use-extend-native/no-use-extend-native, @typescript-eslint/no-unsafe-call
+	// eslint-disable-next-line @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
 	if (Symbol.observable !== undefined && value === (value as any)[Symbol.observable]?.()) {
 		return true;
 	}
 
-	// eslint-disable-next-line @typescript-eslint/no-unsafe-call
+	// eslint-disable-next-line @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
 	if (value === (value as any)['@@observable']?.()) {
 		return true;
 	}
@@ -777,8 +777,8 @@ export function isTruthy<T>(value: T | Falsy): value is T {
 	return Boolean(value);
 }
 
-// eslint-disable-next-line @typescript-eslint/ban-types
-type ResolveTypesOfTypeGuardsTuple<TypeGuardsOfT, ResultOfT extends unknown[] = [] > =
+// eslint-disable-next-line @typescript-eslint/no-restricted-types
+type ResolveTypesOfTypeGuardsTuple<TypeGuardsOfT, ResultOfT extends unknown[] = []> =
 	TypeGuardsOfT extends [TypeGuard<infer U>, ...infer TOthers]
 		? ResolveTypesOfTypeGuardsTuple<TOthers, [...ResultOfT, U]>
 		: TypeGuardsOfT extends undefined[]
@@ -847,23 +847,23 @@ export function isValidLength(value: unknown): value is number {
 	return isSafeInteger(value) && value >= 0;
 }
 
-// eslint-disable-next-line @typescript-eslint/ban-types
+// eslint-disable-next-line @typescript-eslint/no-restricted-types
 export function isWeakMap<Key extends object = object, Value = unknown>(value: unknown): value is WeakMap<Key, Value> {
 	return getObjectType(value) === 'WeakMap';
 }
 
-// eslint-disable-next-line @typescript-eslint/ban-types, unicorn/prevent-abbreviations
+// eslint-disable-next-line @typescript-eslint/no-restricted-types
 export function isWeakRef(value: unknown): value is WeakRef<object> {
 	return getObjectType(value) === 'WeakRef';
 }
 
-// eslint-disable-next-line @typescript-eslint/ban-types
+// eslint-disable-next-line @typescript-eslint/no-restricted-types
 export function isWeakSet(value: unknown): value is WeakSet<object> {
 	return getObjectType(value) === 'WeakSet';
 }
 
 export function isWhitespaceString(value: unknown): value is Whitespace {
-	return isString(value) && /^\s+$/.test(value);
+	return isString(value) && /^\s+$/v.test(value);
 }
 
 type ArrayMethod = (function_: (value: unknown, index: number, array: unknown[]) => boolean, thisArgument?: unknown) => boolean;
@@ -907,9 +907,9 @@ type Assert = {
 	positiveNumber: (value: unknown, message?: string) => asserts value is number;
 	negativeNumber: (value: unknown, message?: string) => asserts value is number;
 	bigint: (value: unknown, message?: string) => asserts value is bigint;
-	// eslint-disable-next-line @typescript-eslint/ban-types
+	// eslint-disable-next-line @typescript-eslint/no-unsafe-function-type
 	function: (value: unknown, message?: string) => asserts value is Function;
-	// eslint-disable-next-line @typescript-eslint/ban-types
+	// eslint-disable-next-line @typescript-eslint/no-restricted-types
 	null: (value: unknown, message?: string) => asserts value is null;
 	class: <T = unknown>(value: unknown, message?: string) => asserts value is Class<T>;
 	boolean: (value: unknown, message?: string) => asserts value is boolean;
@@ -918,7 +918,7 @@ type Assert = {
 	array: <T = unknown>(value: unknown, assertion?: (element: unknown) => asserts element is T, message?: string) => asserts value is T[];
 	buffer: (value: unknown, message?: string) => asserts value is NodeBuffer;
 	blob: (value: unknown, message?: string) => asserts value is Blob;
-	// eslint-disable-next-line @typescript-eslint/ban-types
+	// eslint-disable-next-line @typescript-eslint/no-restricted-types
 	nullOrUndefined: (value: unknown, message?: string) => asserts value is null | undefined;
 	object: <Key extends keyof any = string, Value = unknown>(value: unknown, message?: string) => asserts value is Record<Key, Value>;
 	iterable: <T = unknown>(value: unknown, message?: string) => asserts value is Iterable<T>;
@@ -929,20 +929,20 @@ type Assert = {
 	promise: <T = unknown>(value: unknown, message?: string) => asserts value is Promise<T>;
 	generatorFunction: (value: unknown, message?: string) => asserts value is GeneratorFunction;
 	asyncGeneratorFunction: (value: unknown, message?: string) => asserts value is AsyncGeneratorFunction;
-	// eslint-disable-next-line @typescript-eslint/ban-types
+	// eslint-disable-next-line @typescript-eslint/no-unsafe-function-type
 	asyncFunction: (value: unknown, message?: string) => asserts value is Function;
-	// eslint-disable-next-line @typescript-eslint/ban-types
+	// eslint-disable-next-line @typescript-eslint/no-unsafe-function-type
 	boundFunction: (value: unknown, message?: string) => asserts value is Function;
 	regExp: (value: unknown, message?: string) => asserts value is RegExp;
 	date: (value: unknown, message?: string) => asserts value is Date;
 	error: (value: unknown, message?: string) => asserts value is Error;
 	map: <Key = unknown, Value = unknown>(value: unknown, message?: string) => asserts value is Map<Key, Value>;
 	set: <T = unknown>(value: unknown, message?: string) => asserts value is Set<T>;
-	// eslint-disable-next-line @typescript-eslint/ban-types
+	// eslint-disable-next-line @typescript-eslint/no-restricted-types
 	weakMap: <Key extends object = object, Value = unknown>(value: unknown, message?: string) => asserts value is WeakMap<Key, Value>;
-	// eslint-disable-next-line @typescript-eslint/ban-types
+	// eslint-disable-next-line @typescript-eslint/no-restricted-types
 	weakSet: <T extends object = object>(value: unknown, message?: string) => asserts value is WeakSet<T>;
-	// eslint-disable-next-line @typescript-eslint/ban-types
+	// eslint-disable-next-line @typescript-eslint/no-restricted-types
 	weakRef: <T extends object = object>(value: unknown, message?: string) => asserts value is WeakRef<T>;
 	int8Array: (value: unknown, message?: string) => asserts value is Int8Array;
 	uint8Array: (value: unknown, message?: string) => asserts value is Uint8Array;
@@ -1261,7 +1261,7 @@ export function assertArrayLike<T = unknown>(value: unknown, message?: string): 
 	}
 }
 
-// eslint-disable-next-line @typescript-eslint/ban-types
+// eslint-disable-next-line @typescript-eslint/no-unsafe-function-type
 export function assertAsyncFunction(value: unknown, message?: string): asserts value is Function {
 	if (!isAsyncFunction(value)) {
 		throw new TypeError(message ?? typeErrorMessage('AsyncFunction', value));
@@ -1316,7 +1316,7 @@ export function assertBoolean(value: unknown, message?: string): asserts value i
 	}
 }
 
-// eslint-disable-next-line @typescript-eslint/ban-types
+// eslint-disable-next-line @typescript-eslint/no-unsafe-function-type
 export function assertBoundFunction(value: unknown, message?: string): asserts value is Function {
 	if (!isBoundFunction(value)) {
 		throw new TypeError(message ?? typeErrorMessage('Function', value));
@@ -1434,7 +1434,7 @@ export function assertFormData(value: unknown, message?: string): asserts value 
 	}
 }
 
-// eslint-disable-next-line @typescript-eslint/ban-types
+// eslint-disable-next-line @typescript-eslint/no-unsafe-function-type
 export function assertFunction(value: unknown, message?: string): asserts value is Function {
 	if (!isFunction(value)) {
 		throw new TypeError(message ?? typeErrorMessage('Function', value));
@@ -1567,14 +1567,14 @@ export function assertNonEmptyStringAndNotWhitespace(value: unknown, message?: s
 	}
 }
 
-// eslint-disable-next-line @typescript-eslint/ban-types
+// eslint-disable-next-line @typescript-eslint/no-restricted-types
 export function assertNull(value: unknown, message?: string): asserts value is null {
 	if (!isNull(value)) {
 		throw new TypeError(message ?? typeErrorMessage('null', value));
 	}
 }
 
-// eslint-disable-next-line @typescript-eslint/ban-types
+// eslint-disable-next-line @typescript-eslint/no-restricted-types
 export function assertNullOrUndefined(value: unknown, message?: string): asserts value is null | undefined {
 	if (!isNullOrUndefined(value)) {
 		throw new TypeError(message ?? typeErrorMessage('null or undefined', value));
@@ -1593,7 +1593,7 @@ export function assertNumericString(value: unknown, message?: string): asserts v
 	}
 }
 
-// eslint-disable-next-line @typescript-eslint/ban-types
+// eslint-disable-next-line @typescript-eslint/no-restricted-types
 export function assertObject(value: unknown, message?: string): asserts value is object {
 	if (!isObject(value)) {
 		throw new TypeError(message ?? typeErrorMessage('Object', value));
@@ -1757,21 +1757,21 @@ export function assertValidLength(value: unknown, message?: string): asserts val
 	}
 }
 
-// eslint-disable-next-line @typescript-eslint/ban-types
+// eslint-disable-next-line @typescript-eslint/no-restricted-types
 export function assertWeakMap<Key extends object = object, Value = unknown>(value: unknown, message?: string): asserts value is WeakMap<Key, Value> {
 	if (!isWeakMap(value)) {
 		throw new TypeError(message ?? typeErrorMessage('WeakMap', value));
 	}
 }
 
-// eslint-disable-next-line @typescript-eslint/ban-types, unicorn/prevent-abbreviations
+// eslint-disable-next-line @typescript-eslint/no-restricted-types
 export function assertWeakRef<T extends object = object>(value: unknown, message?: string): asserts value is WeakRef<T> {
 	if (!isWeakRef(value)) {
 		throw new TypeError(message ?? typeErrorMessage('WeakRef', value));
 	}
 }
 
-// eslint-disable-next-line @typescript-eslint/ban-types
+// eslint-disable-next-line @typescript-eslint/no-restricted-types
 export function assertWeakSet<T extends object = object>(value: unknown, message?: string): asserts value is WeakSet<T> {
 	if (!isWeakSet(value)) {
 		throw new TypeError(message ?? typeErrorMessage('WeakSet', value));
@@ -1795,4 +1795,4 @@ export type {
 	Primitive,
 	TypedArray,
 	UrlString,
-} from './types.js';
+} from './types.ts';

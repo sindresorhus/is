@@ -4,7 +4,8 @@
 Matches any [primitive value](https://developer.mozilla.org/en-US/docs/Glossary/Primitive).
 */
 export type Primitive =
-	| null // eslint-disable-line @typescript-eslint/ban-types
+	// eslint-disable-next-line @typescript-eslint/no-restricted-types
+	| null
 	| undefined
 	| string
 	| number
@@ -53,10 +54,11 @@ export type ObservableLike = {
 	[Symbol.observable](): ObservableLike;
 };
 
-// eslint-disable-next-line @typescript-eslint/ban-types
+// eslint-disable-next-line @typescript-eslint/no-restricted-types
 export type Falsy = false | 0 | 0n | '' | null | undefined;
 
-export type WeakRef<T extends object> = { // eslint-disable-line @typescript-eslint/ban-types, unicorn/prevent-abbreviations
+// eslint-disable-next-line @typescript-eslint/no-restricted-types
+export type WeakRef<T extends object> = {
 	readonly [Symbol.toStringTag]: 'WeakRef';
 	deref(): T | undefined;
 };

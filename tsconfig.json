@@ -1,5 +1,11 @@
 {
 	"extends": "@sindresorhus/tsconfig",
+	"compilerOptions": {
+		"types": ["node"],
+		"rootDir": "source",
+		"allowImportingTsExtensions": true,
+		"rewriteRelativeImportExtensions": true
+	},
 	"include": [
 		"source"
 	],
