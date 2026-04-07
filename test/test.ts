@@ -13,6 +13,7 @@ import {expectTypeOf} from 'expect-type';
 import ZenObservable from 'zen-observable';
 import is, {
 	assert as isAssert,
+	assertPropertyKey,
 	type AssertionTypeDescription,
 	type Predicate,
 	type Primitive,
@@ -1552,6 +1553,11 @@ test('is.emptyObject', () => {
 	assert.ok(is.emptyObject({}));
 	assert.ok(is.emptyObject(new Object())); // eslint-disable-line no-object-constructor
 	assert.strictEqual(is.emptyObject({unicorn: '🦄'}), false);
+	assert.strictEqual(is.emptyObject(function () {}), false); // eslint-disable-line prefer-arrow-callback
+	assert.strictEqual(is.emptyObject(() => {}), false);
+	assert.strictEqual(is.emptyObject(class Foo {}), false); // eslint-disable-line @typescript-eslint/no-extraneous-class
+	assert.strictEqual(is.emptyObject([]), false);
+	assert.strictEqual(is.emptyObject(['unicorn']), false);
 
 	assert.doesNotThrow(() => {
 		isAssert.emptyObject({});
@@ -1562,6 +1568,9 @@ test('is.emptyObject', () => {
 	assert.throws(() => {
 		isAssert.emptyObject({unicorn: '🦄'});
 	});
+	assert.throws(() => {
+		isAssert.emptyObject(function () {}); // eslint-disable-line prefer-arrow-callback
+	});
 });
 
 test('is.nonEmptyObject', () => {
@@ -1571,6 +1580,13 @@ test('is.nonEmptyObject', () => {
 	assert.strictEqual(is.nonEmptyObject({}), false);
 	assert.strictEqual(is.nonEmptyObject(new Object()), false); // eslint-disable-line no-object-constructor
 	assert.ok(is.nonEmptyObject({unicorn: '🦄'}));
+
+	assert.strictEqual(is.nonEmptyObject([]), false);
+	assert.strictEqual(is.nonEmptyObject(['unicorn']), false);
+
+	const functionWithProperty = function () {};
+	(functionWithProperty as any).custom = 'value';
+	assert.strictEqual(is.nonEmptyObject(functionWithProperty), false);
 
 	assert.throws(() => {
 		isAssert.nonEmptyObject({});
@@ -1623,6 +1639,11 @@ test('is.propertyKey', () => {
 	assert.strictEqual(is.propertyKey([]), false);
 	assert.strictEqual(is.propertyKey(new Map()), false);
 	assert.strictEqual(is.propertyKey(new Set()), false);
+
+	// AssertPropertyKey should narrow to PropertyKey (string | number | symbol), not just number
+	const symbolValue: unknown = Symbol('test');
+	assertPropertyKey(symbolValue);
+	expectTypeOf(symbolValue).toEqualTypeOf<PropertyKey>();
 });
 
 test('is.any', () => {

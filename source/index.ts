@@ -510,7 +510,7 @@ export function isEmptyMap(value: unknown): value is Map<never, never> {
 }
 
 export function isEmptyObject<Key extends keyof any = string>(value: unknown): value is Record<Key, never> {
-	return isObject(value) && !isMap(value) && !isSet(value) && Object.keys(value).length === 0;
+	return isObject(value) && !isFunction(value) && !isArray(value) && !isMap(value) && !isSet(value) && Object.keys(value).length === 0;
 }
 
 export function isEmptySet(value: unknown): value is Set<never> {
@@ -656,7 +656,7 @@ export function isNonEmptyMap<Key = unknown, Value = unknown>(value: unknown): v
 // TODO: Use `not` operator here to remove `Map` and `Set` from type guard:
 // - https://github.com/Microsoft/TypeScript/pull/29317
 export function isNonEmptyObject<Key extends keyof any = string, Value = unknown>(value: unknown): value is Record<Key, Value> {
-	return isObject(value) && !isMap(value) && !isSet(value) && Object.keys(value).length > 0;
+	return isObject(value) && !isFunction(value) && !isArray(value) && !isMap(value) && !isSet(value) && Object.keys(value).length > 0;
 }
 
 export function isNonEmptySet<T = unknown>(value: unknown): value is Set<T> {
@@ -1636,7 +1636,7 @@ export function assertPromise<T = unknown>(value: unknown, message?: string): as
 	}
 }
 
-export function assertPropertyKey(value: unknown, message?: string): asserts value is number {
+export function assertPropertyKey(value: unknown, message?: string): asserts value is PropertyKey {
 	if (!isPropertyKey(value)) {
 		throw new TypeError(message ?? typeErrorMessage('PropertyKey', value));
 	}
