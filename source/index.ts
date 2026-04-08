@@ -599,6 +599,10 @@ export function isInRange(value: number, range: number | [number, number]): valu
 	}
 
 	if (isArray(range) && range.length === 2) {
+		if (Number.isNaN(range[0]) || Number.isNaN(range[1])) {
+			throw new TypeError(`Invalid range: ${JSON.stringify(range)}`);
+		}
+
 		return value >= Math.min(...range) && value <= Math.max(...range);
 	}
 

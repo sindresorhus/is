@@ -1274,6 +1274,14 @@ test('is.inRange', () => {
 		is.inRange(0, [1, 2, 3]);
 	});
 
+	assert.throws(() => {
+		is.inRange(5, [NaN, 10]);
+	}, TypeError);
+
+	assert.throws(() => {
+		is.inRange(5, [0, NaN]);
+	}, TypeError);
+
 	assert.doesNotThrow(() => {
 		isAssert.inRange(x, [0, 5]);
 	});
