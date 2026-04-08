@@ -266,6 +266,7 @@ const is = Object.assign(
 		error: isError,
 		evenInteger: isEvenInteger,
 		falsy: isFalsy,
+		finiteNumber: isFiniteNumber,
 		float32Array: isFloat32Array,
 		float64Array: isFloat64Array,
 		formData: isFormData,
@@ -291,6 +292,7 @@ const is = Object.assign(
 		nonEmptySet: isNonEmptySet,
 		nonEmptyString: isNonEmptyString,
 		nonEmptyStringAndNotWhitespace: isNonEmptyStringAndNotWhitespace,
+		nonNegativeNumber: isNonNegativeNumber,
 		null: isNull,
 		nullOrUndefined: isNullOrUndefined,
 		number: isNumber,
@@ -299,6 +301,7 @@ const is = Object.assign(
 		observable: isObservable,
 		oddInteger: isOddInteger,
 		plainObject: isPlainObject,
+		positiveInteger: isPositiveInteger,
 		positiveNumber: isPositiveNumber,
 		primitive: isPrimitive,
 		promise: isPromise,
@@ -544,6 +547,10 @@ export function isFalsy(value: unknown): value is Falsy {
 	return !value;
 }
 
+export function isFiniteNumber(value: unknown): value is number {
+	return Number.isFinite(value);
+}
+
 // TODO: Support detecting Float16Array when targeting Node.js 24.
 
 export function isFloat32Array(value: unknown): value is Float32Array {
@@ -677,6 +684,10 @@ export function isNonEmptyStringAndNotWhitespace(value: unknown): value is NonEm
 	return isString(value) && !isEmptyStringOrWhitespace(value);
 }
 
+export function isNonNegativeNumber(value: unknown): value is number {
+	return isNumber(value) && value >= 0;
+}
+
 // eslint-disable-next-line @typescript-eslint/no-restricted-types
 export function isNull(value: unknown): value is null {
 	return value === null;
@@ -732,6 +743,10 @@ export function isPlainObject<Value = unknown>(value: unknown): value is Record<
 	const prototype = Object.getPrototypeOf(value);
 
 	return (prototype === null || prototype === Object.prototype || Object.getPrototypeOf(prototype) === null) && !(Symbol.toStringTag in value) && !(Symbol.iterator in value);
+}
+
+export function isPositiveInteger(value: unknown): value is number {
+	return isInteger(value) && value > 0;
 }
 
 export function isPositiveNumber(value: unknown): value is number {
@@ -908,8 +923,11 @@ type Assert = {
 	undefined: (value: unknown, message?: string) => asserts value is undefined;
 	string: (value: unknown, message?: string) => asserts value is string;
 	number: (value: unknown, message?: string) => asserts value is number;
+	finiteNumber: (value: unknown, message?: string) => asserts value is number;
 	positiveNumber: (value: unknown, message?: string) => asserts value is number;
 	negativeNumber: (value: unknown, message?: string) => asserts value is number;
+	nonNegativeNumber: (value: unknown, message?: string) => asserts value is number;
+	positiveInteger: (value: unknown, message?: string) => asserts value is number;
 	bigint: (value: unknown, message?: string) => asserts value is bigint;
 	// eslint-disable-next-line @typescript-eslint/no-unsafe-function-type
 	function: (value: unknown, message?: string) => asserts value is Function;
@@ -1050,6 +1068,7 @@ export const assert: Assert = {
 	error: assertError,
 	evenInteger: assertEvenInteger,
 	falsy: assertFalsy,
+	finiteNumber: assertFiniteNumber,
 	float32Array: assertFloat32Array,
 	float64Array: assertFloat64Array,
 	formData: assertFormData,
@@ -1075,6 +1094,7 @@ export const assert: Assert = {
 	nonEmptySet: assertNonEmptySet,
 	nonEmptyString: assertNonEmptyString,
 	nonEmptyStringAndNotWhitespace: assertNonEmptyStringAndNotWhitespace,
+	nonNegativeNumber: assertNonNegativeNumber,
 	null: assertNull,
 	nullOrUndefined: assertNullOrUndefined,
 	number: assertNumber,
@@ -1083,6 +1103,7 @@ export const assert: Assert = {
 	observable: assertObservable,
 	oddInteger: assertOddInteger,
 	plainObject: assertPlainObject,
+	positiveInteger: assertPositiveInteger,
 	positiveNumber: assertPositiveNumber,
 	primitive: assertPrimitive,
 	promise: assertPromise,
@@ -1141,6 +1162,7 @@ const methodTypeMap = {
 	isError: 'Error',
 	isEvenInteger: 'even integer',
 	isFalsy: 'falsy',
+	isFiniteNumber: 'finite number',
 	isFloat32Array: 'Float32Array',
 	isFloat64Array: 'Float64Array',
 	isFormData: 'FormData',
@@ -1166,6 +1188,7 @@ const methodTypeMap = {
 	isNonEmptySet: 'non-empty set',
 	isNonEmptyString: 'non-empty string',
 	isNonEmptyStringAndNotWhitespace: 'non-empty string and not whitespace',
+	isNonNegativeNumber: 'non-negative number',
 	isNull: 'null',
 	isNullOrUndefined: 'null or undefined',
 	isNumber: 'number',
@@ -1174,6 +1197,7 @@ const methodTypeMap = {
 	isObservable: 'Observable',
 	isOddInteger: 'odd integer',
 	isPlainObject: 'plain object',
+	isPositiveInteger: 'positive integer',
 	isPositiveNumber: 'positive number',
 	isPrimitive: 'primitive',
 	isPromise: 'Promise',
@@ -1420,6 +1444,12 @@ export function assertFalsy(value: unknown, message?: string): asserts value is 
 	}
 }
 
+export function assertFiniteNumber(value: unknown, message?: string): asserts value is number {
+	if (!isFiniteNumber(value)) {
+		throw new TypeError(message ?? typeErrorMessage('finite number', value));
+	}
+}
+
 export function assertFloat32Array(value: unknown, message?: string): asserts value is Float32Array {
 	if (!isFloat32Array(value)) {
 		throw new TypeError(message ?? typeErrorMessage('Float32Array', value));
@@ -1571,6 +1601,12 @@ export function assertNonEmptyStringAndNotWhitespace(value: unknown, message?: s
 	}
 }
 
+export function assertNonNegativeNumber(value: unknown, message?: string): asserts value is number {
+	if (!isNonNegativeNumber(value)) {
+		throw new TypeError(message ?? typeErrorMessage('non-negative number', value));
+	}
+}
+
 // eslint-disable-next-line @typescript-eslint/no-restricted-types
 export function assertNull(value: unknown, message?: string): asserts value is null {
 	if (!isNull(value)) {
@@ -1619,6 +1655,12 @@ export function assertOddInteger(value: number, message?: string): asserts value
 export function assertPlainObject<Value = unknown>(value: unknown, message?: string): asserts value is Record<PropertyKey, Value> {
 	if (!isPlainObject(value)) {
 		throw new TypeError(message ?? typeErrorMessage('plain object', value));
+	}
+}
+
+export function assertPositiveInteger(value: unknown, message?: string): asserts value is number {
+	if (!isPositiveInteger(value)) {
+		throw new TypeError(message ?? typeErrorMessage('positive integer', value));
 	}
 }
 

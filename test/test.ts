@@ -544,6 +544,34 @@ test('is.positiveNumber', () => {
 	});
 });
 
+test('is.finiteNumber', () => {
+	assert.ok(is.finiteNumber(6));
+	assert.ok(is.finiteNumber(-6));
+	assert.ok(is.finiteNumber(0));
+	assert.ok(is.finiteNumber(1.4));
+
+	assert.doesNotThrow(() => {
+		isAssert.finiteNumber(6);
+	});
+	assert.doesNotThrow(() => {
+		isAssert.finiteNumber(0);
+	});
+
+	assert.strictEqual(is.finiteNumber(Number.POSITIVE_INFINITY), false);
+	assert.strictEqual(is.finiteNumber(Number.NEGATIVE_INFINITY), false);
+	assert.strictEqual(is.finiteNumber(Number.NaN), false);
+
+	assert.throws(() => {
+		isAssert.finiteNumber(Number.POSITIVE_INFINITY);
+	});
+	assert.throws(() => {
+		isAssert.finiteNumber(Number.NEGATIVE_INFINITY);
+	});
+	assert.throws(() => {
+		isAssert.finiteNumber(Number.NaN);
+	});
+});
+
 test('is.negativeNumber', () => {
 	assert.ok(is.negativeNumber(-6));
 	assert.ok(is.negativeNumber(-1.4));
@@ -579,6 +607,62 @@ test('is.negativeNumber', () => {
 	});
 	assert.throws(() => {
 		isAssert.negativeNumber(Number.POSITIVE_INFINITY);
+	});
+});
+
+test('is.nonNegativeNumber', () => {
+	assert.ok(is.nonNegativeNumber(0));
+	assert.ok(is.nonNegativeNumber(6));
+	assert.ok(is.nonNegativeNumber(1.4));
+	assert.ok(is.nonNegativeNumber(Number.POSITIVE_INFINITY));
+
+	assert.doesNotThrow(() => {
+		isAssert.nonNegativeNumber(0);
+	});
+	assert.doesNotThrow(() => {
+		isAssert.nonNegativeNumber(6);
+	});
+
+	assert.ok(is.nonNegativeNumber(-0)); // -0 >= 0 is true in JavaScript
+	assert.strictEqual(is.nonNegativeNumber(-6), false);
+	assert.strictEqual(is.nonNegativeNumber(-1.4), false);
+	assert.strictEqual(is.nonNegativeNumber(Number.NEGATIVE_INFINITY), false);
+	assert.strictEqual(is.nonNegativeNumber(Number.NaN), false);
+
+	assert.throws(() => {
+		isAssert.nonNegativeNumber(-6);
+	});
+	assert.throws(() => {
+		isAssert.nonNegativeNumber(Number.NEGATIVE_INFINITY);
+	});
+});
+
+test('is.positiveInteger', () => {
+	assert.ok(is.positiveInteger(1));
+	assert.ok(is.positiveInteger(6));
+	assert.ok(is.positiveInteger(100));
+
+	assert.doesNotThrow(() => {
+		isAssert.positiveInteger(1);
+	});
+	assert.doesNotThrow(() => {
+		isAssert.positiveInteger(6);
+	});
+
+	assert.strictEqual(is.positiveInteger(0), false);
+	assert.strictEqual(is.positiveInteger(-1), false);
+	assert.strictEqual(is.positiveInteger(1.5), false);
+	assert.strictEqual(is.positiveInteger(Number.POSITIVE_INFINITY), false);
+	assert.strictEqual(is.positiveInteger(Number.NaN), false);
+
+	assert.throws(() => {
+		isAssert.positiveInteger(0);
+	});
+	assert.throws(() => {
+		isAssert.positiveInteger(-1);
+	});
+	assert.throws(() => {
+		isAssert.positiveInteger(1.5);
 	});
 });
 
@@ -2160,6 +2244,10 @@ test('custom assertion message', () => {
 	}, {message});
 
 	assert.throws(() => {
+		isAssert.finiteNumber(Number.POSITIVE_INFINITY, message);
+	}, {message});
+
+	assert.throws(() => {
 		isAssert.float32Array(undefined, message);
 	}, {message});
 
@@ -2260,6 +2348,10 @@ test('custom assertion message', () => {
 	}, {message});
 
 	assert.throws(() => {
+		isAssert.nonNegativeNumber(-1, message);
+	}, {message});
+
+	assert.throws(() => {
 		isAssert.null(undefined, message);
 	}, {message});
 
@@ -2289,6 +2381,10 @@ test('custom assertion message', () => {
 
 	assert.throws(() => {
 		isAssert.plainObject(undefined, message);
+	}, {message});
+
+	assert.throws(() => {
+		isAssert.positiveInteger(0, message);
 	}, {message});
 
 	assert.throws(() => {

@@ -463,6 +463,10 @@ function foo() {
 foo();
 ```
 
+##### .finiteNumber(value)
+
+Check if `value` is a number and is finite. Excludes `Infinity` and `-Infinity`.
+
 ##### .positiveNumber(value)
 
 Check if `value` is a number and is more than 0.
@@ -470,6 +474,14 @@ Check if `value` is a number and is more than 0.
 ##### .negativeNumber(value)
 
 Check if `value` is a number and is less than 0.
+
+##### .nonNegativeNumber(value)
+
+Check if `value` is a number and is 0 or more.
+
+##### .positiveInteger(value)
+
+Check if `value` is an integer and is more than 0.
 
 ##### .inRange(value, range)
 
