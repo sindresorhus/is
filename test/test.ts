@@ -666,6 +666,69 @@ test('is.positiveInteger', () => {
 	});
 });
 
+test('is.negativeInteger', () => {
+	assert.ok(is.negativeInteger(-1));
+	assert.ok(is.negativeInteger(-6));
+	assert.ok(is.negativeInteger(-100));
+
+	assert.doesNotThrow(() => {
+		isAssert.negativeInteger(-1);
+	});
+	assert.doesNotThrow(() => {
+		isAssert.negativeInteger(-6);
+	});
+
+	assert.strictEqual(is.negativeInteger(0), false);
+	assert.strictEqual(is.negativeInteger(-0), false); // -0 < 0 is false in JavaScript
+	assert.strictEqual(is.negativeInteger(1), false);
+	assert.strictEqual(is.negativeInteger(-1.5), false);
+	assert.strictEqual(is.negativeInteger(Number.NEGATIVE_INFINITY), false);
+	assert.strictEqual(is.negativeInteger(Number.NaN), false);
+
+	assert.throws(() => {
+		isAssert.negativeInteger(0);
+	});
+	assert.throws(() => {
+		isAssert.negativeInteger(1);
+	});
+	assert.throws(() => {
+		isAssert.negativeInteger(-1.5);
+	});
+	assert.throws(() => {
+		isAssert.negativeInteger(Number.NEGATIVE_INFINITY);
+	});
+});
+
+test('is.nonNegativeInteger', () => {
+	assert.ok(is.nonNegativeInteger(0));
+	assert.ok(is.nonNegativeInteger(1));
+	assert.ok(is.nonNegativeInteger(100));
+
+	assert.doesNotThrow(() => {
+		isAssert.nonNegativeInteger(0);
+	});
+	assert.doesNotThrow(() => {
+		isAssert.nonNegativeInteger(1);
+	});
+
+	assert.ok(is.nonNegativeInteger(-0)); // -0 >= 0 is true in JavaScript
+
+	assert.strictEqual(is.nonNegativeInteger(-1), false);
+	assert.strictEqual(is.nonNegativeInteger(1.5), false);
+	assert.strictEqual(is.nonNegativeInteger(Number.POSITIVE_INFINITY), false);
+	assert.strictEqual(is.nonNegativeInteger(Number.NaN), false);
+
+	assert.throws(() => {
+		isAssert.nonNegativeInteger(-1);
+	});
+	assert.throws(() => {
+		isAssert.nonNegativeInteger(1.5);
+	});
+	assert.throws(() => {
+		isAssert.nonNegativeInteger(Number.POSITIVE_INFINITY);
+	});
+});
+
 test('is.numericString supplemental', () => {
 	assert.strictEqual(is.numericString(''), false);
 	assert.strictEqual(is.numericString(' '), false);
@@ -711,6 +774,41 @@ test('is.array supplemental', () => {
 	assert.throws(() => {
 		isAssert.array([1, '2'], isAssert.number, 'Expected numbers');
 	}, /Expected numbers/v);
+});
+
+test('is.arrayOf', () => {
+	const isStringArray = is.arrayOf(is.string);
+	assert.ok(isStringArray(['a', 'b', 'c']));
+	assert.ok(isStringArray([]));
+	assert.strictEqual(isStringArray([1, 2, 3]), false);
+	assert.strictEqual(isStringArray(['a', 1]), false);
+	assert.strictEqual(isStringArray('not an array'), false);
+	assert.strictEqual(isStringArray(undefined), false);
+
+	const isNumberArray = is.arrayOf(is.number);
+	assert.ok(isNumberArray([1, 2, 3]));
+	assert.strictEqual(isNumberArray([1, '2']), false);
+});
+
+test('is.oneOf', () => {
+	const isDirection = is.oneOf(['north', 'south', 'east', 'west'] as const);
+	assert.ok(isDirection('north'));
+	assert.ok(isDirection('west'));
+	assert.strictEqual(isDirection('up'), false);
+	assert.strictEqual(isDirection(1), false);
+	assert.strictEqual(isDirection(undefined), false);
+
+	const isSmallNumber = is.oneOf([1, 2, 3] as const);
+	assert.ok(isSmallNumber(1));
+	assert.strictEqual(isSmallNumber(4), false);
+
+	// Empty values array always returns false
+	const isNever = is.oneOf([] as const);
+	assert.strictEqual(isNever('anything'), false);
+
+	// Array.includes uses SameValueZero, so NaN matches NaN (unlike ===)
+	const isNanValue = is.oneOf([Number.NaN] as const);
+	assert.ok(isNanValue(Number.NaN));
 });
 
 test('is.boundFunction supplemental', () => {
@@ -1359,11 +1457,11 @@ test('is.inRange', () => {
 	});
 
 	assert.throws(() => {
-		is.inRange(5, [NaN, 10]);
+		is.inRange(5, [Number.NaN, 10]);
 	}, TypeError);
 
 	assert.throws(() => {
-		is.inRange(5, [0, NaN]);
+		is.inRange(5, [0, Number.NaN]);
 	}, TypeError);
 
 	assert.doesNotThrow(() => {

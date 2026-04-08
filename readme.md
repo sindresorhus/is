@@ -130,6 +130,17 @@ is.array(value); // Validate `value` is an array.
 is.array(value, is.number); // Validate `value` is an array and all of its items are numbers.
 ```
 
+##### .arrayOf(predicate)
+
+Returns a type guard that checks if `value` is an array where every item matches the predicate. Useful for composing with other methods.
+
+```js
+const isStringArray = is.arrayOf(is.string);
+
+isStringArray(['a', 'b']); //=> true
+isStringArray(['a', 1]); //=> false
+```
+
 ##### .function(value)
 
 ##### .buffer(value)
@@ -483,6 +494,14 @@ Check if `value` is a number and is 0 or more.
 
 Check if `value` is an integer and is more than 0.
 
+##### .negativeInteger(value)
+
+Check if `value` is an integer and is less than 0.
+
+##### .nonNegativeInteger(value)
+
+Check if `value` is an integer and is 0 or more.
+
 ##### .inRange(value, range)
 
 Check if `value` (number) is in the given `range`. The range is an array of two values, lower bound and upper bound, in no specific order.
@@ -659,6 +678,17 @@ is.optional('🦄', is.string);
 
 is.optional(123, is.string);
 //=> false
+```
+
+##### .oneOf(values)
+
+Returns a type guard that checks if `value` is one of the given `values`. Best used with `as const` for precise type narrowing.
+
+```ts
+const isDirection = is.oneOf(['north', 'south', 'east', 'west'] as const);
+
+isDirection('north'); //=> true
+isDirection('up'); //=> false
 ```
 
 ##### .validDate(value)

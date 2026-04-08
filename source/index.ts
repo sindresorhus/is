@@ -133,7 +133,12 @@ const assertionTypeDescriptions = [
 	'non-empty map',
 	'PropertyKey',
 	'even integer',
+	'finite number',
+	'negative integer',
+	'non-negative integer',
+	'non-negative number',
 	'odd integer',
+	'positive integer',
 	'T',
 	'in range',
 	'predicate returns truthy for any value',
@@ -240,6 +245,7 @@ const is = Object.assign(
 		array: isArray,
 		arrayBuffer: isArrayBuffer,
 		arrayLike: isArrayLike,
+		arrayOf: isArrayOf,
 		asyncFunction: isAsyncFunction,
 		asyncGenerator: isAsyncGenerator,
 		asyncGeneratorFunction: isAsyncGeneratorFunction,
@@ -284,6 +290,7 @@ const is = Object.assign(
 		map: isMap,
 		nan: isNan,
 		nativePromise: isNativePromise,
+		negativeInteger: isNegativeInteger,
 		negativeNumber: isNegativeNumber,
 		nodeStream: isNodeStream,
 		nonEmptyArray: isNonEmptyArray,
@@ -292,6 +299,7 @@ const is = Object.assign(
 		nonEmptySet: isNonEmptySet,
 		nonEmptyString: isNonEmptyString,
 		nonEmptyStringAndNotWhitespace: isNonEmptyStringAndNotWhitespace,
+		nonNegativeInteger: isNonNegativeInteger,
 		nonNegativeNumber: isNonNegativeNumber,
 		null: isNull,
 		nullOrUndefined: isNullOrUndefined,
@@ -300,6 +308,7 @@ const is = Object.assign(
 		object: isObject,
 		observable: isObservable,
 		oddInteger: isOddInteger,
+		oneOf: isOneOf,
 		plainObject: isPlainObject,
 		positiveInteger: isPositiveInteger,
 		positiveNumber: isPositiveNumber,
@@ -433,6 +442,10 @@ export function isArrayBuffer(value: unknown): value is ArrayBuffer {
 
 export function isArrayLike<T = unknown>(value: unknown): value is ArrayLike<T> {
 	return !isNullOrUndefined(value) && !isFunction(value) && isValidLength((value as ArrayLike<T>).length);
+}
+
+export function isArrayOf<T>(predicate: (value: unknown) => value is T): (value: unknown) => value is T[] {
+	return (value: unknown): value is T[] => isArray(value) && value.every(element => predicate(element));
 }
 
 export function isAsyncFunction<T = unknown>(value: unknown): value is ((...arguments_: any[]) => Promise<T>) {
@@ -648,6 +661,10 @@ export function isNativePromise<T = unknown>(value: unknown): value is Promise<T
 	return getObjectType(value) === 'Promise';
 }
 
+export function isNegativeInteger(value: unknown): value is number {
+	return isInteger(value) && value < 0;
+}
+
 export function isNegativeNumber(value: unknown): value is number {
 	return isNumber(value) && value < 0;
 }
@@ -682,6 +699,10 @@ export function isNonEmptyString(value: unknown): value is NonEmptyString {
 // TODO: Use `not ''` when the `not` operator is available.
 export function isNonEmptyStringAndNotWhitespace(value: unknown): value is NonEmptyString {
 	return isString(value) && !isEmptyStringOrWhitespace(value);
+}
+
+export function isNonNegativeInteger(value: unknown): value is number {
+	return isInteger(value) && value >= 0;
 }
 
 export function isNonNegativeNumber(value: unknown): value is number {
@@ -731,6 +752,10 @@ export function isObservable(value: unknown): value is ObservableLike {
 
 export function isOddInteger(value: unknown): value is number {
 	return isAbsoluteModule2(1)(value);
+}
+
+export function isOneOf<T extends readonly unknown[]>(values: T): (value: unknown) => value is T[number] {
+	return (value: unknown): value is T[number] => values.includes(value as T[number]);
 }
 
 export function isPlainObject<Value = unknown>(value: unknown): value is Record<PropertyKey, Value> {
@@ -925,7 +950,9 @@ type Assert = {
 	number: (value: unknown, message?: string) => asserts value is number;
 	finiteNumber: (value: unknown, message?: string) => asserts value is number;
 	positiveNumber: (value: unknown, message?: string) => asserts value is number;
+	negativeInteger: (value: unknown, message?: string) => asserts value is number;
 	negativeNumber: (value: unknown, message?: string) => asserts value is number;
+	nonNegativeInteger: (value: unknown, message?: string) => asserts value is number;
 	nonNegativeNumber: (value: unknown, message?: string) => asserts value is number;
 	positiveInteger: (value: unknown, message?: string) => asserts value is number;
 	bigint: (value: unknown, message?: string) => asserts value is bigint;
@@ -1086,6 +1113,7 @@ export const assert: Assert = {
 	map: assertMap,
 	nan: assertNan,
 	nativePromise: assertNativePromise,
+	negativeInteger: assertNegativeInteger,
 	negativeNumber: assertNegativeNumber,
 	nodeStream: assertNodeStream,
 	nonEmptyArray: assertNonEmptyArray,
@@ -1094,6 +1122,7 @@ export const assert: Assert = {
 	nonEmptySet: assertNonEmptySet,
 	nonEmptyString: assertNonEmptyString,
 	nonEmptyStringAndNotWhitespace: assertNonEmptyStringAndNotWhitespace,
+	nonNegativeInteger: assertNonNegativeInteger,
 	nonNegativeNumber: assertNonNegativeNumber,
 	null: assertNull,
 	nullOrUndefined: assertNullOrUndefined,
@@ -1180,6 +1209,7 @@ const methodTypeMap = {
 	isMap: 'Map',
 	isNan: 'NaN',
 	isNativePromise: 'native Promise',
+	isNegativeInteger: 'negative integer',
 	isNegativeNumber: 'negative number',
 	isNodeStream: 'Node.js Stream',
 	isNonEmptyArray: 'non-empty array',
@@ -1188,6 +1218,7 @@ const methodTypeMap = {
 	isNonEmptySet: 'non-empty set',
 	isNonEmptyString: 'non-empty string',
 	isNonEmptyStringAndNotWhitespace: 'non-empty string and not whitespace',
+	isNonNegativeInteger: 'non-negative integer',
 	isNonNegativeNumber: 'non-negative number',
 	isNull: 'null',
 	isNullOrUndefined: 'null or undefined',
@@ -1553,6 +1584,12 @@ export function assertNativePromise<T = unknown>(value: unknown, message?: strin
 	}
 }
 
+export function assertNegativeInteger(value: unknown, message?: string): asserts value is number {
+	if (!isNegativeInteger(value)) {
+		throw new TypeError(message ?? typeErrorMessage('negative integer', value));
+	}
+}
+
 export function assertNegativeNumber(value: unknown, message?: string): asserts value is number {
 	if (!isNegativeNumber(value)) {
 		throw new TypeError(message ?? typeErrorMessage('negative number', value));
@@ -1598,6 +1635,12 @@ export function assertNonEmptyString(value: unknown, message?: string): asserts 
 export function assertNonEmptyStringAndNotWhitespace(value: unknown, message?: string): asserts value is string {
 	if (!isNonEmptyStringAndNotWhitespace(value)) {
 		throw new TypeError(message ?? typeErrorMessage('non-empty string and not whitespace', value));
+	}
+}
+
+export function assertNonNegativeInteger(value: unknown, message?: string): asserts value is number {
+	if (!isNonNegativeInteger(value)) {
+		throw new TypeError(message ?? typeErrorMessage('non-negative integer', value));
 	}
 }
 
