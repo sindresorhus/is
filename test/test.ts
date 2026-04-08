@@ -15,6 +15,7 @@ import is, {
 	assert as isAssert,
 	assertPropertyKey,
 	type AssertionTypeDescription,
+	type NaN as NaNType,
 	type Predicate,
 	type Primitive,
 	type TypedArray,
@@ -156,7 +157,7 @@ const primitiveTypes = {
 	safeInteger: {
 		fixtures: [...reusableFixtures.integer, ...reusableFixtures.safeInteger],
 		typename: 'number',
-		typeDescription: 'integer',
+		typeDescription: 'safe integer',
 	},
 	infinite: {
 		fixtures: [...reusableFixtures.infinite],
@@ -208,6 +209,7 @@ const objectTypes = {
 	object: {
 		fixtures: [
 			Object.create({x: 1}),
+			{[Symbol.toStringTag]: 'String'},
 			...reusableFixtures.plainObject,
 		],
 		typename: 'Object',
@@ -280,6 +282,7 @@ const objectTypes = {
 	boundFunction: {
 		fixtures: [...reusableFixtures.boundFunction, ...reusableFixtures.asyncFunction],
 		typename: 'Function',
+		typeDescription: 'bound Function',
 	},
 	map: {
 		fixtures: [
@@ -526,6 +529,7 @@ test('is.positiveNumber', () => {
 	assert.strictEqual(is.positiveNumber(-6), false);
 	assert.strictEqual(is.positiveNumber(-1.4), false);
 	assert.strictEqual(is.positiveNumber(Number.NEGATIVE_INFINITY), false);
+	assert.strictEqual(is.positiveNumber(Number.NaN), false);
 
 	assert.throws(() => {
 		isAssert.positiveNumber(0);
@@ -541,6 +545,33 @@ test('is.positiveNumber', () => {
 	});
 	assert.throws(() => {
 		isAssert.positiveNumber(Number.NEGATIVE_INFINITY);
+	});
+});
+
+test('is.nan', () => {
+	assert.ok(is.nan(Number.NaN));
+	assert.ok(is.nan(NaN)); // eslint-disable-line unicorn/prefer-number-properties
+
+	assert.doesNotThrow(() => {
+		isAssert.nan(Number.NaN);
+	});
+
+	assert.strictEqual(is.nan(0), false);
+	assert.strictEqual(is.nan(-0), false);
+	assert.strictEqual(is.nan(1), false);
+	assert.strictEqual(is.nan(Number.POSITIVE_INFINITY), false);
+	assert.strictEqual(is.nan(Number.NEGATIVE_INFINITY), false);
+	assert.strictEqual(is.nan('NaN'), false);
+	assert.strictEqual(is.nan(undefined), false);
+
+	assert.throws(() => {
+		isAssert.nan(0);
+	});
+	assert.throws(() => {
+		isAssert.nan(1);
+	});
+	assert.throws(() => {
+		isAssert.nan('NaN');
 	});
 });
 
@@ -592,6 +623,7 @@ test('is.negativeNumber', () => {
 	assert.strictEqual(is.negativeNumber(6), false);
 	assert.strictEqual(is.negativeNumber(1.4), false);
 	assert.strictEqual(is.negativeNumber(Number.POSITIVE_INFINITY), false);
+	assert.strictEqual(is.negativeNumber(Number.NaN), false);
 
 	assert.throws(() => {
 		isAssert.negativeNumber(0);
@@ -726,6 +758,32 @@ test('is.nonNegativeInteger', () => {
 	});
 	assert.throws(() => {
 		isAssert.nonNegativeInteger(Number.POSITIVE_INFINITY);
+	});
+});
+
+test('is.infinite', () => {
+	assert.ok(is.infinite(Number.POSITIVE_INFINITY));
+	assert.ok(is.infinite(Number.NEGATIVE_INFINITY));
+
+	assert.doesNotThrow(() => {
+		isAssert.infinite(Number.POSITIVE_INFINITY);
+	});
+	assert.doesNotThrow(() => {
+		isAssert.infinite(Number.NEGATIVE_INFINITY);
+	});
+
+	assert.strictEqual(is.infinite(0), false);
+	assert.strictEqual(is.infinite(1), false);
+	assert.strictEqual(is.infinite(-1), false);
+	assert.strictEqual(is.infinite(Number.NaN), false);
+	assert.strictEqual(is.infinite(Number.MAX_VALUE), false);
+	assert.strictEqual(is.infinite('Infinity'), false);
+
+	assert.throws(() => {
+		isAssert.infinite(0);
+	});
+	assert.throws(() => {
+		isAssert.infinite(Number.NaN);
 	});
 });
 
@@ -995,6 +1053,20 @@ test('is.urlString', () => {
 		if (typeof value === 'string') {
 			expectTypeOf(value).toEqualTypeOf<string>();
 		}
+	}
+})();
+
+// Type test for is.nan branded-type narrowing
+(() => {
+	const value: unknown = Number.NaN;
+
+	if (is.nan(value)) {
+		// ✅ In true branch: value is narrowed to the branded NaN type
+		expectTypeOf(value).toEqualTypeOf<NaNType>();
+		expectTypeOf(value).toMatchTypeOf<number>();
+	} else {
+		// ✅ In false branch: value remains unknown (not incorrectly narrowed)
+		expectTypeOf(value).toEqualTypeOf<unknown>();
 	}
 })();
 
@@ -2268,370 +2340,379 @@ test('assert', () => {
 test('custom assertion message', () => {
 	const message = 'Custom error message';
 
-	assert.throws(() => {
+	const assertThrowsTypeErrorWithMessage = (assertion: () => void) => {
+		// `node:assert` does not verify the error class when matching only on `{message}`.
+		assert.throws(assertion, error => {
+			assert.ok(error instanceof TypeError);
+			assert.strictEqual(error.message, message);
+			return true;
+		});
+	};
+
+	assertThrowsTypeErrorWithMessage(() => {
 		isAssert.array(undefined, undefined, message);
-	}, {message});
+	});
 
-	assert.throws(() => {
+	assertThrowsTypeErrorWithMessage(() => {
 		isAssert.arrayBuffer(undefined, message);
-	}, {message});
+	});
 
-	assert.throws(() => {
+	assertThrowsTypeErrorWithMessage(() => {
 		isAssert.arrayLike(undefined, message);
-	}, {message});
+	});
 
-	assert.throws(() => {
+	assertThrowsTypeErrorWithMessage(() => {
 		isAssert.asyncFunction(undefined, message);
-	}, {message});
+	});
 
-	assert.throws(() => {
+	assertThrowsTypeErrorWithMessage(() => {
 		isAssert.asyncGenerator(undefined, message);
-	}, {message});
+	});
 
-	assert.throws(() => {
+	assertThrowsTypeErrorWithMessage(() => {
 		isAssert.asyncGeneratorFunction(undefined, message);
-	}, {message});
+	});
 
-	assert.throws(() => {
+	assertThrowsTypeErrorWithMessage(() => {
 		isAssert.asyncIterable(undefined, message);
-	}, {message});
+	});
 
-	assert.throws(() => {
+	assertThrowsTypeErrorWithMessage(() => {
 		isAssert.bigInt64Array(undefined, message);
-	}, {message});
+	});
 
-	assert.throws(() => {
+	assertThrowsTypeErrorWithMessage(() => {
 		isAssert.bigUint64Array(undefined, message);
-	}, {message});
+	});
 
-	assert.throws(() => {
+	assertThrowsTypeErrorWithMessage(() => {
 		isAssert.bigint(undefined, message);
-	}, {message});
+	});
 
-	assert.throws(() => {
+	assertThrowsTypeErrorWithMessage(() => {
 		isAssert.blob(undefined, message);
-	}, {message});
+	});
 
-	assert.throws(() => {
+	assertThrowsTypeErrorWithMessage(() => {
 		isAssert.boolean(undefined, message);
-	}, {message});
+	});
 
-	assert.throws(() => {
+	assertThrowsTypeErrorWithMessage(() => {
 		isAssert.boundFunction(undefined, message);
-	}, {message});
+	});
 
-	assert.throws(() => {
+	assertThrowsTypeErrorWithMessage(() => {
 		isAssert.buffer(undefined, message);
-	}, {message});
+	});
 
-	assert.throws(() => {
+	assertThrowsTypeErrorWithMessage(() => {
 		isAssert.class(undefined, message);
-	}, {message});
+	});
 
-	assert.throws(() => {
+	assertThrowsTypeErrorWithMessage(() => {
 		isAssert.dataView(undefined, message);
-	}, {message});
+	});
 
-	assert.throws(() => {
+	assertThrowsTypeErrorWithMessage(() => {
 		isAssert.date(undefined, message);
-	}, {message});
+	});
 
-	assert.throws(() => {
+	assertThrowsTypeErrorWithMessage(() => {
 		isAssert.directInstanceOf(undefined, Error, message);
-	}, {message});
+	});
 
-	assert.throws(() => {
+	assertThrowsTypeErrorWithMessage(() => {
 		isAssert.emptyArray(undefined, message);
-	}, {message});
+	});
 
-	assert.throws(() => {
+	assertThrowsTypeErrorWithMessage(() => {
 		isAssert.emptyMap(undefined, message);
-	}, {message});
+	});
 
-	assert.throws(() => {
+	assertThrowsTypeErrorWithMessage(() => {
 		isAssert.emptyObject(undefined, message);
-	}, {message});
+	});
 
-	assert.throws(() => {
+	assertThrowsTypeErrorWithMessage(() => {
 		isAssert.emptySet(undefined, message);
-	}, {message});
+	});
 
-	assert.throws(() => {
+	assertThrowsTypeErrorWithMessage(() => {
 		isAssert.emptyString(undefined, message);
-	}, {message});
+	});
 
-	assert.throws(() => {
+	assertThrowsTypeErrorWithMessage(() => {
 		isAssert.emptyStringOrWhitespace(undefined, message);
-	}, {message});
+	});
 
-	assert.throws(() => {
+	assertThrowsTypeErrorWithMessage(() => {
 		enum Enum {}
 		isAssert.enumCase('invalid', Enum, message);
-	}, {message});
+	});
 
-	assert.throws(() => {
+	assertThrowsTypeErrorWithMessage(() => {
 		isAssert.error(undefined, message);
-	}, {message});
+	});
 
-	assert.throws(() => {
+	assertThrowsTypeErrorWithMessage(() => {
 		isAssert.evenInteger(33, message);
-	}, {message});
+	});
 
-	assert.throws(() => {
+	assertThrowsTypeErrorWithMessage(() => {
 		isAssert.falsy(true, message);
-	}, {message});
+	});
 
-	assert.throws(() => {
+	assertThrowsTypeErrorWithMessage(() => {
 		isAssert.finiteNumber(Number.POSITIVE_INFINITY, message);
-	}, {message});
+	});
 
-	assert.throws(() => {
+	assertThrowsTypeErrorWithMessage(() => {
 		isAssert.float32Array(undefined, message);
-	}, {message});
+	});
 
-	assert.throws(() => {
+	assertThrowsTypeErrorWithMessage(() => {
 		isAssert.float64Array(undefined, message);
-	}, {message});
+	});
 
-	assert.throws(() => {
+	assertThrowsTypeErrorWithMessage(() => {
 		isAssert.formData(undefined, message);
-	}, {message});
+	});
 
-	assert.throws(() => {
+	assertThrowsTypeErrorWithMessage(() => {
 		isAssert.function(undefined, message);
-	}, {message});
+	});
 
-	assert.throws(() => {
+	assertThrowsTypeErrorWithMessage(() => {
 		isAssert.generator(undefined, message);
-	}, {message});
+	});
 
-	assert.throws(() => {
+	assertThrowsTypeErrorWithMessage(() => {
 		isAssert.generatorFunction(undefined, message);
-	}, {message});
+	});
 
-	assert.throws(() => {
+	assertThrowsTypeErrorWithMessage(() => {
 		isAssert.htmlElement(undefined, message);
-	}, {message});
+	});
 
-	assert.throws(() => {
+	assertThrowsTypeErrorWithMessage(() => {
 		isAssert.inRange(5, [1, 2], message);
-	}, {message});
+	});
 
-	assert.throws(() => {
+	assertThrowsTypeErrorWithMessage(() => {
 		isAssert.infinite(undefined, message);
-	}, {message});
+	});
 
-	assert.throws(() => {
+	assertThrowsTypeErrorWithMessage(() => {
 		isAssert.int16Array(undefined, message);
-	}, {message});
+	});
 
-	assert.throws(() => {
+	assertThrowsTypeErrorWithMessage(() => {
 		isAssert.int32Array(undefined, message);
-	}, {message});
+	});
 
-	assert.throws(() => {
+	assertThrowsTypeErrorWithMessage(() => {
 		isAssert.int8Array(undefined, message);
-	}, {message});
+	});
 
-	assert.throws(() => {
+	assertThrowsTypeErrorWithMessage(() => {
 		isAssert.integer(undefined, message);
-	}, {message});
+	});
 
-	assert.throws(() => {
+	assertThrowsTypeErrorWithMessage(() => {
 		isAssert.iterable(undefined, message);
-	}, {message});
+	});
 
-	assert.throws(() => {
+	assertThrowsTypeErrorWithMessage(() => {
 		isAssert.map(undefined, message);
-	}, {message});
+	});
 
-	assert.throws(() => {
+	assertThrowsTypeErrorWithMessage(() => {
 		isAssert.nan(undefined, message);
-	}, {message});
+	});
 
-	assert.throws(() => {
+	assertThrowsTypeErrorWithMessage(() => {
 		isAssert.nativePromise(undefined, message);
-	}, {message});
+	});
 
-	assert.throws(() => {
+	assertThrowsTypeErrorWithMessage(() => {
 		isAssert.negativeNumber(undefined, message);
-	}, {message});
+	});
 
-	assert.throws(() => {
+	assertThrowsTypeErrorWithMessage(() => {
 		isAssert.nodeStream(undefined, message);
-	}, {message});
+	});
 
-	assert.throws(() => {
+	assertThrowsTypeErrorWithMessage(() => {
 		isAssert.nonEmptyArray(undefined, message);
-	}, {message});
+	});
 
-	assert.throws(() => {
+	assertThrowsTypeErrorWithMessage(() => {
 		isAssert.nonEmptyMap(undefined, message);
-	}, {message});
+	});
 
-	assert.throws(() => {
+	assertThrowsTypeErrorWithMessage(() => {
 		isAssert.nonEmptyObject(undefined, message);
-	}, {message});
+	});
 
-	assert.throws(() => {
+	assertThrowsTypeErrorWithMessage(() => {
 		isAssert.nonEmptySet(undefined, message);
-	}, {message});
+	});
 
-	assert.throws(() => {
+	assertThrowsTypeErrorWithMessage(() => {
 		isAssert.nonEmptyString(undefined, message);
-	}, {message});
+	});
 
-	assert.throws(() => {
+	assertThrowsTypeErrorWithMessage(() => {
 		isAssert.nonEmptyStringAndNotWhitespace(undefined, message);
-	}, {message});
+	});
 
-	assert.throws(() => {
+	assertThrowsTypeErrorWithMessage(() => {
 		isAssert.nonNegativeNumber(-1, message);
-	}, {message});
+	});
 
-	assert.throws(() => {
+	assertThrowsTypeErrorWithMessage(() => {
 		isAssert.null(undefined, message);
-	}, {message});
+	});
 
-	assert.throws(() => {
+	assertThrowsTypeErrorWithMessage(() => {
 		isAssert.nullOrUndefined(false, message);
-	}, {message});
+	});
 
-	assert.throws(() => {
+	assertThrowsTypeErrorWithMessage(() => {
 		isAssert.number(undefined, message);
-	}, {message});
+	});
 
-	assert.throws(() => {
+	assertThrowsTypeErrorWithMessage(() => {
 		isAssert.numericString(undefined, message);
-	}, {message});
+	});
 
-	assert.throws(() => {
+	assertThrowsTypeErrorWithMessage(() => {
 		isAssert.object(undefined, message);
-	}, {message});
+	});
 
-	assert.throws(() => {
+	assertThrowsTypeErrorWithMessage(() => {
 		isAssert.observable(undefined, message);
-	}, {message});
+	});
 
-	assert.throws(() => {
+	assertThrowsTypeErrorWithMessage(() => {
 		isAssert.oddInteger(42, message);
-	}, {message});
+	});
 
-	assert.throws(() => {
+	assertThrowsTypeErrorWithMessage(() => {
 		isAssert.plainObject(undefined, message);
-	}, {message});
+	});
 
-	assert.throws(() => {
+	assertThrowsTypeErrorWithMessage(() => {
 		isAssert.positiveInteger(0, message);
-	}, {message});
+	});
 
-	assert.throws(() => {
+	assertThrowsTypeErrorWithMessage(() => {
 		isAssert.positiveNumber(undefined, message);
-	}, {message});
+	});
 
-	assert.throws(() => {
+	assertThrowsTypeErrorWithMessage(() => {
 		isAssert.primitive([], message);
-	}, {message});
+	});
 
-	assert.throws(() => {
+	assertThrowsTypeErrorWithMessage(() => {
 		isAssert.promise(undefined, message);
-	}, {message});
+	});
 
-	assert.throws(() => {
+	assertThrowsTypeErrorWithMessage(() => {
 		isAssert.propertyKey(undefined, message);
-	}, {message});
+	});
 
-	assert.throws(() => {
+	assertThrowsTypeErrorWithMessage(() => {
 		isAssert.regExp(undefined, message);
-	}, {message});
+	});
 
-	assert.throws(() => {
+	assertThrowsTypeErrorWithMessage(() => {
 		isAssert.safeInteger(undefined, message);
-	}, {message});
+	});
 
-	assert.throws(() => {
+	assertThrowsTypeErrorWithMessage(() => {
 		isAssert.set(undefined, message);
-	}, {message});
+	});
 
-	assert.throws(() => {
+	assertThrowsTypeErrorWithMessage(() => {
 		isAssert.sharedArrayBuffer(undefined, message);
-	}, {message});
+	});
 
-	assert.throws(() => {
+	assertThrowsTypeErrorWithMessage(() => {
 		isAssert.string(undefined, message);
-	}, {message});
+	});
 
-	assert.throws(() => {
+	assertThrowsTypeErrorWithMessage(() => {
 		isAssert.symbol(undefined, message);
-	}, {message});
+	});
 
-	assert.throws(() => {
+	assertThrowsTypeErrorWithMessage(() => {
 		isAssert.truthy(undefined, message);
-	}, {message});
+	});
 
-	assert.throws(() => {
+	assertThrowsTypeErrorWithMessage(() => {
 		isAssert.tupleLike(undefined, [], message);
-	}, {message});
+	});
 
-	assert.throws(() => {
+	assertThrowsTypeErrorWithMessage(() => {
 		isAssert.typedArray(undefined, message);
-	}, {message});
+	});
 
-	assert.throws(() => {
+	assertThrowsTypeErrorWithMessage(() => {
 		isAssert.uint16Array(undefined, message);
-	}, {message});
+	});
 
-	assert.throws(() => {
+	assertThrowsTypeErrorWithMessage(() => {
 		isAssert.uint32Array(undefined, message);
-	}, {message});
+	});
 
-	assert.throws(() => {
+	assertThrowsTypeErrorWithMessage(() => {
 		isAssert.uint8Array(undefined, message);
-	}, {message});
+	});
 
-	assert.throws(() => {
+	assertThrowsTypeErrorWithMessage(() => {
 		isAssert.uint8ClampedArray(undefined, message);
-	}, {message});
+	});
 
-	assert.throws(() => {
+	assertThrowsTypeErrorWithMessage(() => {
 		isAssert.undefined(false, message);
-	}, {message});
+	});
 
-	assert.throws(() => {
+	assertThrowsTypeErrorWithMessage(() => {
 		isAssert.urlInstance(undefined, message);
-	}, {message});
+	});
 
-	assert.throws(() => {
+	assertThrowsTypeErrorWithMessage(() => {
 		isAssert.urlSearchParams(undefined, message);
-	}, {message});
+	});
 
-	assert.throws(() => {
+	assertThrowsTypeErrorWithMessage(() => {
 		isAssert.urlString(undefined, message);
-	}, {message});
+	});
 
-	assert.throws(() => {
+	assertThrowsTypeErrorWithMessage(() => {
 		isAssert.validDate(undefined, message);
-	}, {message});
+	});
 
-	assert.throws(() => {
+	assertThrowsTypeErrorWithMessage(() => {
 		isAssert.validLength(undefined, message);
-	}, {message});
+	});
 
-	assert.throws(() => {
+	assertThrowsTypeErrorWithMessage(() => {
 		isAssert.weakMap(undefined, message);
-	}, {message});
+	});
 
-	assert.throws(() => {
+	assertThrowsTypeErrorWithMessage(() => {
 		isAssert.weakRef(undefined, message);
-	}, {message});
+	});
 
-	assert.throws(() => {
+	assertThrowsTypeErrorWithMessage(() => {
 		isAssert.weakSet(undefined, message);
-	}, {message});
+	});
 
-	assert.throws(() => {
+	assertThrowsTypeErrorWithMessage(() => {
 		isAssert.whitespaceString(undefined, message);
-	}, {message});
+	});
 });
 
 test('is.optional', () => {

@@ -1,14 +1,29 @@
 import type {
 	ArrayLike,
 	Class,
+	EvenInteger,
 	Falsy,
+	FiniteNumber,
+	Integer,
+	NaN as NaNType,
+	NegativeInfinity,
+	NegativeInteger,
+	NegativeNumber,
 	NodeStream,
 	NonEmptyString,
+	NonNegativeInteger,
+	NonNegativeNumber,
 	ObservableLike,
+	OddInteger,
 	Predicate,
 	Primitive,
+	PositiveInfinity,
+	PositiveInteger,
+	PositiveNumber,
+	SafeInteger,
 	TypedArray,
 	UrlString,
+	ValidLength,
 	WeakRef,
 	Whitespace,
 } from './types.ts';
@@ -21,6 +36,15 @@ type ExtractFromGlobalConstructors<Name extends string> =
 		: never;
 
 type NodeBuffer = ExtractFromGlobalConstructors<'Buffer'>;
+
+type NumericGuardResult<Input, Branded extends number> =
+	(
+		unknown extends Input
+			? Branded
+			: Input extends number
+				? Branded & Input
+				: number
+	) & Input;
 
 const typedArrayTypeNames = [
 	'Int8Array',
@@ -99,6 +123,7 @@ function isPrimitiveTypeName(name: unknown): name is PrimitiveTypeName {
 export type TypeName = ObjectTypeName | PrimitiveTypeName;
 
 const assertionTypeDescriptions = [
+	'bound Function',
 	'positive number',
 	'negative number',
 	'Class',
@@ -139,6 +164,7 @@ const assertionTypeDescriptions = [
 	'non-negative number',
 	'odd integer',
 	'positive integer',
+	'safe integer',
 	'T',
 	'in range',
 	'predicate returns truthy for any value',
@@ -225,8 +251,7 @@ function detect(value: unknown): TypeName {
 		return 'Promise';
 	}
 
-	const objectTag = Object.prototype.toString.call(value).slice(8, -1);
-	if (objectTag === 'String' || objectTag === 'Boolean' || objectTag === 'Number') {
+	if (isBoxedPrimitiveObject(value)) {
 		throw new TypeError('Please don\'t use object wrappers for primitive types');
 	}
 
@@ -235,6 +260,23 @@ function detect(value: unknown): TypeName {
 
 function hasPromiseApi<T = unknown>(value: unknown): value is Promise<T> {
 	return isFunction((value as Promise<T>)?.then) && isFunction((value as Promise<T>)?.catch);
+}
+
+function hasBoxedPrimitiveBrand(value: unknown, valueOf: () => unknown): boolean {
+	try {
+		// `Object.prototype.toString` can be spoofed via `Symbol.toStringTag`, but the
+		// boxed primitive `valueOf` methods still enforce the real internal brand.
+		Reflect.apply(valueOf, value, []);
+		return true;
+	} catch {
+		return false;
+	}
+}
+
+function isBoxedPrimitiveObject(value: unknown): boolean {
+	return hasBoxedPrimitiveBrand(value, String.prototype.valueOf)
+		|| hasBoxedPrimitiveBrand(value, Boolean.prototype.valueOf)
+		|| hasBoxedPrimitiveBrand(value, Number.prototype.valueOf);
 }
 
 const is = Object.assign(
@@ -560,11 +602,13 @@ export function isEnumCase<T = unknown>(value: unknown, targetEnum: T): value is
 }
 
 export function isError(value: unknown): value is Error {
-	// TODO: Use `Error.isError` when targeting Node.js 24.`
+	// TODO: Use `Error.isError` when targeting Node.js 24.
 	return getObjectType(value) === 'Error';
 }
 
-export function isEvenInteger(value: unknown): value is number {
+// For numeric guards, preserve branded narrowing for `unknown`, keep the false branch usable for plain `number`, and still narrow mixed unions to `number`.
+export function isEvenInteger<Input>(value: Input): value is NumericGuardResult<Input, EvenInteger>;
+export function isEvenInteger(value: unknown): boolean {
 	return isAbsoluteModule2(0)(value);
 }
 
@@ -573,7 +617,8 @@ export function isFalsy(value: unknown): value is Falsy {
 	return !value;
 }
 
-export function isFiniteNumber(value: unknown): value is number {
+export function isFiniteNumber<Input>(value: Input): value is NumericGuardResult<Input, FiniteNumber>;
+export function isFiniteNumber(value: unknown): boolean {
 	return Number.isFinite(value);
 }
 
@@ -622,7 +667,8 @@ export function isHtmlElement(value: unknown): value is HTMLElement {
 		&& DOM_PROPERTIES_TO_CHECK.every(property => property in value);
 }
 
-export function isInfinite(value: unknown): value is number {
+export function isInfinite<Input>(value: Input): value is NumericGuardResult<Input, PositiveInfinity | NegativeInfinity>;
+export function isInfinite(value: unknown): boolean {
 	return value === Number.POSITIVE_INFINITY || value === Number.NEGATIVE_INFINITY;
 }
 
@@ -654,7 +700,8 @@ export function isInt8Array(value: unknown): value is Int8Array {
 	return getObjectType(value) === 'Int8Array';
 }
 
-export function isInteger(value: unknown): value is number {
+export function isInteger<Input>(value: Input): value is NumericGuardResult<Input, Integer>;
+export function isInteger(value: unknown): boolean {
 	return Number.isInteger(value);
 }
 
@@ -666,7 +713,8 @@ export function isMap<Key = unknown, Value = unknown>(value: unknown): value is 
 	return getObjectType(value) === 'Map';
 }
 
-export function isNan(value: unknown) {
+export function isNan<Input>(value: Input): value is NumericGuardResult<Input, NaNType>;
+export function isNan(value: unknown): boolean {
 	return Number.isNaN(value);
 }
 
@@ -674,11 +722,13 @@ export function isNativePromise<T = unknown>(value: unknown): value is Promise<T
 	return getObjectType(value) === 'Promise';
 }
 
-export function isNegativeInteger(value: unknown): value is number {
+export function isNegativeInteger<Input>(value: Input): value is NumericGuardResult<Input, NegativeInteger>;
+export function isNegativeInteger(value: unknown): boolean {
 	return isInteger(value) && value < 0;
 }
 
-export function isNegativeNumber(value: unknown): value is number {
+export function isNegativeNumber<Input>(value: Input): value is NumericGuardResult<Input, NegativeNumber>;
+export function isNegativeNumber(value: unknown): boolean {
 	return isNumber(value) && value < 0;
 }
 
@@ -714,11 +764,13 @@ export function isNonEmptyStringAndNotWhitespace(value: unknown): value is NonEm
 	return isString(value) && !isEmptyStringOrWhitespace(value);
 }
 
-export function isNonNegativeInteger(value: unknown): value is number {
+export function isNonNegativeInteger<Input>(value: Input): value is NumericGuardResult<Input, NonNegativeInteger>;
+export function isNonNegativeInteger(value: unknown): boolean {
 	return isInteger(value) && value >= 0;
 }
 
-export function isNonNegativeNumber(value: unknown): value is number {
+export function isNonNegativeNumber<Input>(value: Input): value is NumericGuardResult<Input, NonNegativeNumber>;
+export function isNonNegativeNumber(value: unknown): boolean {
 	return isNumber(value) && value >= 0;
 }
 
@@ -763,7 +815,8 @@ export function isObservable(value: unknown): value is ObservableLike {
 	return false;
 }
 
-export function isOddInteger(value: unknown): value is number {
+export function isOddInteger<Input>(value: Input): value is NumericGuardResult<Input, OddInteger>;
+export function isOddInteger(value: unknown): boolean {
 	return isAbsoluteModule2(1)(value);
 }
 
@@ -783,11 +836,13 @@ export function isPlainObject<Value = unknown>(value: unknown): value is Record<
 	return (prototype === null || prototype === Object.prototype || Object.getPrototypeOf(prototype) === null) && !(Symbol.toStringTag in value) && !(Symbol.iterator in value);
 }
 
-export function isPositiveInteger(value: unknown): value is number {
+export function isPositiveInteger<Input>(value: Input): value is NumericGuardResult<Input, PositiveInteger>;
+export function isPositiveInteger(value: unknown): boolean {
 	return isInteger(value) && value > 0;
 }
 
-export function isPositiveNumber(value: unknown): value is number {
+export function isPositiveNumber<Input>(value: Input): value is NumericGuardResult<Input, PositiveNumber>;
+export function isPositiveNumber(value: unknown): boolean {
 	return isNumber(value) && value > 0;
 }
 
@@ -808,7 +863,8 @@ export function isRegExp(value: unknown): value is RegExp {
 	return getObjectType(value) === 'RegExp';
 }
 
-export function isSafeInteger(value: unknown): value is number {
+export function isSafeInteger<Input>(value: Input): value is NumericGuardResult<Input, SafeInteger>;
+export function isSafeInteger(value: unknown): boolean {
 	return Number.isSafeInteger(value);
 }
 
@@ -900,7 +956,8 @@ export function isValidDate(value: unknown): value is Date {
 	return isDate(value) && !isNan(Number(value));
 }
 
-export function isValidLength(value: unknown): value is number {
+export function isValidLength<Input>(value: Input): value is NumericGuardResult<Input, ValidLength>;
+export function isValidLength(value: unknown): boolean {
 	return isSafeInteger(value) && value >= 0;
 }
 
@@ -956,6 +1013,8 @@ function typeErrorMessageMultipleValues(expectedType: AssertionTypeDescription |
 }
 
 // Type assertions have to be declared with an explicit type.
+// Keep assertion outputs unbranded even when the corresponding `is.*` guard uses a branded subtype.
+// The brands exist to preserve useful false-branch narrowing for type guards on `number` inputs, which does not apply to `asserts`.
 type Assert = {
 	// Unknowns.
 	undefined: (value: unknown, message?: string) => asserts value is undefined;
@@ -1188,7 +1247,7 @@ const methodTypeMap = {
 	isBigUint64Array: 'BigUint64Array',
 	isBlob: 'Blob',
 	isBoolean: 'boolean',
-	isBoundFunction: 'Function',
+	isBoundFunction: 'bound Function',
 	isBuffer: 'Buffer',
 	isClass: 'Class',
 	isDataView: 'DataView',
@@ -1247,7 +1306,7 @@ const methodTypeMap = {
 	isPromise: 'Promise',
 	isPropertyKey: 'PropertyKey',
 	isRegExp: 'RegExp',
-	isSafeInteger: 'integer',
+	isSafeInteger: 'safe integer',
 	isSet: 'Set',
 	isSharedArrayBuffer: 'SharedArrayBuffer',
 	isString: 'string',
@@ -1391,7 +1450,7 @@ export function assertBoolean(value: unknown, message?: string): asserts value i
 // eslint-disable-next-line @typescript-eslint/no-unsafe-function-type
 export function assertBoundFunction(value: unknown, message?: string): asserts value is Function {
 	if (!isBoundFunction(value)) {
-		throw new TypeError(message ?? typeErrorMessage('Function', value));
+		throw new TypeError(message ?? typeErrorMessage('bound Function', value));
 	}
 }
 
@@ -1752,7 +1811,7 @@ export function assertRegExp(value: unknown, message?: string): asserts value is
 
 export function assertSafeInteger(value: unknown, message?: string): asserts value is number {
 	if (!isSafeInteger(value)) {
-		throw new TypeError(message ?? typeErrorMessage('integer', value));
+		throw new TypeError(message ?? typeErrorMessage('safe integer', value));
 	}
 }
 
@@ -1891,10 +1950,25 @@ export default is;
 export type {
 	ArrayLike,
 	Class,
+	EvenInteger,
+	FiniteNumber,
+	Integer,
+	NaN,
+	NegativeInfinity,
+	NegativeInteger,
+	NegativeNumber,
 	NodeStream,
+	NonNegativeInteger,
+	NonNegativeNumber,
 	ObservableLike,
+	OddInteger,
+	PositiveInfinity,
+	PositiveInteger,
+	PositiveNumber,
 	Predicate,
 	Primitive,
+	SafeInteger,
 	TypedArray,
 	UrlString,
+	ValidLength,
 } from './types.ts';

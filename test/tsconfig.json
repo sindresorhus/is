@@ -1,0 +1,12 @@
+{
+	"extends": "../tsconfig.json",
+	"compilerOptions": {
+		"rootDir": "..",
+		"noUnusedLocals": false,
+		"noUnusedParameters": false
+	},
+	"include": [
+		"../source",
+		"type-tests.ts"
+	]
+}

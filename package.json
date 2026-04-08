@@ -21,7 +21,7 @@
 	},
 	"scripts": {
 		"build": "del distribution && tsc",
-		"test": "tsc --noEmit && xo && node --experimental-transform-types --test test/test.ts",
+		"test": "tsc --noEmit && tsc --project test/tsconfig.json --noEmit && xo && node --experimental-transform-types --test test/test.ts",
 		"prepare": "npm run build"
 	},
 	"files": [
