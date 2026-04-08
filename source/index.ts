@@ -542,8 +542,21 @@ export function isEmptyStringOrWhitespace(value: unknown): value is '' | Whitesp
 }
 
 export function isEnumCase<T = unknown>(value: unknown, targetEnum: T): value is T[keyof T] {
-	// eslint-disable-next-line @typescript-eslint/no-unsafe-argument
-	return Object.values(targetEnum as any).includes(value as string);
+	// Numeric enums have reverse mappings (e.g. `Direction[0] = "Up"`), so their runtime object contains both `{ Up: 0 }` and `{ "0": "Up" }`. Filtering out entries that round-trip like a canonical number and point back to an own property leaves only actual enum member values.
+	const enumObject = targetEnum as Record<PropertyKey, unknown>;
+
+	return Object.entries(enumObject).some(([key, enumValue]) => {
+		if (!isString(enumValue)) {
+			return enumValue === value;
+		}
+
+		const numericKey = Number(key);
+		if (Number.isNaN(numericKey) || String(numericKey) !== key) {
+			return enumValue === value;
+		}
+
+		return enumValue === value && !(Object.hasOwn(enumObject, enumValue) && enumObject[enumValue] === numericKey);
+	});
 }
 
 export function isError(value: unknown): value is Error {
@@ -786,7 +799,7 @@ export function isPromise<T = unknown>(value: unknown): value is Promise<T> {
 	return isNativePromise(value) || hasPromiseApi(value);
 }
 
-// `PropertyKey` is any value that can be used as an object key (string, number, or symbol)
+// `PropertyKey` is any value that can be used as an object key (string, number, or symbol). Note: NaN is technically `typeof 'number'` and thus fits TypeScript's `PropertyKey`, but we intentionally exclude it here because using NaN as a property key is almost always a mistake.
 export function isPropertyKey(value: unknown): value is PropertyKey {
 	return isAny([isString, isNumber, isSymbol], value);
 }

@@ -855,6 +855,12 @@ test('is.enumCase', () => {
 		Key2 = 'key2',
 	}
 
+	enum NumericKeyStringEnum {
+		// eslint-disable-next-line @stylistic/quote-props
+		'0' = 'zero',
+		'01' = 'padded',
+	}
+
 	assert.ok(is.enumCase('key1', NonNumericalEnum));
 	assert.doesNotThrow(() => {
 		isAssert.enumCase('key1', NonNumericalEnum);
@@ -864,6 +870,40 @@ test('is.enumCase', () => {
 	assert.throws(() => {
 		isAssert.enumCase('invalid', NonNumericalEnum);
 	});
+
+	assert.ok(is.enumCase('zero', NumericKeyStringEnum));
+	assert.ok(is.enumCase('padded', NumericKeyStringEnum));
+	assert.doesNotThrow(() => {
+		isAssert.enumCase('zero', NumericKeyStringEnum);
+	});
+	assert.doesNotThrow(() => {
+		isAssert.enumCase('padded', NumericKeyStringEnum);
+	});
+
+	enum NumericalEnum {
+		Key1 = 0,
+		Key2 = 1,
+	}
+
+	assert.ok(is.enumCase(0, NumericalEnum));
+	assert.ok(is.enumCase(1, NumericalEnum));
+	assert.strictEqual(is.enumCase('Key1', NumericalEnum), false);
+	assert.strictEqual(is.enumCase('Key2', NumericalEnum), false);
+	assert.doesNotThrow(() => {
+		isAssert.enumCase(0, NumericalEnum);
+	});
+	assert.throws(() => {
+		isAssert.enumCase('Key1', NumericalEnum);
+	});
+
+	enum HeterogeneousEnum {
+		A = 1,
+		B = 'hello',
+	}
+
+	assert.ok(is.enumCase(1, HeterogeneousEnum));
+	assert.ok(is.enumCase('hello', HeterogeneousEnum));
+	assert.strictEqual(is.enumCase('A', HeterogeneousEnum), false);
 });
 
 test('is.directInstanceOf', () => {
