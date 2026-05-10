@@ -1,4 +1,10 @@
+import {expectTypeOf} from 'expect-type';
 import is, {
+	assert as isAssert,
+	assertNotNullOrUndefined,
+	assertNotPrimitive,
+	assertNotString,
+	assertNotUndefined,
 	type EvenInteger,
 	type FiniteNumber,
 	type Integer,
@@ -12,9 +18,13 @@ import is, {
 	type PositiveInfinity,
 	type PositiveInteger,
 	type PositiveNumber,
+	type Primitive,
 	type SafeInteger,
 	type ValidLength,
 } from '../source/index.ts';
+
+// eslint-disable-next-line @typescript-eslint/no-restricted-types
+type UnknownNotPrimitive<Forbidden extends Primitive> = Exclude<Primitive, Forbidden> | object;
 
 // For each predicate, verify two things:
 // 1. True branch narrows to the branded type.
@@ -197,6 +207,154 @@ const distinctNumericBrandsStayDistinct = (
 	return negativeInteger;
 };
 
+const assertNotUndefinedCheck = (value: string | undefined) => {
+	isAssert.not.undefined(value);
+	expectTypeOf(value).toEqualTypeOf<string>();
+};
+
+const assertNotUndefinedUnknownCheck = (value: unknown) => {
+	isAssert.not.undefined(value);
+	expectTypeOf(value).toEqualTypeOf<UnknownNotPrimitive<undefined>>();
+};
+
+const assertNotUndefinedGenericCheck = <T>(value: T) => {
+	isAssert.not.undefined(value);
+	const _: Exclude<T, undefined> = value;
+};
+
+const nullValue = null;
+type Null = typeof nullValue;
+
+const assertNotNullUnknownCheck = (value: unknown) => {
+	isAssert.not.null(value);
+	expectTypeOf(value).toEqualTypeOf<UnknownNotPrimitive<Null>>();
+};
+
+const assertNotNullOrUndefinedCheck = (value: string | Null | undefined) => {
+	isAssert.not.nullOrUndefined(value);
+	expectTypeOf(value).toEqualTypeOf<string>();
+};
+
+const assertNotNullOrUndefinedUnknownCheck = (value: unknown) => {
+	isAssert.not.nullOrUndefined(value);
+	expectTypeOf(value).toEqualTypeOf<UnknownNotPrimitive<Null | undefined>>();
+};
+
+const assertNotStringCheck = (value: string | number) => {
+	isAssert.not.string(value);
+	expectTypeOf(value).toEqualTypeOf<number>();
+};
+
+const assertNotStringUnknownCheck = (value: unknown) => {
+	isAssert.not.string(value);
+	expectTypeOf(value).toEqualTypeOf<UnknownNotPrimitive<string>>();
+};
+
+const assertNotStringGenericCheck = <T>(value: T) => {
+	isAssert.not.string(value);
+	const _: Exclude<T, string> = value;
+};
+
+const assertNotBooleanUnknownCheck = (value: unknown) => {
+	isAssert.not.boolean(value);
+	expectTypeOf(value).toEqualTypeOf<UnknownNotPrimitive<boolean>>();
+};
+
+const assertNotSymbolUnknownCheck = (value: unknown) => {
+	isAssert.not.symbol(value);
+	expectTypeOf(value).toEqualTypeOf<UnknownNotPrimitive<symbol>>();
+};
+
+const assertNotBigintUnknownCheck = (value: unknown) => {
+	isAssert.not.bigint(value);
+	expectTypeOf(value).toEqualTypeOf<UnknownNotPrimitive<bigint>>();
+};
+
+const assertNotPrimitiveUnknownCheck = (value: unknown) => {
+	isAssert.not.primitive(value);
+	// eslint-disable-next-line @typescript-eslint/no-restricted-types
+	expectTypeOf(value).toEqualTypeOf<object>();
+};
+
+const assertNotPrimitiveGenericCheck = <T>(value: T) => {
+	isAssert.not.primitive(value);
+	const _: Exclude<T, Primitive> = value;
+};
+
+const assertNotNamedUndefinedExportCheck = (value: 0 | false | '' | Null | undefined | 'ok') => {
+	assertNotUndefined(value);
+	expectTypeOf(value).toEqualTypeOf<0 | false | '' | Null | 'ok'>();
+};
+
+const assertNotNamedNullOrUndefinedUnknownExportCheck = (value: unknown) => {
+	assertNotNullOrUndefined(value);
+	expectTypeOf(value).toEqualTypeOf<UnknownNotPrimitive<Null | undefined>>();
+};
+
+const assertNotNamedStringExportCheck = (value: string | number) => {
+	assertNotString(value);
+	expectTypeOf(value).toEqualTypeOf<number>();
+};
+
+const assertNotNamedStringUnknownExportCheck = (value: unknown) => {
+	assertNotString(value);
+	expectTypeOf(value).toEqualTypeOf<UnknownNotPrimitive<string>>();
+};
+
+const assertNotNamedPrimitiveUnknownExportCheck = (value: unknown) => {
+	assertNotPrimitive(value);
+	// eslint-disable-next-line @typescript-eslint/no-restricted-types
+	expectTypeOf(value).toEqualTypeOf<object>();
+};
+
+const assertNotCallableDoesNotExistCheck = (value: string | undefined) => {
+	// @ts-expect-error -- Generic negative assertions cannot safely infer complement types from arbitrary predicates.
+	isAssert.not(is.undefined, value);
+	const _: string | undefined = value;
+};
+
+const assertNotNumberDoesNotExistCheck = (value: string | number) => {
+	// @ts-expect-error -- `is.number` rejects `NaN`, so a narrowing negative assertion would be unsound.
+	isAssert.not.number(value); // eslint-disable-line @typescript-eslint/no-unsafe-call
+	const _: string | number = value;
+};
+
+const assertNotIntegerDoesNotExistCheck = (value: string | number) => {
+	// @ts-expect-error -- Numeric refinements are intentionally excluded from `assert.not`.
+	isAssert.not.integer(value); // eslint-disable-line @typescript-eslint/no-unsafe-call
+	const _: string | number = value;
+};
+
+const assertNotObjectDoesNotExistCheck = (value: Record<string, unknown> | string) => {
+	// @ts-expect-error -- TypeScript's `{}` type includes primitives, so `not.object` cannot safely narrow every object-like input.
+	isAssert.not.object(value); // eslint-disable-line @typescript-eslint/no-unsafe-call
+	const _: Record<string, unknown> | string = value;
+};
+
+const assertNotBlobDoesNotExistCheck = (value: Blob | File | string) => {
+	// @ts-expect-error -- `File` extends `Blob` in TypeScript but does not match the exact runtime `Blob` check.
+	isAssert.not.blob(value); // eslint-disable-line @typescript-eslint/no-unsafe-call
+	const _: Blob | File | string = value;
+};
+
+const assertNotMapDoesNotExistCheck = (value: Map<string, number> | string) => {
+	// @ts-expect-error -- Structural object types such as `Map` can be assignable in TypeScript without matching the runtime brand check.
+	isAssert.not.map(value); // eslint-disable-line @typescript-eslint/no-unsafe-call, unicorn/no-array-callback-reference
+	const _: Map<string, number> | string = value;
+};
+
+const assertNotSetDoesNotExistCheck = (value: Set<string> | string) => {
+	// @ts-expect-error -- Structural object types such as `Set` can be assignable in TypeScript without matching the runtime brand check.
+	isAssert.not.set(value); // eslint-disable-line @typescript-eslint/no-unsafe-call
+	const _: Set<string> | string = value;
+};
+
+const assertNotDateDoesNotExistCheck = (value: Date | string) => {
+	// @ts-expect-error -- Structural object types such as `Date` can be assignable in TypeScript without matching the runtime brand check.
+	isAssert.not.date(value); // eslint-disable-line @typescript-eslint/no-unsafe-call
+	const _: Date | string = value;
+};
+
 // Suppress unused variable warnings
 nanCheck(42);
 finiteNumberCheck(42);
@@ -218,3 +376,30 @@ integerMixedUnionCheck(1);
 positiveNumberMixedUnionCheck(1);
 chainedNumericGuardCheck(1);
 distinctNumericBrandsStayDistinct(42 as PositiveInteger, -1 as NegativeInteger, 0 as ValidLength);
+assertNotUndefinedCheck('🦄');
+assertNotUndefinedUnknownCheck('🦄');
+assertNotUndefinedGenericCheck<string | undefined>('🦄');
+assertNotNullUnknownCheck('🦄');
+assertNotNullOrUndefinedCheck('🦄');
+assertNotNullOrUndefinedUnknownCheck('🦄');
+assertNotStringCheck(1);
+assertNotStringUnknownCheck(1);
+assertNotStringGenericCheck<string | number>(1);
+assertNotBooleanUnknownCheck(1);
+assertNotSymbolUnknownCheck(1);
+assertNotBigintUnknownCheck(1);
+assertNotPrimitiveUnknownCheck({});
+assertNotPrimitiveGenericCheck<string | {unicorn: true}>({unicorn: true});
+assertNotNamedUndefinedExportCheck(0);
+assertNotNamedNullOrUndefinedUnknownExportCheck('🦄');
+assertNotNamedStringExportCheck(1);
+assertNotNamedStringUnknownExportCheck(1);
+assertNotNamedPrimitiveUnknownExportCheck({});
+assertNotCallableDoesNotExistCheck('🦄');
+assertNotNumberDoesNotExistCheck(Number.NaN);
+assertNotIntegerDoesNotExistCheck(1.5);
+assertNotObjectDoesNotExistCheck('🦄');
+assertNotBlobDoesNotExistCheck('🦄');
+assertNotMapDoesNotExistCheck('🦄');
+assertNotSetDoesNotExistCheck('🦄');
+assertNotDateDoesNotExistCheck('🦄');

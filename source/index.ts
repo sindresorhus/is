@@ -403,9 +403,13 @@ function validatePredicateArray(predicateArray: readonly Predicate[], allowEmpty
 	}
 
 	for (const predicate of predicateArray) {
-		if (!isFunction(predicate)) {
-			throw new TypeError(`Invalid predicate: ${JSON.stringify(predicate)}`);
-		}
+		validatePredicate(predicate);
+	}
+}
+
+function validatePredicate(predicate: Predicate) {
+	if (!isFunction(predicate)) {
+		throw new TypeError(`Invalid predicate: ${JSON.stringify(predicate)}`);
 	}
 }
 
@@ -983,9 +987,7 @@ export function isWhitespaceString(value: unknown): value is Whitespace {
 type ArrayMethod = (function_: (value: unknown, index: number, array: unknown[]) => boolean, thisArgument?: unknown) => boolean;
 
 function predicateOnArray(method: ArrayMethod, predicate: Predicate, values: unknown[]) {
-	if (!isFunction(predicate)) {
-		throw new TypeError(`Invalid predicate: ${JSON.stringify(predicate)}`);
-	}
+	validatePredicate(predicate);
 
 	if (values.length === 0) {
 		throw new TypeError('Invalid number of values');
@@ -997,6 +999,17 @@ function predicateOnArray(method: ArrayMethod, predicate: Predicate, values: unk
 function typeErrorMessage(description: AssertionTypeDescription, value: unknown): string {
 	return `Expected value which is \`${description}\`, received value of type \`${is(value)}\`.`;
 }
+
+function typeErrorMessageNot(description: AssertionTypeDescription, value: unknown): string {
+	return `Expected value which is not \`${description}\`, received value of type \`${is(value)}\`.`;
+}
+
+type NotAssertionResult<Value, Forbidden, UnknownResult> = Exclude<Value, Forbidden> & ([unknown] extends [Value] ? UnknownResult : unknown);
+
+type NotAssertion<Forbidden, UnknownResult = unknown> = <Value>(value: Value, message?: string) => asserts value is NotAssertionResult<Value, Forbidden, UnknownResult>;
+
+// eslint-disable-next-line @typescript-eslint/no-restricted-types
+type UnknownNotPrimitive<Forbidden extends Primitive> = Exclude<Primitive, Forbidden> | object;
 
 function unique<T>(values: T[]): T[] {
 	// eslint-disable-next-line unicorn/prefer-spread
@@ -1123,6 +1136,8 @@ type Assert = {
 	directInstanceOf: <T>(instance: unknown, class_: Class<T>, message?: string) => asserts instance is T;
 	inRange: (value: number, range: number | [number, number], message?: string) => asserts value is number;
 
+	not: NotAssert;
+
 	// Variadic functions.
 	any: (predicate: Predicate | readonly Predicate[], ...values: unknown[]) => void | never;
 	all: (predicate: Predicate | readonly Predicate[], ...values: unknown[]) => void | never;
@@ -1135,9 +1150,58 @@ type Assert = {
 	optional: <T>(value: unknown, assertion: (value: unknown, message?: string) => asserts value is T, message?: string) => asserts value is T | undefined;
 };
 
+type NotAssert = {
+	undefined: NotAssertion<undefined, UnknownNotPrimitive<undefined>>;
+	// eslint-disable-next-line @typescript-eslint/no-restricted-types
+	null: NotAssertion<null, UnknownNotPrimitive<null>>;
+	// eslint-disable-next-line @typescript-eslint/no-restricted-types
+	nullOrUndefined: NotAssertion<null | undefined, UnknownNotPrimitive<null | undefined>>;
+	string: NotAssertion<string, UnknownNotPrimitive<string>>;
+	boolean: NotAssertion<boolean, UnknownNotPrimitive<boolean>>;
+	symbol: NotAssertion<symbol, UnknownNotPrimitive<symbol>>;
+	bigint: NotAssertion<bigint, UnknownNotPrimitive<bigint>>;
+	// eslint-disable-next-line @typescript-eslint/no-restricted-types
+	primitive: NotAssertion<Primitive, object>;
+};
+
+// Negative assertions are limited to types where the assertion rejects every TypeScript value assignable to the forbidden type. Structural object types such as `Map`, `Set`, `Date`, and `Array` are excluded because TypeScript accepts shape-compatible mocks while the runtime checks use object brands, so `Exclude` would narrow values that can pass the negative assertion.
+function createAssertNot<Forbidden, UnknownResult = unknown>(predicate: Predicate, description: AssertionTypeDescription): NotAssertion<Forbidden, UnknownResult> {
+	return <Value>(value: Value, message?: string): asserts value is NotAssertionResult<Value, Forbidden, UnknownResult> => {
+		if (predicate(value)) {
+			throw new TypeError(message ?? typeErrorMessageNot(description, value));
+		}
+	};
+}
+
+export const assertNotUndefined: NotAssertion<undefined, UnknownNotPrimitive<undefined>> = createAssertNot<undefined, UnknownNotPrimitive<undefined>>(isUndefined, 'undefined');
+// eslint-disable-next-line @typescript-eslint/no-restricted-types
+export const assertNotNull: NotAssertion<null, UnknownNotPrimitive<null>> = createAssertNot<null, UnknownNotPrimitive<null>>(isNull, 'null');
+// eslint-disable-next-line @typescript-eslint/no-restricted-types
+export const assertNotNullOrUndefined: NotAssertion<null | undefined, UnknownNotPrimitive<null | undefined>>
+	// eslint-disable-next-line @typescript-eslint/no-restricted-types
+	= createAssertNot<null | undefined, UnknownNotPrimitive<null | undefined>>(isNullOrUndefined, 'null or undefined');
+export const assertNotString: NotAssertion<string, UnknownNotPrimitive<string>> = createAssertNot<string, UnknownNotPrimitive<string>>(isString, 'string');
+export const assertNotBoolean: NotAssertion<boolean, UnknownNotPrimitive<boolean>> = createAssertNot<boolean, UnknownNotPrimitive<boolean>>(isBoolean, 'boolean');
+export const assertNotSymbol: NotAssertion<symbol, UnknownNotPrimitive<symbol>> = createAssertNot<symbol, UnknownNotPrimitive<symbol>>(isSymbol, 'symbol');
+export const assertNotBigint: NotAssertion<bigint, UnknownNotPrimitive<bigint>> = createAssertNot<bigint, UnknownNotPrimitive<bigint>>(isBigint, 'bigint');
+export const assertNotPrimitive: NotAssertion<Primitive, object> = createAssertNot<Primitive, object>(isPrimitive, 'primitive'); // eslint-disable-line @typescript-eslint/no-restricted-types
+
+// We intentionally do not support `assert.not(is.undefined, value)`. TypeScript cannot derive safe complement types from arbitrary predicates, and many predicates here are refinements (for example, `is.number` rejects `NaN`). Explicit methods keep runtime checks and type narrowing aligned.
+const notAssertions: NotAssert = {
+	bigint: assertNotBigint,
+	boolean: assertNotBoolean,
+	null: assertNotNull,
+	nullOrUndefined: assertNotNullOrUndefined,
+	primitive: assertNotPrimitive,
+	string: assertNotString,
+	symbol: assertNotSymbol,
+	undefined: assertNotUndefined,
+};
+
 export const assert: Assert = {
 	all: assertAll,
 	any: assertAny,
+	not: notAssertions,
 	optional: assertOptional,
 	array: assertArray,
 	arrayBuffer: assertArrayBuffer,

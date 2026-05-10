@@ -466,6 +466,17 @@ const subClasses = new Map<TypeNameWithFixture, TypeNameWithFixture[]>([
 	['object', keysOf(objectTypes)],
 ]);
 
+const notAssertionFixtures = {
+	bigint: {fixture: 1n, nonFixture: '🦄', typeDescription: 'bigint'},
+	boolean: {fixture: false, nonFixture: '🦄', typeDescription: 'boolean'},
+	null: {fixture: null, nonFixture: '🦄', typeDescription: 'null'},
+	nullOrUndefined: {fixtures: [null, undefined], nonFixture: '🦄', typeDescription: 'null or undefined'},
+	primitive: {fixtures: [false, null, undefined], nonFixture: [], typeDescription: 'primitive'},
+	string: {fixture: '🦄', nonFixture: 1, typeDescription: 'string'},
+	symbol: {fixture: Symbol('🦄'), nonFixture: '🦄', typeDescription: 'symbol'},
+	undefined: {fixture: undefined, nonFixture: null, typeDescription: 'undefined'},
+} as const satisfies Record<keyof typeof isAssert.not, ({fixture: unknown} | {fixtures: unknown[]}) & {nonFixture: unknown; typeDescription: string}>;
+
 // This ensures a certain method matches only the types it's supposed to and none of the other methods' types
 for (const type of keysOf(types)) {
 	test(`is.${type}`, () => {
@@ -2535,6 +2546,14 @@ test('custom assertion message', () => {
 	});
 
 	assertThrowsTypeErrorWithMessage(() => {
+		isAssert.not.undefined(undefined, message);
+	});
+
+	assertThrowsTypeErrorWithMessage(() => {
+		isAssert.not.string('hello', message);
+	});
+
+	assertThrowsTypeErrorWithMessage(() => {
 		isAssert.negativeNumber(undefined, message);
 	});
 
@@ -2712,6 +2731,68 @@ test('custom assertion message', () => {
 
 	assertThrowsTypeErrorWithMessage(() => {
 		isAssert.whitespaceString(undefined, message);
+	});
+});
+
+test('isAssert.not.undefined', () => {
+	assert.throws(() => {
+		isAssert.not.undefined(undefined);
+	}, {
+		message: 'Expected value which is not `undefined`, received value of type `undefined`.',
+	});
+
+	assert.doesNotThrow(() => {
+		isAssert.not.undefined(null);
+	});
+
+	assert.doesNotThrow(() => {
+		isAssert.not.undefined(false);
+	});
+
+	assert.doesNotThrow(() => {
+		isAssert.not.undefined(0);
+	});
+
+	assert.doesNotThrow(() => {
+		isAssert.not.undefined('');
+	});
+});
+
+test('isAssert.not', () => {
+	assert.deepStrictEqual(new Set(keysOf(isAssert.not)), new Set(keysOf(notAssertionFixtures)));
+
+	for (const type of keysOf(notAssertionFixtures)) {
+		const {nonFixture, typeDescription} = notAssertionFixtures[type];
+		const testAssert = isAssert.not[type];
+		const fixtures = 'fixtures' in notAssertionFixtures[type] ? notAssertionFixtures[type].fixtures : [notAssertionFixtures[type].fixture];
+
+		for (const fixture of fixtures) {
+			assert.throws(() => {
+				testAssert(fixture);
+			}, {
+				message: `Expected value which is not \`${typeDescription}\`, received value of type \`${is(fixture)}\`.`,
+			});
+		}
+
+		assert.doesNotThrow(() => {
+			testAssert(nonFixture);
+		});
+	}
+
+	assert.strictEqual('number' in isAssert.not, false);
+	assert.strictEqual('integer' in isAssert.not, false);
+	assert.strictEqual('object' in isAssert.not, false);
+	assert.strictEqual('blob' in isAssert.not, false);
+	assert.strictEqual('array' in isAssert.not, false);
+	assert.strictEqual('date' in isAssert.not, false);
+	assert.strictEqual('function' in isAssert.not, false);
+	assert.strictEqual('map' in isAssert.not, false);
+	assert.strictEqual('set' in isAssert.not, false);
+});
+
+test('isAssert.not edge cases', () => {
+	assert.doesNotThrow(() => {
+		isAssert.not.null(undefined);
 	});
 });
 

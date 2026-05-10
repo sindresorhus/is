@@ -786,6 +786,44 @@ handleMovieRatingApiResponse({rating: 0.87, title: 'The Matrix'});
 handleMovieRatingApiResponse({rating: '🦄'});
 ```
 
+### Negative assertion
+
+Asserts that `value` is not the specified type. Only exact, type-safe negative assertions are exposed.
+
+Supported assertions:
+
+- `assert.not.undefined(value)`
+- `assert.not.null(value)`
+- `assert.not.nullOrUndefined(value)`
+- `assert.not.string(value)`
+- `assert.not.boolean(value)`
+- `assert.not.symbol(value)`
+- `assert.not.bigint(value)`
+- `assert.not.primitive(value)`
+
+This intentionally excludes checks that cannot produce a safe TypeScript complement: `number` because `is.number` rejects `NaN`, refinements such as `integer` and `validDate`, and branded structural object checks such as `map` and `date`. Broad object checks such as `object` are also excluded to keep negative assertions limited to primitive and nullish types.
+
+```ts
+import {assert} from '@sindresorhus/is';
+
+const value: string | undefined = getValue();
+
+assert.not.undefined(value);
+// Throws if `value` is `undefined`. Otherwise, `value` is now typed as `string`.
+```
+
+For `unknown` input, exact negative assertions narrow to the remaining representable type:
+
+```ts
+const value: unknown = getValue();
+
+assert.not.nullOrUndefined(value);
+// `value` is now typed as non-nullish.
+
+assert.not.primitive(value);
+// `value` is now typed as `object`.
+```
+
 ### Optional assertion
 
 Asserts that `value` is `undefined` or satisfies the provided `assertion`.
