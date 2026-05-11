@@ -825,7 +825,7 @@ export function isOddInteger(value: unknown): boolean {
 }
 
 export function isOneOf<T extends readonly unknown[]>(values: T): (value: unknown) => value is T[number] {
-	return (value: unknown): value is T[number] => values.includes(value as T[number]);
+	return (value: unknown): value is T[number] => values.includes(value);
 }
 
 export function isPlainObject<Value = unknown>(value: unknown): value is Record<PropertyKey, Value> {
